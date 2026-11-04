@@ -1,0 +1,25 @@
+
+{
+  "id": "/Ezaza/",
+  "name": "حساباتي - حاسبة وفواتير الكهرباء",
+  "short_name": "حساباتي",
+  "description": "حسابات تأسيسات الكهرباء وإعداد فواتير العملاء",
+  "start_url": "/Ezaza/",
+  "scope": "/Ezaza/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fcf8fb",
+  "theme_color": "#3b0d32",
+  "icons": [
+    {
+      "src": "/Ezaza/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/Ezaza/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
