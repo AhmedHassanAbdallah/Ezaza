@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#3b0d32">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>حاسبة وفواتير الكهرباء</title>
+  <!-- استدعاء خط القاهرة العريض (Cairo Bold) لكامل التطبيق والفاتورة -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --onion-darkest: #26071f;
+      --onion-deep: #3b0d32;
+      --onion-plum: #6a1b55;
+      --onion-magenta: #9c2f73;
+      --onion-copper: #d97736;
+      --onion-copper-soft: #fff4ec;
+      --onion-blush: #f5eaf1;
+      --onion-cream: #fcf8fb;
+      --onion-border: #d8b4c8;
+      --text-main: #1f0519;
+      --text-muted: #5e3a54;
+      --danger: #e11d48;
+      --p-font-size: 13px;
+      --p-cell-pad-v: 5px;
+      --p-cell-pad-h: 6px;
+      --p-logo-height: 58px;
+      --font-ruqaa: 'Cairo', system-ui, -apple-system, sans-serif;
+      --font-bold: 'Cairo', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-bold) !important;
+      font-weight: 700;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+      background: var(--onion-cream);
+      color: var(--text-main);
+      line-height: 1.45;
+    }
+
+    body { padding-bottom: 45px; }
+
+    /* تطبيق خط القاهرة العريض (Cairo Bold) على جميع العناوين والعناصر */
+    .ruqaa-text, h1, h2, h3, h4, .active-view-title, .drawer-head, button, input, select, textarea {
+      font-family: var(--font-bold) !important;
+      font-weight: 700 !important;
+    }
+
+    /* الشريط العلوي النحيف */
+    .top-bar {
+      background: linear-gradient(135deg, var(--onion-darkest), var(--onion-plum));
+      color: #fff;
+      height: 54px;
+      padding: 0 10px;
+      position: sticky;
+      top: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 2px 12px rgba(38,7,31,0.28);
+    }
+    .nav-right-group { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+    .dots-menu-btn {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 900;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .active-view-title { font-size: 1.05rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* القائمة المنسدلة للطباعة */
+    .print-dropdown-wrap { position: relative; flex-shrink: 0; }
+    .print-dropdown-btn {
+      background: linear-gradient(135deg, var(--onion-copper), #b85d1f);
+      color: #fff;
+      border: none;
+      height: 36px;
+      padding: 0 11px;
+      border-radius: 9px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+    .print-dropdown-list {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 44px;
+      width: 245px;
+      max-width: 88vw;
+      background: #fff;
+      border-radius: 12px;
+      border: 2px solid var(--onion-plum);
+      box-shadow: 0 12px 28px rgba(38,7,31,0.28);
+      overflow: hidden;
+      z-index: 400;
+    }
+    .print-dropdown-list.open { display: block; }
+    .dropdown-action-item {
+      width: 100%;
+      padding: 11px 13px;
+      border: none;
+      background: #fff;
+      color: var(--text-main);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border-bottom: 1px solid var(--onion-blush);
+      cursor: pointer;
+    }
+    .dropdown-action-item:last-child { border-bottom: none; }
+
+    /* القائمة الجانبية (الثلاث نقاط) */
+    .drawer-backdrop { display: none; position: fixed; inset: 0; background: rgba(38,7,31,0.55); z-index: 350; }
+    .drawer-backdrop.open { display: block; }
+    .side-drawer {
+      position: fixed;
+      top: 0;
+      right: -290px;
+      width: 275px;
+      max-width: 82vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 360;
+      box-shadow: -5px 0 25px rgba(38,7,31,0.3);
+      transition: right 0.24s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .side-drawer.open { right: 0; }
+    .drawer-head {
+      background: linear-gradient(135deg, var(--onion-darkest), var(--onion-plum));
+      color: #fff;
+      padding: 16px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1rem;
+    }
+    .drawer-close-btn { background: rgba(255,255,255,0.15); color: #fff; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; }
+    .drawer-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; }
+    .drawer-nav-item {
+      width: 100%;
+      padding: 12px 13px;
+      border-radius: 10px;
+      border: 1.5px solid var(--onion-border);
+      background: var(--onion-cream);
+      color: var(--text-main);
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .drawer-nav-item.active {
+      background: linear-gradient(135deg, var(--onion-plum), var(--onion-magenta));
+      color: #fff;
+      border-color: var(--onion-deep);
+    }
+    .drawer-badge { background: var(--onion-copper); color: #fff; font-size: 0.74rem; padding: 2px 8px; border-radius: 99px; font-weight: 800; }
+
+    /* البطاقات والحقول */
+    .container { width: 100%; max-width: 720px; margin: 0 auto; padding: 10px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-bottom: 12px; }
+    .metric-box {
+      background: #fff;
+      border: 1.5px solid var(--onion-border);
+      border-radius: 10px;
+      padding: 7px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+    .metric-box.net-highlight { background: var(--onion-copper-soft); border-color: var(--onion-copper); }
+    .metric-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 800; white-space: nowrap; }
+    .metric-val { font-size: 0.9rem; font-weight: 900; color: var(--onion-plum); white-space: nowrap; }
+    .metric-box.net-highlight .metric-val { color: var(--onion-copper); font-size: 0.95rem; }
+
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1.5px solid var(--onion-border);
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(106,27,85,0.06);
+      width: 100%;
+    }
+    .card-head-dark {
+      background: linear-gradient(135deg, var(--onion-deep), var(--onion-plum));
+      color: #fff;
+      padding: 10px 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .card-head-dark h3 { font-size: 1rem; color: #fff; }
+    .pill-copper { background: var(--onion-copper); color: #fff; font-size: 0.74rem; padding: 2px 9px; border-radius: 99px; font-weight: 800; }
+    .card-body { padding: 12px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+    @media (max-width: 390px) { .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+    .form-group { margin-bottom: 9px; min-width: 0; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      min-width: 0;
+      padding: 8px 10px;
+      border: 1.5px solid var(--onion-border);
+      border-radius: 9px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      background: var(--onion-cream);
+      color: var(--text-main);
+    }
+    input:focus, select:focus { outline: none; border-color: var(--onion-magenta); background: #fff; }
+
+    .sys-radio-card { border: 1.5px solid var(--onion-border); border-radius: 11px; padding: 10px 12px; margin-bottom: 8px; background: var(--onion-cream); cursor: pointer; display: flex; align-items: flex-start; gap: 10px; }
+    .sys-radio-card.selected { border-color: var(--onion-copper); background: var(--onion-copper-soft); }
+    .radio-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--onion-plum); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .sys-radio-card.selected .radio-circle { border-color: var(--onion-copper); }
+    .radio-dot { width: 10px; height: 10px; border-radius: 50%; background: transparent; }
+    .sys-radio-card.selected .radio-dot { background: var(--onion-copper); }
+    .sys-radio-info h4 { font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
+    .sys-radio-info p { font-size: 0.75rem; color: var(--text-muted); line-height: 1.35; }
+    .rule-banner { background: var(--onion-blush); border: 1.5px solid var(--onion-border); color: var(--onion-deep); padding: 8px 10px; border-radius: 9px; font-size: 0.8rem; font-weight: 800; margin-top: 6px; }
+
+    .chips-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 9px; }
+    .chip { background: var(--onion-blush); color: var(--onion-plum); border: 1px solid var(--onion-border); padding: 4px 9px; border-radius: 99px; font-size: 0.76rem; font-weight: 800; cursor: pointer; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 13px; border-radius: 10px; font-weight: 800; font-size: 0.86rem; border: none; cursor: pointer; width: 100%; }
+    .btn-primary { background: linear-gradient(135deg, var(--onion-plum), var(--onion-magenta)); color: #fff; }
+    .btn-copper { background: linear-gradient(135deg, var(--onion-copper), #b85d1f); color: #fff; }
+    .btn-outline { background: var(--onion-cream); border: 1.5px solid var(--onion-border); color: var(--onion-plum); }
+    .btn-danger { background: #ffe4e6; color: var(--danger); }
+    .btn-sm { padding: 5px 9px; font-size: 0.75rem; width: auto; }
+
+    .extra-item-row { display: grid; grid-template-columns: 1.5fr 0.85fr 0.85fr 32px; gap: 5px; margin-bottom: 6px; align-items: center; }
+    .room-card { border: 1.5px solid var(--onion-border); border-radius: 10px; padding: 10px; margin-bottom: 8px; background: var(--onion-cream); }
+    .room-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px dashed var(--onion-border); gap: 6px; }
+    .room-name { font-family: var(--font-bold) !important; font-weight: 700; font-size: 1.02rem; color: var(--onion-deep); }
+    .room-total-badge { background: var(--onion-plum); color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.82rem; white-space: nowrap; }
+    .room-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px; }
+    .room-detail-item { background: #fff; padding: 4px 7px; border-radius: 5px; border: 1px solid var(--onion-blush); display: flex; justify-content: space-between; gap: 4px; }
+
+    .summary-box { background: linear-gradient(135deg, var(--onion-darkest), var(--onion-plum)); color: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.12); font-size: 0.85rem; gap: 8px; }
+    .summary-row.total { border-bottom: none; font-size: 1.08rem; font-weight: 900; color: #ffbe88; padding-top: 9px; }
+
+    .logo-config-box { border: 1.5px dashed var(--onion-border); background: var(--onion-cream); padding: 10px; border-radius: 10px; margin-top: 8px; }
+    .logo-preview-thumb { max-height: 46px; max-width: 100px; object-fit: contain; border-radius: 6px; border: 1px solid var(--onion-border); background: #fff; padding: 2px; }
+
+    /* =====================================================
+       تصميم الفاتورة المطبوعة والمعاينة (تطابق 100% وتباين عالي جداً)
+       ===================================================== */
+    #printPreviewModal { display: none; position: fixed; inset: 0; background: rgba(38,7,31,0.94); z-index: 999; overflow-y: auto; padding: 8px; }
+    .preview-toolbar { max-width: 210mm; margin: 0 auto 8px auto; background: #fff; padding: 10px; border-radius: 12px; border: 2px solid var(--onion-copper); display: flex; flex-direction: column; gap: 7px; }
+    .toolbar-row { display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; align-items: center; }
+    .edit-hint-banner { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 0.76rem; font-weight: 800; padding: 5px 8px; border-radius: 6px; text-align: center; }
+
+    #printSheet {
+      background: #ffffff !important;
+      color: #000000 !important;
+      width: 100%;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 6mm 7mm;
+      border-radius: 4px;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.35);
+    }
+
+    #printSheet.show-edit-borders [contenteditable="true"] {
+      outline: 1px dashed #d97736;
+      background-color: #fffdf9;
+      border-radius: 2px;
+    }
+
+    .p-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #3b0d32;
+      padding-bottom: 6px;
+      margin-bottom: 7px;
+      gap: 10px;
+    }
+    .p-brand-side { display: flex; align-items: center; gap: 10px; }
+    .p-logo-wrap img { height: var(--p-logo-height); max-width: 125px; object-fit: contain; display: block; }
+    .p-title-block h1 {
+      font-family: var(--font-bold) !important;
+      font-size: 1.45rem;
+      color: #3b0d32 !important;
+      font-weight: 700 !important;
+      margin-bottom: 2px;
+    }
+    .p-title-block p {
+      font-family: var(--font-bold) !important;
+      font-size: 0.98rem;
+      color: #000000 !important;
+      font-weight: 700 !important;
+    }
+    .p-meta-box {
+      text-align: right;
+      font-size: 0.84rem;
+      font-weight: 800;
+      background: #f8eff4 !important;
+      color: #000000 !important;
+      border: 2px solid #3b0d32;
+      padding: 5px 10px;
+      border-radius: 7px;
+      line-height: 1.4;
+    }
+
+    /* شريط التسعيرة (لا يذكر النظام الحديث، ويوضح النظام القديم بوضوح تام) */
+    .p-pricing-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      background: #fdf2f8 !important;
+      border: 2px solid #6a1b55;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      font-weight: 900;
+      color: #26071f !important;
+      margin-bottom: 7px;
+    }
+
+    .p-section-caption {
+      font-family: var(--font-bold) !important;
+      font-size: 1.05rem;
+      font-weight: 700 !important;
+      color: #3b0d32 !important;
+      background: #f3e4ec !important;
+      border-right: 4px solid #6a1b55;
+      padding: 3px 8px;
+      margin-bottom: 4px;
+      margin-top: 4px;
+    }
+
+    /* جداول الفاتورة: خلفية رأس فاتحة ونص داكن عريض يستحيل اختفاؤه في الطباعة */
+    .p-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--p-font-size);
+      margin-bottom: 7px;
+    }
+    .p-table th, .p-table td {
+      border: 1.5px solid #1f0519 !important;
+      padding: var(--p-cell-pad-v) var(--p-cell-pad-h);
+      text-align: center;
+      vertical-align: middle;
+      color: #000000 !important;
+      font-weight: 800 !important;
+    }
+    .p-table th {
+      font-family: var(--font-bold) !important;
+      background-color: #ead3e0 !important;
+      color: #1f0519 !important;
+      font-weight: 700 !important;
+      font-size: calc(var(--p-font-size) + 1px);
+      line-height: 1.25;
+      border-bottom: 2.5px solid #3b0d32 !important;
+    }
+    .p-table td.room-col {
+      font-family: var(--font-bold) !important;
+      text-align: right;
+      font-weight: 700 !important;
+      font-size: calc(var(--p-font-size) + 1px);
+      color: #26071f !important;
+    }
+    .p-table td.extras-col {
+      text-align: right;
+      font-size: calc(var(--p-font-size) - 0.5px);
+      line-height: 1.25;
+    }
+    .p-table tr:nth-child(even) td {
+      background-color: #faf5f8 !important;
+    }
+    .p-table tfoot td {
+      background-color: #ead3e0 !important;
+      color: #000000 !important;
+      font-weight: 900 !important;
+      border-top: 2.5px solid #3b0d32 !important;
+      font-size: var(--p-font-size);
+    }
+
+    .p-bottom-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 9px;
+      margin-top: 5px;
+      align-items: stretch;
+    }
+    @media (max-width: 550px) { .p-bottom-grid { grid-template-columns: 1fr; } }
+
+    .p-notes-box {
+      border: 1.8px solid #1f0519;
+      border-radius: 6px;
+      padding: 6px 9px;
+      font-size: calc(var(--p-font-size) - 0.5px);
+      color: #000000 !important;
+      background: #fff !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .p-totals-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--p-font-size);
+    }
+    .p-totals-table td {
+      border: 1.5px solid #1f0519 !important;
+      padding: var(--p-cell-pad-v) 7px;
+      color: #000000 !important;
+      font-weight: 800 !important;
+      background: #fff !important;
+    }
+    .p-totals-table tr.final-row td {
+      background-color: #ead3e0 !important;
+      color: #1f0519 !important;
+      font-weight: 900 !important;
+      font-size: calc(var(--p-font-size) + 2px);
+      border: 2px solid #3b0d32 !important;
+    }
+
+        .app-toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--onion-darkest);
+      color: #fff;
+      border: 2px solid var(--onion-copper);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      z-index: 2000;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      display: none;
+      text-align: center;
+      max-width: 90vw;
+    }
+    .app-confirm-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(38,7,31,0.6);
+      z-index: 2100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .app-confirm-box {
+      background: #fff;
+      border: 2px solid var(--onion-plum);
+      border-radius: 14px;
+      padding: 18px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+
+    @page { size: A4 portrait; margin: 5mm; }
+    @media print {
+      html, body { background: #ffffff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+      #editorApp, .preview-toolbar { display: none !important; }
+      #printPreviewModal { display: block !important; position: static !important; background: transparent !important; padding: 0 !important; overflow: visible !important; }
+      #printSheet { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; }
+      #printSheet [contenteditable="true"] { outline: none !important; background: transparent !important; }
+      .p-bottom-grid { grid-template-columns: 1.25fr 1fr !important; page-break-inside: avoid; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="editorApp">
+    <header class="top-bar">
+      <div class="nav-right-group">
+        <button type="button" class="dots-menu-btn" onclick="toggleDrawer()" aria-label="أقسام التطبيق">⋮</button>
+        <span class="active-view-title" id="headerSectionTitle">1. التسعير والبيانات</span>
+      </div>
+
+      <div class="print-dropdown-wrap">
+        <button type="button" class="print-dropdown-btn" onclick="togglePrintMenu(event)">
+          <span>🖨️ الفاتورة والحفظ</span>
+          <span>▾</span>
+        </button>
+        <div class="print-dropdown-list" id="printDropdownList">
+          <button type="button" class="dropdown-action-item" onclick="openSinglePagePreview(false)"><span>👁️</span><span>معاينة وتعديل الفاتورة (PDF)</span></button>
+          <button type="button" class="dropdown-action-item" onclick="openSinglePagePreview(true)"><span>🖨️</span><span>طباعة / حفظ PDF فوري</span></button>
+          <button type="button" class="dropdown-action-item" onclick="manualSaveToast()"><span>✔️</span><span>حفظ الفاتورة الحالية</span></button>
+          <button type="button" class="dropdown-action-item" onclick="copyInvoiceForWhatsApp()"><span>📋</span><span>نسخ الفاتورة للواتساب</span></button>
+          <button type="button" class="dropdown-action-item" onclick="createNewInvoice()"><span>➕</span><span>فاتورة زبون جديدة</span></button>
+          <button type="button" class="dropdown-action-item" onclick="downloadSelfHTML()"><span>📥</span><span>تنزيل ملف index.html جاهز</span></button>
+        </div>
+      </div>
+    </header>
+
+    <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+    <aside class="side-drawer" id="sideDrawer">
+      <div class="drawer-head">
+        <span>⚡ أقسام حاسبة الكهرباء</span>
+        <button type="button" class="drawer-close-btn" onclick="closeDrawer()">✕</button>
+      </div>
+      <div class="drawer-body">
+        <button type="button" class="drawer-nav-item active" id="navBtn-pricing" onclick="switchView('pricing', '1. التسعير والبيانات')"><span>1. التسعير والبيانات واللوجو</span><span>⚙️</span></button>
+        <button type="button" class="drawer-nav-item" id="navBtn-rooms" onclick="switchView('rooms', '2. الغرف واللوحة والصواعد')"><span>2. الغرف واللوحة والصواعد</span><span class="drawer-badge" id="drawerRoomCount">0</span></button>
+        <button type="button" class="drawer-nav-item" id="navBtn-summary" onclick="switchView('summary', '3. الدفعات والملخص النهائي')"><span>3. الدفعات والملخص النهائي</span><span>📊</span></button>
+        <button type="button" class="drawer-nav-item" id="navBtn-saved" onclick="switchView('saved', '4. الفواتير المحفوظة')"><span>4. الفواتير المحفوظة والنسخ</span><span>📂</span></button>
+      </div>
+    </aside>
+
+    <div class="container">
+      <div class="metrics-grid">
+        <div class="metric-box"><span class="metric-label">إجمالي النقاط:</span><span class="metric-val" id="topTotalPoints">0 نقطة</span></div>
+        <div class="metric-box"><span class="metric-label">حساب النقاط:</span><span class="metric-val" id="topPointsCost">0 ج.م</span></div>
+        <div class="metric-box"><span class="metric-label">البروفايل والإضافي:</span><span class="metric-val" id="topExtrasCost">0 ج.م</span></div>
+        <div class="metric-box net-highlight"><span class="metric-label">الصافي المطلوب:</span><span class="metric-val" id="topNetRequired">0 ج.م</span></div>
+      </div>
+
+      <!-- القسم 1: التسعير والبيانات واللوجو -->
+      <section class="view-panel active" id="panel-pricing">
+        <div class="card">
+          <div class="card-head-dark">
+            <h3>● نظام تسعير النقاط والعملية الحسابية</h3>
+            <span class="pill-copper" id="activeSystemBadge">تسعيرة موحدة</span>
+          </div>
+          <div class="card-body">
+            <div class="sys-radio-card selected" id="cardModern" onclick="setSystemType('modern')">
+              <div class="radio-circle"><div class="radio-dot"></div></div>
+              <div class="sys-radio-info">
+                <h4>النظام الحديث (تسعيرة واحدة - لا يُذكر اسم النظام في الفاتورة)</h4>
+                <p>جميع النقاط (البرايز، المفاتيح، الخطوط الرئيسية، الصواعد، الإسبوتات، وشريط الليد) تُحسب بسعر نقطة واحد ثابت.</p>
+              </div>
+            </div>
+
+            <div class="sys-radio-card" id="cardOld" onclick="setSystemType('old')">
+              <div class="radio-circle"><div class="radio-dot"></div></div>
+              <div class="sys-radio-info">
+                <h4>النظام القديم (متوسط التسعيرتين للتأسيس - يُوضح أعلى الفاتورة)</h4>
+                <p>نقاط (البرايز والمفاتيح والخطوط والصواعد) بمتوسط السعرين، والباقي (الإسبوتات وشريط الليد) بالسعر الجديد.</p>
+              </div>
+            </div>
+
+            <div id="oldPriceGroup" class="form-group" style="display:none; margin-top:10px;">
+              <label>سعر النقطة وقت بداية العمل (التأسيس - ج.م)</label>
+              <input type="number" id="oldPointPrice" min="0" step="any" placeholder="40" oninput="saveInvoiceMeta()">
+            </div>
+
+            <div class="grid-2" style="margin-top:10px;">
+              <div class="form-group"><label>سعر النقطة الحالي (ج.م)</label><input type="number" id="newPointPrice" min="0" step="any" placeholder="70" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>سعر متر الليد بروفايل (ج.م)</label><input type="number" id="profileMeterPrice" min="0" step="any" placeholder="150" oninput="saveInvoiceMeta()"></div>
+            </div>
+            <div class="rule-banner" id="systemRuleNotice"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head-dark"><h3>🖼️ بيانات الفاتورة واللوجو الشخصي</h3></div>
+          <div class="card-body">
+            <div class="grid-2">
+              <div class="form-group"><label>عنوان الفاتورة الرئيسي</label><input type="text" id="invoiceTitle" placeholder="كشف حساب ومستخلص أعمال كهرباء" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>اسم الزبون / العميل</label><input type="text" id="clientName" placeholder="أ. محمد فيصل" oninput="saveInvoiceMeta()"></div>
+            </div>
+            <div class="grid-3">
+              <div class="form-group"><label>التاريخ</label><input type="text" id="invoiceDate" placeholder="2026/11/4" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>اسمك / لقبك المهني</label><input type="text" id="techName" placeholder="م/ أحمد حسن" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>رقم الهاتف</label><input type="text" id="techPhone" placeholder="010xxxxxxxx" oninput="saveInvoiceMeta()"></div>
+            </div>
+
+            <div class="logo-config-box">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+                <label style="font-size:0.8rem; font-weight:800; color:var(--onion-plum); display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="showLogoCheck" onchange="saveInvoiceMeta()" style="width:17px; height:17px;">
+                  <span>إظهار اللوجو أعلى الفاتورة</span>
+                </label>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('logoInputFile').click()">📁 اختيار لوجو</button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="removeLogo()">حذف اللوجو</button>
+                </div>
+                <input type="file" id="logoInputFile" accept="image/*" style="display:none;" onchange="uploadLogoFile(event)">
+              </div>
+              <div id="logoPreviewContainer" style="display:none; align-items:center; gap:10px;">
+                <img id="logoThumbImg" class="logo-preview-thumb" src="" alt="لوجو">
+                <span style="font-size:0.74rem; color:var(--text-muted);">اللوجو جاهز للطباعة.</span>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" style="margin-top:12px;" onclick="switchView('rooms', '2. الغرف واللوحة والصواعد')">الانتقال إلى الغرف واللوحة والصواعد ⬅</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- القسم 2: اللوحة الرئيسية والصواعد (في قسم مستقل) + الغرف -->
+      <section class="view-panel" id="panel-rooms">
+
+        <!-- بطاقة اللوحة الرئيسية والصواعد المستقلة عن الغرف -->
+        <div class="card">
+          <div class="card-head-dark">
+            <h3>⚡ اللوحة الأتوماتيك الرئيسية والصواعد (مستقل عن الغرف)</h3>
+            <span class="pill-copper" id="mainPanelBadge">0 نقطة</span>
+          </div>
+          <div class="card-body">
+            <div class="grid-2">
+              <div class="form-group">
+                <label>عدد خطوط اللوحة الأتوماتيك (الخط = 2 ن)</label>
+                <input type="number" id="mainPanelLines" min="0" step="any" placeholder="0" oninput="saveMainPanelData()">
+              </div>
+              <div class="form-group">
+                <label>عدد الصواعد الرئيسية للشقة (الصاعد = 2 ن)</label>
+                <input type="number" id="mainRisersCount" min="0" step="any" placeholder="0" oninput="saveMainPanelData()">
+              </div>
+            </div>
+            <div id="mainPanelLiveSummary" class="rule-banner" style="margin-top:4px;"></div>
+          </div>
+        </div>
+
+        <!-- بطاقة إضافة غرفة (بدون خطوط لوحة أو صواعد) -->
+        <div class="card" id="roomFormCard">
+          <div class="card-head-dark">
+            <h3 id="roomFormTitle">➕ إضافة غرفة أو قسم</h3>
+            <button type="button" id="cancelEditBtn" class="btn btn-copper btn-sm" style="display:none;" onclick="resetRoomForm()">إلغاء التعديل</button>
+          </div>
+          <div class="card-body">
+            <div class="chips-wrap">
+              <button type="button" class="chip" onclick="setRoomName('الريسبشن')">الريسبشن</button>
+              <button type="button" class="chip" onclick="setRoomName('الصالة')">الصالة</button>
+              <button type="button" class="chip" onclick="setRoomName('غرفة النوم الرئيسية')">غرفة النوم الرئيسية</button>
+              <button type="button" class="chip" onclick="setRoomName('غرفة الأطفال')">غرفة الأطفال</button>
+              <button type="button" class="chip" onclick="setRoomName('غرفة المعيشة')">غرفة المعيشة</button>
+              <button type="button" class="chip" onclick="setRoomName('المطبخ')">المطبخ</button>
+              <button type="button" class="chip" onclick="setRoomName('الحمام')">الحمام</button>
+              <button type="button" class="chip" onclick="setRoomName('الطرقة والمدخل')">الطرقة والمدخل</button>
+              <button type="button" class="chip" onclick="setRoomName('البلكونة')">البلكونة</button>
+            </div>
+
+            <div class="form-group"><label>اسم الغرفة حسب الزبون</label><input type="text" id="roomName" placeholder="اكتب اسم الغرفة أو اختر من الأعلى"></div>
+
+            <div class="grid-2">
+              <div class="form-group"><label>برايز ومفاتيح (الواحدة = 1 ن)</label><input type="number" id="roomSockets" min="0" step="any" placeholder="0"></div>
+              <div class="form-group"><label>عدد الإسبوتات (الواحد = ½ ن)</label><input type="number" id="roomSpots" min="0" step="any" placeholder="0"></div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group"><label>شريط ليد بالمتر (المتر = ½ ن)</label><input type="number" id="roomLedStrip" min="0" step="any" placeholder="0"></div>
+              <div class="form-group"><label>ليد بروفايل بالمتر (بسعر المتر)</label><input type="number" id="roomLedProfile" min="0" step="any" placeholder="0"></div>
+            </div>
+
+            <div style="margin-top:6px; margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label style="font-size:0.76rem; font-weight:800; color:var(--onion-plum);">بنود إضافية بسعر مستقل في الغرفة (اختياري):</label>
+                <button type="button" class="btn btn-outline btn-sm" onclick="addExtraItemRow()">+ إضافة بند</button>
+              </div>
+              <div id="extraItemsContainer"></div>
+            </div>
+
+            <button type="button" id="saveRoomBtn" class="btn btn-primary" onclick="saveRoom()">حفظ الغرفة في الفاتورة</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head-dark"><h3>🏠 قائمة الغرف المسجلة</h3><span class="pill-copper" id="roomsCountBadge">0 غرف</span></div>
+          <div class="card-body" id="roomsListContainer"></div>
+        </div>
+      </section>
+
+      <!-- القسم 3: الدفعات والملخص النهائي -->
+      <section class="view-panel" id="panel-summary">
+        <div class="card">
+          <div class="card-head-dark"><h3>💵 الدفعات المستلمة والخصم</h3></div>
+          <div class="card-body">
+            <div class="grid-2">
+              <div class="form-group"><label>المدفوع تحت الحساب (ج.م)</label><input type="number" id="paidAmount" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>خصم خاص للزبون (ج.م)</label><input type="number" id="discountAmount" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
+            </div>
+          </div>
+        </div>
+        <div class="summary-box" id="finalSummaryBox"></div>
+        <div class="grid-2">
+          <button type="button" class="btn btn-copper" onclick="openSinglePagePreview(false)">👁️ معاينة وتعديل ورقة الـ PDF</button>
+          <button type="button" class="btn btn-primary" onclick="copyInvoiceForWhatsApp()">📋 نسخ الفاتورة للواتساب</button>
+        </div>
+      </section>
+
+      <!-- القسم 4: الفواتير المحفوظة والنسخ الاحتياطي -->
+      <section class="view-panel" id="panel-saved">
+        <div class="card">
+          <div class="card-head-dark"><h3>📂 سجل فواتير الزبائن المحفوظة</h3></div>
+          <div class="card-body">
+            <div class="form-group"><label>اختر فاتورة لفتحها أو تعديلها:</label><select id="invoiceSelector" onchange="switchInvoice(this.value)"></select></div>
+            <div class="grid-2" style="margin-top:10px;">
+              <button type="button" class="btn btn-primary" onclick="createNewInvoice()">+ فاتورة زبون جديدة</button>
+              <button type="button" class="btn btn-danger" onclick="deleteCurrentInvoice()">🗑️ حذف الفاتورة الحالية</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head-dark"><h3>💾 نسخ احتياطي وتحميل ملف التطبيق</h3></div>
+          <div class="card-body">
+            <div class="grid-2" style="margin-bottom:8px;">
+              <button type="button" class="btn btn-outline" onclick="exportBackupJSON()">⬇️ تنزيل نسخة احتياطية</button>
+              <button type="button" class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆️ استعادة من ملف</button>
+              <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importBackupJSON(event)">
+            </div>
+            <button type="button" class="btn btn-copper" onclick="downloadSelfHTML()">📥 تنزيل ملف index.html جاهز على الهاتف</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- نافذة المعاينة الحية والتعديل المباشر قبل الطباعة -->
+  <div id="printPreviewModal">
+    <div class="preview-toolbar">
+      <div class="toolbar-row">
+        <button type="button" class="btn btn-copper btn-sm" onclick="triggerSystemPrint()">🖨️ طباعة / حفظ PDF الآن</button>
+        <div style="display:flex; gap:5px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="adjustPrintSize(1)">🔍 تكبير الخط +</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="adjustPrintSize(-1)">🔍 تصغير الخط -</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="toggleLogoFromPreview()">🖼️ إظهار/إخفاء اللوجو</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="toggleEditHighlights()">✏️ حدود التعديل</button>
+        </div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="closeSinglePagePreview()">✕ إغلاق</button>
+      </div>
+      <div class="edit-hint-banner">💡 المعاينة بالأسفل مطابقة 100% لورقة الطباعة، واضغط على أي كلمة أو رقم داخلها لتعديله مباشرة!</div>
+    </div>
+    <div id="printSheet" class="show-edit-borders"></div>
+  </div>
+
+  <div id="appToast" class="app-toast"></div>
+  <div id="appConfirmModal" class="app-confirm-backdrop">
+    <div class="app-confirm-box">
+      <p id="appConfirmText" style="margin-bottom:14px; font-size:0.95rem; color:var(--text-main);"></p>
+      <div class="grid-2">
+        <button type="button" class="btn btn-danger" id="appConfirmYesBtn">نعم، تأكيد</button>
+        <button type="button" class="btn btn-outline" id="appConfirmNoBtn">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'ahmed_elec_invoices_v7';
+    let appData = {
+      invoiceTitle: 'كشف حساب ومستخلص أعمال كهرباء',
+      techName: 'م/ أحمد حسن - للأعمال والتشطيبات الكهربائية',
+      techPhone: '',
+      logoData: '',
+      showLogo: false,
+      currentId: null,
+      invoices: []
+    };
+    let editingRoomIndex = null;
+    let currentPrintFontSize = 13;
+    let currentCellPadV = 5;
+
+    function showAppToast(msg) {
+      const t = document.getElementById('appToast');
+      if (!t) return;
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2800);
+    }
+
+    function showAppConfirm(msg, onConfirm) {
+      const modal = document.getElementById('appConfirmModal');
+      const txt = document.getElementById('appConfirmText');
+      const yesBtn = document.getElementById('appConfirmYesBtn');
+      const noBtn = document.getElementById('appConfirmNoBtn');
+      txt.textContent = msg;
+      modal.style.display = 'flex';
+      yesBtn.onclick = () => { modal.style.display = 'none'; onConfirm(); };
+      noBtn.onclick = () => { modal.style.display = 'none'; };
+    }
+
+    function toggleDrawer() {
+      document.getElementById('sideDrawer').classList.toggle('open');
+      document.getElementById('drawerBackdrop').classList.toggle('open');
+      closePrintMenu();
+    }
+    function closeDrawer() {
+      document.getElementById('sideDrawer').classList.remove('open');
+      document.getElementById('drawerBackdrop').classList.remove('open');
+    }
+    function togglePrintMenu(e) {
+      e.stopPropagation();
+      document.getElementById('printDropdownList').classList.toggle('open');
+    }
+    function closePrintMenu() {
+      const el = document.getElementById('printDropdownList');
+      if (el) el.classList.remove('open');
+    }
+    document.addEventListener('click', () => closePrintMenu());
+
+    function switchView(panelKey, titleText) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + panelKey).classList.add('active');
+      document.querySelectorAll('.drawer-nav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('navBtn-' + panelKey).classList.add('active');
+      document.getElementById('headerSectionTitle').innerText = titleText;
+      closeDrawer();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function manualSaveToast() {
+      saveToStorage();
+      closePrintMenu();
+      showAppToast('✔️ تم حفظ الفاتورة والبيانات على الهاتف.');
+    }
+
+    function uploadLogoFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxW = 300;
+          const scale = Math.min(1, maxW / img.width);
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          appData.logoData = canvas.toDataURL('image/png');
+          appData.showLogo = true;
+          document.getElementById('showLogoCheck').checked = true;
+          saveToStorage();
+          renderLogoUI();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeLogo() {
+      appData.logoData = '';
+      appData.showLogo = false;
+      document.getElementById('showLogoCheck').checked = false;
+      saveToStorage();
+      renderLogoUI();
+    }
+
+    function renderLogoUI() {
+      const wrap = document.getElementById('logoPreviewContainer');
+      const img = document.getElementById('logoThumbImg');
+      document.getElementById('showLogoCheck').checked = !!appData.showLogo;
+      if (appData.logoData) {
+        img.src = appData.logoData;
+        wrap.style.display = 'flex';
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
+    // ترحيل أي خطوط أو صواعد قديمة من الغرف إلى القسم المستقل تلقائياً
+    function normalizeInvoicesMigration() {
+      appData.invoices.forEach(inv => {
+        if (typeof inv.mainLines !== 'number') inv.mainLines = 0;
+        if (typeof inv.mainRisers !== 'number') inv.mainRisers = 0;
+        if (Array.isArray(inv.rooms)) {
+          inv.rooms.forEach(r => {
+            if (r.lines > 0) { inv.mainLines += r.lines; r.lines = 0; }
+            if (r.risers > 0) { inv.mainRisers += r.risers; r.risers = 0; }
+          });
+        }
+      });
+    }
+
+    function initApp() {
+      const saved = localStorage.getItem(STORAGE_KEY)
+                 || localStorage.getItem('ahmed_elec_invoices_v6')
+                 || localStorage.getItem('ahmed_elec_invoices_v5')
+                 || localStorage.getItem('ahmed_elec_invoices_v4');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          appData = {
+            invoiceTitle: parsed.invoiceTitle || 'كشف حساب ومستخلص أعمال كهرباء',
+            techName: parsed.techName || 'م/ أحمد حسن - للأعمال والتشطيبات الكهربائية',
+            techPhone: parsed.techPhone || '',
+            logoData: parsed.logoData || parsed.logoDataUrl || '',
+            showLogo: !!parsed.showLogo,
+            currentId: parsed.currentId || null,
+            invoices: parsed.invoices || []
+          };
+          normalizeInvoicesMigration();
+        } catch (e) {}
+      }
+      if (!appData.invoices || appData.invoices.length === 0) {
+        createNewInvoice(false);
+      } else if (!appData.currentId) {
+        appData.currentId = appData.invoices[0].id;
+      }
+      renderAll();
+    }
+
+    function saveToStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    }
+
+    function getCurrentInvoice() {
+      return appData.invoices.find(inv => inv.id === appData.currentId) || appData.invoices[0];
+    }
+
+    function createNewInvoice(goPricing = true) {
+      closePrintMenu();
+      const today = new Date().toLocaleDateString('ar-EG');
+      const newInv = {
+        id: 'inv_' + Date.now(),
+        clientName: 'عميل جديد ' + (appData.invoices.length + 1),
+        date: today,
+        systemType: 'modern',
+        oldPointPrice: 0,
+        newPointPrice: 70,
+        profileMeterPrice: 150,
+        mainLines: 0,
+        mainRisers: 0,
+        paidAmount: 0,
+        discountAmount: 0,
+        rooms: []
+      };
+      appData.invoices.unshift(newInv);
+      appData.currentId = newInv.id;
+      editingRoomIndex = null;
+      saveToStorage();
+      renderAll();
+      if (goPricing) switchView('pricing', '1. التسعير والبيانات');
+    }
+
+    function deleteCurrentInvoice() {
+      if (appData.invoices.length <= 1) {
+        showAppConfirm('تصفير الفاتورة الحالية؟', () => {
+          appData.invoices = [];
+          createNewInvoice(false);
+        });
+        return;
+      }
+      showAppConfirm('هل أنت متأكد من حذف هذه الفاتورة نهائياً؟', () => {
+        appData.invoices = appData.invoices.filter(inv => inv.id !== appData.currentId);
+        appData.currentId = appData.invoices[0].id;
+        editingRoomIndex = null;
+        saveToStorage();
+        renderAll();
+      });
+    }
+
+    function switchInvoice(id) {
+      appData.currentId = id;
+      editingRoomIndex = null;
+      saveToStorage();
+      resetRoomForm();
+      renderAll();
+    }
+
+    function setSystemType(type) {
+      const inv = getCurrentInvoice();
+      inv.systemType = type;
+      saveToStorage();
+      renderAll();
+    }
+
+    function saveInvoiceMeta() {
+      const inv = getCurrentInvoice();
+      appData.invoiceTitle = document.getElementById('invoiceTitle').value || 'كشف حساب ومستخلص أعمال كهرباء';
+      appData.techName = document.getElementById('techName').value;
+      appData.techPhone = document.getElementById('techPhone').value;
+      appData.showLogo = document.getElementById('showLogoCheck').checked;
+      inv.clientName = document.getElementById('clientName').value.trim() || 'بدون اسم';
+      inv.date = document.getElementById('invoiceDate').value;
+      inv.oldPointPrice = parseFloat(document.getElementById('oldPointPrice').value) || 0;
+      inv.newPointPrice = parseFloat(document.getElementById('newPointPrice').value) || 0;
+      inv.profileMeterPrice = parseFloat(document.getElementById('profileMeterPrice').value) || 0;
+      inv.paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
+      inv.discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+      saveToStorage();
+      renderSelector();
+      renderSystemNotice();
+      renderRoomsAndSummary();
+    }
+
+    function saveMainPanelData() {
+      const inv = getCurrentInvoice();
+      inv.mainLines = parseFloat(document.getElementById('mainPanelLines').value) || 0;
+      inv.mainRisers = parseFloat(document.getElementById('mainRisersCount').value) || 0;
+      saveToStorage();
+      renderRoomsAndSummary();
+    }
+
+    function setRoomName(name) { document.getElementById('roomName').value = name; }
+
+    function addExtraItemRow(name = '', qty = '', price = '') {
+      const container = document.getElementById('extraItemsContainer');
+      const div = document.createElement('div');
+      div.className = 'extra-item-row';
+      div.innerHTML = `
+        <input type="text" class="ex-name" placeholder="البند (نجفة..)" value="${name}">
+        <input type="number" class="ex-qty" min="0" step="any" placeholder="العدد" value="${qty}">
+        <input type="number" class="ex-price" min="0" step="any" placeholder="السعر" value="${price}">
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function getExtraItemsFromForm() {
+      const rows = document.querySelectorAll('#extraItemsContainer .extra-item-row');
+      const items = [];
+      rows.forEach(r => {
+        const name = r.querySelector('.ex-name').value.trim();
+        const qty = parseFloat(r.querySelector('.ex-qty').value) || 0;
+        const price = parseFloat(r.querySelector('.ex-price').value) || 0;
+        if (name && qty > 0) items.push({ name, qty, price });
+      });
+      return items;
+    }
+
+    function saveRoom() {
+      const inv = getCurrentInvoice();
+      const name = document.getElementById('roomName').value.trim() || ('غرفة ' + (inv.rooms.length + 1));
+      const roomObj = {
+        name: name,
+        sockets: parseFloat(document.getElementById('roomSockets').value) || 0,
+        spots: parseFloat(document.getElementById('roomSpots').value) || 0,
+        ledStrip: parseFloat(document.getElementById('roomLedStrip').value) || 0,
+        ledProfile: parseFloat(document.getElementById('roomLedProfile').value) || 0,
+        extras: getExtraItemsFromForm()
+      };
+      if (editingRoomIndex !== null) inv.rooms[editingRoomIndex] = roomObj;
+      else inv.rooms.push(roomObj);
+      saveToStorage();
+      resetRoomForm();
+      renderRoomsAndSummary();
+    }
+
+    function editRoom(index) {
+      const inv = getCurrentInvoice();
+      const r = inv.rooms[index];
+      editingRoomIndex = index;
+      document.getElementById('roomFormTitle').innerText = '✏️ تعديل: ' + r.name;
+      document.getElementById('saveRoomBtn').innerText = 'تحديث بيانات الغرفة';
+      document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+      document.getElementById('roomName').value = r.name;
+      document.getElementById('roomSockets').value = r.sockets || '';
+      document.getElementById('roomSpots').value = r.spots || '';
+      document.getElementById('roomLedStrip').value = r.ledStrip || '';
+      document.getElementById('roomLedProfile').value = r.ledProfile || '';
+      const container = document.getElementById('extraItemsContainer');
+      container.innerHTML = '';
+      if (r.extras && r.extras.length > 0) r.extras.forEach(ex => addExtraItemRow(ex.name, ex.qty, ex.price));
+      document.getElementById('roomFormCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function deleteRoom(index) {
+      showAppConfirm('حذف هذه الغرفة من الفاتورة؟', () => {
+        const inv = getCurrentInvoice();
+        inv.rooms.splice(index, 1);
+        if (editingRoomIndex === index) resetRoomForm();
+        saveToStorage();
+        renderRoomsAndSummary();
+      });
+    }
+
+    function resetRoomForm() {
+      editingRoomIndex = null;
+      document.getElementById('roomFormTitle').innerText = '➕ إضافة غرفة أو قسم';
+      document.getElementById('saveRoomBtn').innerText = 'حفظ الغرفة في الفاتورة';
+      document.getElementById('cancelEditBtn').style.display = 'none';
+      document.getElementById('roomName').value = '';
+      document.getElementById('roomSockets').value = '';
+      document.getElementById('roomSpots').value = '';
+      document.getElementById('roomLedStrip').value = '';
+      document.getElementById('roomLedProfile').value = '';
+      document.getElementById('extraItemsContainer').innerHTML = '';
+    }
+
+    // حساب الغرفة (البرايز والمفاتيح، الإسبوتات، شريط الليد، البروفايل، والإضافات)
+    function calculateRoom(r, inv) {
+      const socketsPts = (r.sockets || 0) * 1;
+      const basePoints = socketsPts;
+
+      const spotsPts = (r.spots || 0) * 0.5;
+      const ledStripPts = (r.ledStrip || 0) * 0.5;
+      const finishPoints = spotsPts + ledStripPts;
+
+      const totalPoints = basePoints + finishPoints;
+
+      const newRate = inv.newPointPrice || 0;
+      const oldRate = inv.oldPointPrice || 0;
+      const avgRate = (oldRate + newRate) / 2;
+
+      const effectiveBaseRate = inv.systemType === 'old' ? avgRate : newRate;
+      const effectiveFinishRate = newRate;
+
+      const baseCost = basePoints * effectiveBaseRate;
+      const finishCost = finishPoints * effectiveFinishRate;
+
+      const profileCost = (r.ledProfile || 0) * (inv.profileMeterPrice || 0);
+      let extrasCost = 0;
+      if (r.extras && r.extras.length > 0) r.extras.forEach(ex => { extrasCost += (ex.qty || 0) * (ex.price || 0); });
+
+      const totalCost = baseCost + finishCost + profileCost + extrasCost;
+
+      return { socketsPts, basePoints, spotsPts, ledStripPts, finishPoints, totalPoints, effectiveBaseRate, effectiveFinishRate, baseCost, finishCost, profileCost, extrasCost, totalCost };
+    }
+
+    // حساب جدول اللوحة الرئيسية والصواعد المستقل بنفس نظام التسعير
+    function calculateMainPanel(inv) {
+      const linesCount = inv.mainLines || 0;
+      const risersCount = inv.mainRisers || 0;
+      const linesPts = linesCount * 2;
+      const risersPts = risersCount * 2;
+      const totalPanelPts = linesPts + risersPts;
+
+      const newRate = inv.newPointPrice || 0;
+      const oldRate = inv.oldPointPrice || 0;
+      const avgRate = (oldRate + newRate) / 2;
+      const rateUsed = inv.systemType === 'old' ? avgRate : newRate;
+
+      const linesCost = linesPts * rateUsed;
+      const risersCost = risersPts * rateUsed;
+      const totalPanelCost = totalPanelPts * rateUsed;
+
+      return { linesCount, risersCount, linesPts, risersPts, totalPanelPts, rateUsed, linesCost, risersCost, totalPanelCost };
+    }
+
+    function renderSelector() {
+      const sel = document.getElementById('invoiceSelector');
+      sel.innerHTML = '';
+      appData.invoices.forEach(inv => {
+        const opt = document.createElement('option');
+        opt.value = inv.id;
+        opt.textContent = `${inv.clientName} (${inv.date || ''})`;
+        if (inv.id === appData.currentId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderSystemNotice() {
+      const inv = getCurrentInvoice();
+      const notice = document.getElementById('systemRuleNotice');
+      const oldGroup = document.getElementById('oldPriceGroup');
+      const cardModern = document.getElementById('cardModern');
+      const cardOld = document.getElementById('cardOld');
+      const badge = document.getElementById('activeSystemBadge');
+
+      if (inv.systemType === 'old') {
+        cardModern.classList.remove('selected');
+        cardOld.classList.add('selected');
+        oldGroup.style.display = 'block';
+        badge.innerText = 'النظام القديم (متوسط السعرين)';
+        const avg = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
+        notice.innerHTML = `<strong>النظام القديم مفعل (يُوضح أعلى الفاتورة):</strong><br>• متوسط النقطة (للبرايز والمفاتيح وخطوط اللوحة والصواعد) = <strong>${avg} ج.م</strong><br>• الإسبوتات وشريط الليد بالسعر الحالي = <strong>${inv.newPointPrice || 0} ج.م</strong>`;
+      } else {
+        cardModern.classList.add('selected');
+        cardOld.classList.remove('selected');
+        oldGroup.style.display = 'none';
+        badge.innerText = 'تسعيرة موحدة';
+        notice.innerHTML = `<strong>النظام الحديث مفعل:</strong> جميع النقاط تُحسب بتسعيرة موحدة (<strong>${inv.newPointPrice || 0} ج.م</strong> للنقطة)، ولن يُذكر اسم النظام في الفاتورة.`;
+      }
+    }
+
+    function renderAll() {
+      const inv = getCurrentInvoice();
+      renderSelector();
+      document.getElementById('invoiceTitle').value = appData.invoiceTitle || 'كشف حساب ومستخلص أعمال كهرباء';
+      document.getElementById('techName').value = appData.techName || '';
+      document.getElementById('techPhone').value = appData.techPhone || '';
+      document.getElementById('clientName').value = inv.clientName || '';
+      document.getElementById('invoiceDate').value = inv.date || '';
+      document.getElementById('oldPointPrice').value = inv.oldPointPrice || '';
+      document.getElementById('newPointPrice').value = inv.newPointPrice || '';
+      document.getElementById('profileMeterPrice').value = inv.profileMeterPrice || '';
+      document.getElementById('mainPanelLines').value = inv.mainLines || '';
+      document.getElementById('mainRisersCount').value = inv.mainRisers || '';
+      document.getElementById('paidAmount').value = inv.paidAmount || '';
+      document.getElementById('discountAmount').value = inv.discountAmount || '';
+      renderLogoUI();
+      renderSystemNotice();
+      renderRoomsAndSummary();
+    }
+
+    function renderRoomsAndSummary() {
+      const inv = getCurrentInvoice();
+      const panelCalc = calculateMainPanel(inv);
+
+      document.getElementById('mainPanelBadge').innerText = `${panelCalc.totalPanelPts} نقطة (${panelCalc.totalPanelCost.toLocaleString()} ج.م)`;
+      document.getElementById('mainPanelLiveSummary').innerHTML = `
+        • خطوط الأتوماتيك: <strong>${panelCalc.linesCount} (${panelCalc.linesPts} ن)</strong> = ${panelCalc.linesCost.toLocaleString()} ج.م<br>
+        • الصواعد الرئيسية: <strong>${panelCalc.risersCount} (${panelCalc.risersPts} ن)</strong> = ${panelCalc.risersCost.toLocaleString()} ج.م
+      `;
+
+      const list = document.getElementById('roomsListContainer');
+      document.getElementById('roomsCountBadge').innerText = `${inv.rooms.length} غرف`;
+      document.getElementById('drawerRoomCount').innerText = inv.rooms.length;
+
+      let sumRoomsBasePts = 0, sumFinishPts = 0, sumRoomsTotalPts = 0;
+      let sumRoomsBaseCost = 0, sumFinishCost = 0, sumProfileMeters = 0, sumProfileCost = 0, sumExtrasCost = 0, sumRoomsTotalCost = 0;
+
+      if (inv.rooms.length === 0) {
+        list.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:14px; font-size:0.84rem;">لم تضف أي غرف بعد. املأ بيانات الغرفة بالأعلى واضغط حفظ.</p>`;
+      } else {
+        list.innerHTML = '';
+        inv.rooms.forEach((r, idx) => {
+          const calc = calculateRoom(r, inv);
+          sumRoomsBasePts += calc.basePoints;
+          sumFinishPts += calc.finishPoints;
+          sumRoomsTotalPts += calc.totalPoints;
+          sumRoomsBaseCost += calc.baseCost;
+          sumFinishCost += calc.finishCost;
+          sumProfileMeters += (r.ledProfile || 0);
+          sumProfileCost += calc.profileCost;
+          sumExtrasCost += calc.extrasCost;
+          sumRoomsTotalCost += calc.totalCost;
+
+          let detailsHTML = '';
+          if (r.sockets) detailsHTML += `<div class="room-detail-item"><span>برايز ومفاتيح</span><strong>${r.sockets} (${calc.socketsPts} ن)</strong></div>`;
+          if (r.spots) detailsHTML += `<div class="room-detail-item"><span>إسبوتات</span><strong>${r.spots} (${calc.spotsPts} ن)</strong></div>`;
+          if (r.ledStrip) detailsHTML += `<div class="room-detail-item"><span>شريط ليد</span><strong>${r.ledStrip} م (${calc.ledStripPts} ن)</strong></div>`;
+          if (r.ledProfile) detailsHTML += `<div class="room-detail-item"><span>ليد بروفايل (${r.ledProfile} م)</span><strong>${calc.profileCost} ج.م</strong></div>`;
+          if (r.extras && r.extras.length > 0) {
+            r.extras.forEach(ex => { detailsHTML += `<div class="room-detail-item"><span>${ex.name} (${ex.qty})</span><strong>${ex.qty * ex.price} ج.م</strong></div>`; });
+          }
+
+          const card = document.createElement('div');
+          card.className = 'room-card';
+          card.innerHTML = `
+            <div class="room-top"><span class="room-name">${idx + 1}. ${r.name}</span><span class="room-total-badge">${calc.totalCost.toLocaleString()} ج.م</span></div>
+            <div class="room-details-grid">${detailsHTML}</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-muted); padding-top:5px; border-top:1px solid var(--onion-border);">
+              <span>نقاط الغرفة: <strong>${calc.totalPoints} نقطة</strong></span>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="editRoom(${idx})">تعديل</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="deleteRoom(${idx})">حذف</button>
+              </div>
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      }
+
+      const totalBasePtsAll = sumRoomsBasePts + panelCalc.totalPanelPts;
+      const totalBaseCostAll = sumRoomsBaseCost + panelCalc.totalPanelCost;
+      const allPointsCount = sumRoomsTotalPts + panelCalc.totalPanelPts;
+      const pointsCostTotal = totalBaseCostAll + sumFinishCost;
+      const profileAndExtrasTotal = sumProfileCost + sumExtrasCost;
+      const grandTotal = sumRoomsTotalCost + panelCalc.totalPanelCost;
+      const netRemaining = grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0);
+      const avgRate = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
+
+      document.getElementById('topTotalPoints').innerText = `${allPointsCount} نقطة`;
+      document.getElementById('topPointsCost').innerText = `${pointsCostTotal.toLocaleString()} ج.م`;
+      document.getElementById('topExtrasCost').innerText = `${profileAndExtrasTotal.toLocaleString()} ج.م`;
+      document.getElementById('topNetRequired').innerText = `${netRemaining.toLocaleString()} ج.م`;
+
+      document.getElementById('finalSummaryBox').innerHTML = `
+        <div class="ruqaa-text" style="font-size:1.1rem; margin-bottom:8px; color:#ffbe88;">📊 كشف الحساب النهائي: ${inv.clientName}</div>
+        ${inv.systemType === 'old' ? `
+          <div class="summary-row"><span>نقاط البرايز والخطوط والصواعد (${totalBasePtsAll} ن × ${avgRate} ج.م):</span><strong>${totalBaseCostAll.toLocaleString()} ج.م</strong></div>
+          <div class="summary-row"><span>نقاط الإسبوتات وشريط الليد (${sumFinishPts} ن × ${inv.newPointPrice || 0} ج.م):</span><strong>${sumFinishCost.toLocaleString()} ج.م</strong></div>
+        ` : `
+          <div class="summary-row"><span>إجمالي حساب النقاط (${allPointsCount} ن × ${inv.newPointPrice || 0} ج.م):</span><strong>${pointsCostTotal.toLocaleString()} ج.م</strong></div>
+        `}
+        ${sumProfileCost > 0 ? `<div class="summary-row"><span>إجمالي الليد بروفايل (${sumProfileMeters} م):</span><strong>${sumProfileCost.toLocaleString()} ج.م</strong></div>` : ''}
+        ${sumExtrasCost > 0 ? `<div class="summary-row"><span>إجمالي البنود الإضافية:</span><strong>${sumExtrasCost.toLocaleString()} ج.م</strong></div>` : ''}
+        <div class="summary-row" style="font-weight:900;"><span>إجمالي قيمة الأعمال:</span><strong>${grandTotal.toLocaleString()} ج.م</strong></div>
+        ${inv.discountAmount > 0 ? `<div class="summary-row"><span>الخصم:</span><strong>- ${inv.discountAmount.toLocaleString()} ج.م</strong></div>` : ''}
+        ${inv.paidAmount > 0 ? `<div class="summary-row"><span>المدفوع تحت الحساب:</span><strong>- ${inv.paidAmount.toLocaleString()} ج.م</strong></div>` : ''}
+        <div class="summary-row total"><span>الصافي المطلوب سداده:</span><span>${netRemaining.toLocaleString()} ج.م</span></div>
+      `;
+    }
+
+    function autoFitTypographyForRoomCount(count) {
+      if (count <= 10) { currentPrintFontSize = 13.5; currentCellPadV = 6; }
+      else if (count <= 18) { currentPrintFontSize = 12.2; currentCellPadV = 4.2; }
+      else if (count <= 25) { currentPrintFontSize = 11.2; currentCellPadV = 3; }
+      else { currentPrintFontSize = 10.5; currentCellPadV = 2.1; }
+      applyPrintVariables();
+    }
+
+    function applyPrintVariables() {
+      document.documentElement.style.setProperty('--p-font-size', currentPrintFontSize + 'px');
+      document.documentElement.style.setProperty('--p-cell-pad-v', currentCellPadV + 'px');
+    }
+
+    function adjustPrintSize(delta) {
+      currentPrintFontSize = Math.min(16, Math.max(9, currentPrintFontSize + (delta * 0.6)));
+      currentCellPadV = Math.min(10, Math.max(1.5, currentCellPadV + (delta * 0.5)));
+      applyPrintVariables();
+    }
+
+    function toggleLogoFromPreview() {
+      if (!appData.logoData) {
+        document.getElementById('logoInputFile').click();
+        return;
+      }
+      appData.showLogo = !appData.showLogo;
+      document.getElementById('showLogoCheck').checked = appData.showLogo;
+      saveToStorage();
+      const logoEl = document.getElementById('previewLogoContainer');
+      if (logoEl) logoEl.style.display = appData.showLogo ? 'block' : 'none';
+    }
+
+    function toggleEditHighlights() {
+      document.getElementById('printSheet').classList.toggle('show-edit-borders');
+    }
+
+    // بناء ورقة الـ A4 بتباين عالٍ جداً وخط Cairo Bold العريض وجدول مستقل للخطوط والصواعد
+    function buildSinglePageHTML() {
+      const inv = getCurrentInvoice();
+      autoFitTypographyForRoomCount(inv.rooms.length);
+      const avgRate = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
+      const panelCalc = calculateMainPanel(inv);
+
+      let totSockets = 0, totSpots = 0, totSpotsPts = 0, totStrip = 0, totStripPts = 0;
+      let sumRoomsBasePts = 0, sumFinishPts = 0, sumRoomsTotalPts = 0;
+      let sumRoomsBaseCost = 0, sumFinishCost = 0, sumProfileMeters = 0, sumProfileCost = 0, sumExtrasCost = 0, sumRoomsCost = 0;
+
+      let roomRowsHTML = '';
+      inv.rooms.forEach((r, i) => {
+        const c = calculateRoom(r, inv);
+        totSockets += (r.sockets || 0);
+        totSpots += (r.spots || 0);
+        totSpotsPts += c.spotsPts;
+        totStrip += (r.ledStrip || 0);
+        totStripPts += c.ledStripPts;
+
+        sumRoomsBasePts += c.basePoints;
+        sumFinishPts += c.finishPoints;
+        sumRoomsTotalPts += c.totalPoints;
+        sumRoomsBaseCost += c.baseCost;
+        sumFinishCost += c.finishCost;
+        sumProfileMeters += (r.ledProfile || 0);
+        sumProfileCost += c.profileCost;
+        sumExtrasCost += c.extrasCost;
+        sumRoomsCost += c.totalCost;
+
+        const extraTexts = [];
+        if (r.ledProfile) extraTexts.push(`بروفايل: ${r.ledProfile}م (${c.profileCost} ج)`);
+        if (r.extras && r.extras.length > 0) r.extras.forEach(ex => extraTexts.push(`${ex.name}: ${ex.qty}×${ex.price} (${ex.qty * ex.price} ج)`));
+
+        // كتابة الإسبوتات وشريط الليد بنظام النقاط بين قوسين
+        const spotsCellText = r.spots ? `${r.spots} (${c.spotsPts} ن)` : '-';
+        const stripCellText = r.ledStrip ? `${r.ledStrip} م (${c.ledStripPts} ن)` : '-';
+
+        roomRowsHTML += `
+          <tr>
+            <td contenteditable="true">${i + 1}</td>
+            <td class="room-col" contenteditable="true">${r.name}</td>
+            <td contenteditable="true">${r.sockets || '-'}</td>
+            <td contenteditable="true">${spotsCellText}</td>
+            <td contenteditable="true">${stripCellText}</td>
+            <td contenteditable="true">${c.totalPoints} ن</td>
+            <td class="extras-col" contenteditable="true">${extraTexts.length ? extraTexts.join(' ، ') : '-'}</td>
+            <td contenteditable="true">${c.totalCost.toLocaleString()} ج.م</td>
+          </tr>
+        `;
+      });
+
+      const totalBasePtsAll = sumRoomsBasePts + panelCalc.totalPanelPts;
+      const totalBaseCostAll = sumRoomsBaseCost + panelCalc.totalPanelCost;
+      const allPointsCount = sumRoomsTotalPts + panelCalc.totalPanelPts;
+      const grandTotal = sumRoomsCost + panelCalc.totalPanelCost;
+      const netRemaining = grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0);
+
+      // عدم ذكر النظام الحديث نهائياً، وتوضيح النظام القديم فقط عند اختياره
+      let pricingHeaderBar = '';
+      if (inv.systemType === 'old') {
+        pricingHeaderBar = `
+          <div class="p-pricing-bar" contenteditable="true">
+            <div>نظام الحساب: النظام القديم (متوسط التسعيرتين للتأسيس)</div>
+            <div>سعر النقطة وقت البداية: ${inv.oldPointPrice} ج.م</div>
+            <div>سعر النقطة حالياً: ${inv.newPointPrice} ج.م</div>
+            <div>متوسط التأسيس (برايز/خطوط/صواعد): ${avgRate} ج.م</div>
+            ${inv.profileMeterPrice > 0 ? `<div>سعر متر البروفايل: ${inv.profileMeterPrice} ج.م</div>` : ''}
+          </div>
+        `;
+      } else {
+        pricingHeaderBar = `
+          <div class="p-pricing-bar" contenteditable="true">
+            <div>سعر النقطة المعتمد: ${inv.newPointPrice} ج.م</div>
+            ${inv.profileMeterPrice > 0 ? `<div>سعر متر الليد بروفايل: ${inv.profileMeterPrice} ج.م</div>` : ''}
+          </div>
+        `;
+      }
+
+      // جدول مستقل تماماً لخطوط اللوحة الأتوماتيك والصواعد مع النقاط بين قوسين
+      const mainPanelTableHTML = `
+        <div class="p-section-caption" contenteditable="true">أولاً: بيان تفصيل الغرف والأقسام</div>
+      `;
+
+      const separatePanelAndRisersTable = `
+        <div class="p-section-caption" contenteditable="true">ثانياً: جدول خطوط اللوحة الأتوماتيك الرئيسية والصواعد</div>
+        <table class="p-table">
+          <thead>
+            <tr>
+              <th contenteditable="true">البند</th>
+              <th contenteditable="true">العدد (النقاط المحسوبة)</th>
+              <th contenteditable="true">سعر النقطة المعتمد</th>
+              <th contenteditable="true">إجمالي البند</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="room-col" contenteditable="true">خطوط اللوحة الأتوماتيك الرئيسية (الخط = 2 نقطة)</td>
+              <td contenteditable="true">${panelCalc.linesCount ? `${panelCalc.linesCount} خط (${panelCalc.linesPts} ن)` : '-'}</td>
+              <td contenteditable="true">${panelCalc.rateUsed} ج.م</td>
+              <td contenteditable="true">${panelCalc.linesCost.toLocaleString()} ج.م</td>
+            </tr>
+            <tr>
+              <td class="room-col" contenteditable="true">الصواعد الرئيسية للشقة (الصاعد = 2 نقطة)</td>
+              <td contenteditable="true">${panelCalc.risersCount ? `${panelCalc.risersCount} صاعد (${panelCalc.risersPts} ن)` : '-'}</td>
+              <td contenteditable="true">${panelCalc.rateUsed} ج.م</td>
+              <td contenteditable="true">${panelCalc.risersCost.toLocaleString()} ج.م</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td style="text-align:right;" contenteditable="true">إجمالي اللوحة الأتوماتيك والصواعد</td>
+              <td contenteditable="true">${panelCalc.linesCount + panelCalc.risersCount} (${panelCalc.totalPanelPts} ن)</td>
+              <td contenteditable="true">-</td>
+              <td contenteditable="true">${panelCalc.totalPanelCost.toLocaleString()} ج.م</td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+
+      document.getElementById('printSheet').innerHTML = `
+        <div class="p-header">
+          <div class="p-brand-side">
+            <div class="p-logo-wrap" id="previewLogoContainer" style="display:${appData.showLogo && appData.logoData ? 'block' : 'none'};">
+              <img src="${appData.logoData || ''}" alt="Logo">
+            </div>
+            <div class="p-title-block">
+              <h1 contenteditable="true">⚡ ${appData.invoiceTitle || 'كشف حساب ومستخلص أعمال كهرباء'}</h1>
+              <p contenteditable="true">${appData.techName || 'للأعمال والتشطيبات الكهربائية'}</p>
+              ${appData.techPhone ? `<p contenteditable="true">هاتف: ${appData.techPhone}</p>` : ''}
+            </div>
+          </div>
+          <div class="p-meta-box">
+            <div contenteditable="true"><strong>العميل:</strong> ${inv.clientName}</div>
+            <div contenteditable="true"><strong>التاريخ:</strong> ${inv.date || '-'}</div>
+            <div contenteditable="true"><strong>عدد الغرف:</strong> ${inv.rooms.length}</div>
+          </div>
+        </div>
+
+        ${pricingHeaderBar}
+
+        ${mainPanelTableHTML}
+
+        <table class="p-table">
+          <thead>
+            <tr>
+              <th style="width:28px;" contenteditable="true">م</th>
+              <th contenteditable="true">الغرفة / القسم</th>
+              <th contenteditable="true">برايز ومفاتيح (1 ن)</th>
+              <th contenteditable="true">إسبوتات (النقاط)</th>
+              <th contenteditable="true">شريط ليد (النقاط)</th>
+              <th contenteditable="true">مجموع نقاط الغرفة</th>
+              <th contenteditable="true">ليد بروفايل وإضافات</th>
+              <th contenteditable="true">إجمالي الغرفة</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${roomRowsHTML || '<tr><td colspan="8">لا توجد غرف مضافة</td></tr>'}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" style="text-align:right;" contenteditable="true">إجمالي الغرف</td>
+              <td contenteditable="true">${totSockets} (${totSockets} ن)</td>
+              <td contenteditable="true">${totSpots} (${totSpotsPts} ن)</td>
+              <td contenteditable="true">${totStrip} م (${totStripPts} ن)</td>
+              <td contenteditable="true">${sumRoomsTotalPts} نقطة</td>
+              <td contenteditable="true">${(sumProfileCost + sumExtrasCost).toLocaleString()} ج.م</td>
+              <td contenteditable="true">${sumRoomsCost.toLocaleString()} ج.م</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        ${separatePanelAndRisersTable}
+
+        <div class="p-bottom-grid">
+          <div class="p-notes-box">
+            <div contenteditable="true">
+              <strong class="ruqaa-text" style="font-size:0.95rem;">قواعد حساب النقاط المعتمدة:</strong>
+              <ul style="margin-right:15px; margin-top:3px; line-height:1.4;">
+                <li>البريزة أو المفتاح = 1 نقطة | خط الأتوماتيك = 2 نقطة | الصاعد الرئيسي = 2 نقطة.</li>
+                <li>الإسبوت = 0.5 نقطة | متر شريط الليد = 0.5 نقطة.</li>
+                ${inv.systemType === 'old' ? `<li>النظام القديم: (${totalBasePtsAll} ن) تأسيس ولوحة وصواعد بمتوسط السعر (${avgRate} ج.م)، و(${sumFinishPts} ن) إسبوتات وشريط ليد بالسعر الحالي (${inv.newPointPrice} ج.م).</li>` : ''}
+              </ul>
+            </div>
+            <div contenteditable="true" style="display:flex; justify-content:space-between; margin-top:8px; padding-top:6px; border-top:1.5px dashed #1f0519;">
+              <span>توقيع القائم بالأعمال: ....................</span>
+              <span>اعتماد العميل: ....................</span>
+            </div>
+          </div>
+
+          <table class="p-totals-table">
+            ${inv.systemType === 'old' ? `
+              <tr><td contenteditable="true">نقاط البرايز والخطوط والصواعد (${totalBasePtsAll} ن × ${avgRate} ج.م)</td><td contenteditable="true" style="text-align:left;">${totalBaseCostAll.toLocaleString()} ج.م</td></tr>
+              <tr><td contenteditable="true">نقاط الإسبوتات وشريط الليد (${sumFinishPts} ن × ${inv.newPointPrice} ج.م)</td><td contenteditable="true" style="text-align:left;">${sumFinishCost.toLocaleString()} ج.م</td></tr>
+            ` : `
+              <tr><td contenteditable="true">إجمالي النقاط الكلي (${allPointsCount} ن × ${inv.newPointPrice} ج.م)</td><td contenteditable="true" style="text-align:left;">${(totalBaseCostAll + sumFinishCost).toLocaleString()} ج.م</td></tr>
+            `}
+            ${sumProfileCost > 0 ? `<tr><td contenteditable="true">إجمالي الليد بروفايل (${sumProfileMeters} م)</td><td contenteditable="true" style="text-align:left;">${sumProfileCost.toLocaleString()} ج.م</td></tr>` : ''}
+            ${sumExtrasCost > 0 ? `<tr><td contenteditable="true">إجمالي البنود الإضافية</td><td contenteditable="true" style="text-align:left;">${sumExtrasCost.toLocaleString()} ج.م</td></tr>` : ''}
+            <tr><td contenteditable="true">إجمالي المصنعية المستحقة</td><td contenteditable="true" style="text-align:left;">${grandTotal.toLocaleString()} ج.م</td></tr>
+            ${inv.discountAmount > 0 ? `<tr><td contenteditable="true">الخصم</td><td contenteditable="true" style="text-align:left; color:#e11d48 !important;">- ${inv.discountAmount.toLocaleString()} ج.م</td></tr>` : ''}
+            ${inv.paidAmount > 0 ? `<tr><td contenteditable="true">المدفوع تحت الحساب</td><td contenteditable="true" style="text-align:left; color:#0d9488 !important;">- ${inv.paidAmount.toLocaleString()} ج.م</td></tr>` : ''}
+            <tr class="final-row"><td contenteditable="true" class="ruqaa-text">الصافي المطلوب سداده</td><td contenteditable="true" style="text-align:left;">${netRemaining.toLocaleString()} ج.م</td></tr>
+          </table>
+        </div>
+      `;
+    }
+
+    function openSinglePagePreview(autoPrint = false) {
+      closePrintMenu();
+      buildSinglePageHTML();
+      document.getElementById('printPreviewModal').style.display = 'block';
+      if (autoPrint) setTimeout(() => window.print(), 150);
+    }
+
+    function triggerSystemPrint() { window.print(); }
+    function closeSinglePagePreview() { document.getElementById('printPreviewModal').style.display = 'none'; }
+
+    function copyInvoiceForWhatsApp() {
+      closePrintMenu();
+      const inv = getCurrentInvoice();
+      const panelCalc = calculateMainPanel(inv);
+      const avgRate = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
+      let text = `*⚡ ${appData.invoiceTitle || 'كشف حساب أعمال كهرباء'}*\n`;
+      if (appData.techName) text += `*${appData.techName}*\n`;
+      text += `*العميل:* ${inv.clientName} | *التاريخ:* ${inv.date || '-'}\n`;
+      if (inv.systemType === 'old') text += `*نظام الحساب:* النظام القديم (متوسط النقطة ${avgRate} ج.م / الحالي ${inv.newPointPrice} ج.م)\n`;
+      else text += `*سعر النقطة:* ${inv.newPointPrice} ج.م\n`;
+      text += `--------------------------------\n`;
+
+      let grandTotal = panelCalc.totalPanelCost, totalPts = panelCalc.totalPanelPts;
+      inv.rooms.forEach((r, i) => {
+        const c = calculateRoom(r, inv);
+        grandTotal += c.totalCost;
+        totalPts += c.totalPoints;
+        text += `*${i + 1}. ${r.name}:* (${c.totalPoints} ن) = *${c.totalCost.toLocaleString()} ج.م*\n`;
+      });
+
+      if (panelCalc.totalPanelPts > 0) {
+        text += `--------------------------------\n`;
+        text += `*⚡ اللوحة الرئيسية والصواعد:*\n`;
+        if (panelCalc.linesCount) text += `- خطوط اللوحة: ${panelCalc.linesCount} (${panelCalc.linesPts} ن) = ${panelCalc.linesCost.toLocaleString()} ج.م\n`;
+        if (panelCalc.risersCount) text += `- الصواعد: ${panelCalc.risersCount} (${panelCalc.risersPts} ن) = ${panelCalc.risersCost.toLocaleString()} ج.م\n`;
+      }
+
+      const net = grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0);
+      text += `--------------------------------\n*إجمالي عدد النقاط الكلي:* ${totalPts} نقطة\n*إجمالي الحساب الكلي:* ${grandTotal.toLocaleString()} ج.م\n`;
+      if (inv.discountAmount > 0) text += `*الخصم:* ${inv.discountAmount.toLocaleString()} ج.م\n`;
+      if (inv.paidAmount > 0) text += `*المدفوع:* ${inv.paidAmount.toLocaleString()} ج.م\n`;
+      text += `*الصافي المتبقي:* *${net.toLocaleString()} ج.م*`;
+
+      const copyFallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        ta.remove();
+        showAppToast('✔️ تم نسخ الفاتورة! يمكنك لصقها مباشرة في واتساب.');
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showAppToast('✔️ تم نسخ الفاتورة! يمكنك لصقها مباشرة في واتساب.')).catch(copyFallback);
+      } else {
+        copyFallback();
+      }
+    }
+
+    function downloadSelfHTML() {
+      closePrintMenu();
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'index.html';
+      a.click();
+    }
+
+    function exportBackupJSON() {
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `فواتير_الكهرباء_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+
+    function importBackupJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported && Array.isArray(imported.invoices)) {
+            appData = imported;
+            normalizeInvoicesMigration();
+            saveToStorage();
+            renderAll();
+            showAppToast('✔️ تم استعادة جميع الفواتير بنجاح.');
+          }
+        } catch (err) { showAppToast('⚠️ ملف النسخة الاحتياطية غير صالح.'); }
+      };
+      reader.readAsText(file);
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
