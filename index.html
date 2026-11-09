@@ -265,7 +265,7 @@
 
     .dev-card { background: radial-gradient(130% 120% at 0% 0%, var(--navy-600), var(--navy-900) 60%, var(--navy-950)); color: #fff; border-radius: 22px; padding: 20px 18px; margin-bottom: 14px; text-align: center; position: relative; overflow: hidden; box-shadow: var(--shadow-md); }
     .dev-card::before { content: ""; position: absolute; right: -50px; bottom: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(249,115,22,.32), transparent 70%); }
-    .dev-avatar { width: 76px; height: 76px; border-radius: 24px; margin: 0 auto 10px; background: linear-gradient(135deg, var(--orange-400), var(--orange-600)); display: grid; place-items: center; font-size: 1.7rem; font-weight: 900; box-shadow: 0 10px 24px rgba(249,115,22,.4); position: relative; }
+    .dev-avatar { width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 10px; display: block; object-fit: cover; border: 3px solid var(--orange-500); box-shadow: 0 0 0 5px rgba(249,115,22,.22), 0 10px 24px rgba(0,0,0,.35); position: relative; background: var(--navy-800); }
     .dev-name { font-size: 1.3rem; font-weight: 900; position: relative; }
     .dev-role { font-size: .85rem; color: #c8d5ea; margin-bottom: 14px; position: relative; }
     .dev-links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: relative; }
@@ -339,47 +339,108 @@
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
     /* =====================================================
-       تصميم الفاتورة المطبوعة والمعاينة
+       المعاينة: ورقة A4 حقيقية بنفس مقاس الطباعة، مصغّرة لتناسب الشاشة
        ===================================================== */
-    #printPreviewModal { display: none; position: fixed; inset: 0; background: rgba(7,18,38,.96); z-index: 999; overflow-y: auto; padding: 10px 8px 30px; }
-    .preview-toolbar { max-width: 210mm; margin: 0 auto 10px; background: var(--surface); padding: 10px; border-radius: 16px; display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; z-index: 2; box-shadow: var(--shadow-md); }
-    .toolbar-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    #printPreviewModal { display: none; position: fixed; inset: 0; background: #1d2633; z-index: 999; overflow-y: auto; padding: 0 0 40px; }
+    .preview-toolbar { position: sticky; top: 0; z-index: 3; background: var(--navy-950); padding: calc(env(safe-area-inset-top, 0px) + 8px) 10px 8px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+    .toolbar-row { display: flex; gap: 6px; align-items: center; max-width: 820px; margin: 0 auto; width: 100%; }
     .toolbar-row .grow { flex: 1; }
-    .edit-hint { background: var(--accent-soft); color: var(--text); font-size: .76rem; font-weight: 700; padding: 6px 10px; border-radius: 10px; text-align: center; }
+    .tb-btn { width: 40px; height: 40px; border-radius: 11px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.08); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: .85rem; flex-shrink: 0; }
+    .tb-btn.on { background: rgba(249,115,22,.25); border-color: var(--orange-500); }
+    .tb-btn.close { background: rgba(229,56,59,.2); border-color: rgba(229,56,59,.5); }
+    .tb-print { height: 40px; padding: 0 14px; border-radius: 11px; border: 0; background: linear-gradient(135deg, var(--orange-400), var(--orange-600)); color: #fff; font-weight: 800; display: flex; align-items: center; gap: 6px; font-size: .9rem; flex-shrink: 0; }
+    .edit-hint { color: #b9c8e0; font-size: .74rem; text-align: center; }
+    .page-label { color: #8fa3c0; font-size: .72rem; text-align: center; margin: 12px 0 6px; }
+    #printViewport { position: relative; margin: 0 auto; overflow: hidden; }
+    #printSheet {
+      width: 210mm; min-height: 297mm; padding: 9mm 9mm 8mm;
+      background: #fff !important; color: #0b1b33 !important;
+      transform-origin: top right; position: absolute; top: 0; right: 0;
+      box-shadow: 0 10px 40px rgba(0,0,0,.5); font-weight: 700; color-scheme: light;
+    }
+    #printSheet.show-edit-borders [contenteditable="true"]:hover,
+    #printSheet.show-edit-borders [contenteditable="true"]:focus { outline: 1.5px dashed #f97316; outline-offset: 1px; background-color: rgba(249,115,22,.06); }
+    #printSheet [contenteditable="true"]:focus { outline: 1.5px dashed #f97316; }
 
-    #printSheet { background: #ffffff !important; color: #000 !important; width: 100%; max-width: 210mm; margin: 0 auto; padding: 6mm 7mm; border-radius: 6px; box-shadow: 0 6px 25px rgba(0,0,0,.35); font-weight: 700; }
-    #printSheet * { color-scheme: light; }
-    #printSheet.show-edit-borders [contenteditable="true"] { outline: 1px dashed #f97316; background-color: #fffaf5; border-radius: 2px; }
-    .p-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #10284a; padding-bottom: 6px; margin-bottom: 7px; gap: 10px; }
-    .p-brand-side { display: flex; align-items: center; gap: 10px; }
-    .p-logo-wrap img { height: var(--p-logo-height); max-width: 125px; object-fit: contain; display: block; }
-    .p-title-block h1 { font-size: 1.45rem; color: #10284a !important; font-weight: 800 !important; margin-bottom: 2px; }
-    .p-title-block p { font-size: .98rem; color: #000 !important; font-weight: 700 !important; }
-    .p-meta-box { text-align: right; font-size: .84rem; font-weight: 800; background: #eef3fa !important; color: #000 !important; border: 2px solid #10284a; padding: 5px 10px; border-radius: 7px; line-height: 1.4; }
-    .p-pricing-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; background: #fff4ea !important; border: 2px solid #ea580c; padding: 5px 10px; border-radius: 6px; font-size: .84rem; font-weight: 900; color: #071226 !important; margin-bottom: 7px; }
-    .p-section-caption { font-size: 1.05rem; font-weight: 800 !important; color: #10284a !important; background: #e6edf7 !important; border-right: 4px solid #f97316; padding: 3px 8px; margin: 4px 0; }
-    .p-table { width: 100%; border-collapse: collapse; font-size: var(--p-font-size); margin-bottom: 7px; }
-    .p-table th, .p-table td { border: 1.5px solid #0b1b33 !important; padding: var(--p-cell-pad-v) var(--p-cell-pad-h); text-align: center; vertical-align: middle; color: #000 !important; font-weight: 800 !important; }
-    .p-table th { background-color: #dfe8f5 !important; color: #071226 !important; font-size: calc(var(--p-font-size) + 1px); line-height: 1.25; border-bottom: 2.5px solid #10284a !important; }
-    .p-table td.room-col { text-align: right; font-size: calc(var(--p-font-size) + 1px); color: #071226 !important; }
-    .p-table td.extras-col { text-align: right; font-size: calc(var(--p-font-size) - .5px); line-height: 1.25; }
-    .p-table tr:nth-child(even) td { background-color: #f5f8fc !important; }
-    .p-table tfoot td { background-color: #dfe8f5 !important; color: #000 !important; font-weight: 900 !important; border-top: 2.5px solid #10284a !important; font-size: var(--p-font-size); }
-    .p-bottom-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 9px; margin-top: 5px; align-items: stretch; }
-    @media (max-width: 550px) { .p-bottom-grid { grid-template-columns: 1fr; } }
-    .p-notes-box { border: 1.8px solid #0b1b33; border-radius: 6px; padding: 6px 9px; font-size: calc(var(--p-font-size) - .5px); color: #000 !important; background: #fff !important; display: flex; flex-direction: column; justify-content: space-between; }
+    /* ============ تصميم الفاتورة (نصوص وأشكال متجهة بالكامل) ============ */
+    .inv-head { display: flex; justify-content: space-between; align-items: stretch; gap: 14px; background: #10284a !important; color: #fff !important; border-radius: 14px 14px 0 0; padding: 12px 18px; }
+    .inv-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .inv-logo { background: #fff !important; border-radius: 12px; padding: 5px; display: grid; place-items: center; }
+    .inv-logo img { height: var(--p-logo-height); max-width: 120px; object-fit: contain; display: block; }
+    .inv-brand h1 { font-size: 21px; font-weight: 900 !important; color: #fff !important; line-height: 1.3; }
+    .inv-brand p { font-size: 13px; color: #c9d6ea !important; font-weight: 700; line-height: 1.6; }
+    .inv-brand p b { color: #fff !important; }
+    .inv-doc { text-align: left; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .inv-doc .tag { background: #f97316 !important; color: #fff !important; font-size: 13px; font-weight: 900; padding: 4px 14px; border-radius: 99px; }
+    .inv-doc .d { font-size: 12.5px; color: #c9d6ea !important; }
+    .inv-doc .d b { color: #fff !important; }
+    .inv-stripe { height: 5px; background: linear-gradient(90deg, #fbbf24, #f97316 45%, #ea580c) !important; border-radius: 0 0 4px 4px; margin-bottom: 12px; }
+
+    .inv-client { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+    .inv-field { display: flex; align-items: center; gap: 9px; border: 1.5px solid #dbe4f0; border-radius: 10px; padding: 7px 10px; background: #f7f9fc !important; min-width: 0; }
+    .inv-field.wide { grid-column: 1 / -1; }
+    .inv-field .ic { width: 28px; height: 28px; border-radius: 8px; background: #10284a !important; color: #fff !important; display: grid; place-items: center; flex-shrink: 0; }
+    .inv-field .ic svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .inv-field .lbl { font-size: 10.5px; color: #5b6b82 !important; font-weight: 700; line-height: 1.2; }
+    .inv-field .val { font-size: 14px; color: #0b1b33 !important; font-weight: 800; line-height: 1.35; overflow-wrap: anywhere; }
+
+    .inv-pricing { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .inv-chip { border: 1.5px solid #f9c79e; background: #fff4ea !important; color: #7a2e06 !important; border-radius: 99px; padding: 3px 11px; font-size: 11.5px; font-weight: 800; }
+    .inv-chip b { color: #c2410c !important; }
+    .inv-chip.navy { border-color: #b9c9e2; background: #eef3fa !important; color: #10284a !important; }
+
+    .inv-sec { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 900 !important; color: #10284a !important; margin: 6px 0 6px; }
+    .inv-sec .n { width: 24px; height: 24px; border-radius: 7px; background: #f97316 !important; color: #fff !important; display: grid; place-items: center; font-size: 13px; }
+    .inv-sec::after { content: ""; flex: 1; height: 1.5px; background: #dbe4f0 !important; }
+
+    .p-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--p-font-size); margin-bottom: 12px; border: 1.5px solid #10284a; border-radius: 10px; }
+    .p-table thead tr { background: #10284a !important; }
+    .p-table thead th:first-child { border-top-right-radius: 8px; }
+    .p-table thead th:last-child { border-top-left-radius: 8px; }
+    .p-table tfoot td:first-child { border-bottom-right-radius: 8px; }
+    .p-table tfoot td:last-child { border-bottom-left-radius: 8px; }
+    .p-table th, .p-table td { padding: var(--p-cell-pad-v) var(--p-cell-pad-h); text-align: center; vertical-align: middle; color: #0b1b33 !important; font-weight: 700 !important; border-bottom: 1px solid #dbe4f0; border-left: 1px solid #e6ecf4; }
+    .p-table th:last-child, .p-table td:last-child { border-left: 0; }
+    .p-table th { background: #10284a !important; color: #fff !important; font-weight: 800 !important; font-size: calc(var(--p-font-size) - .5px); line-height: 1.3; border-left-color: #2a4772; border-bottom: 0; }
+    .p-table td.room-col { text-align: right; font-weight: 800 !important; }
+    .p-table td.extras-col { text-align: right; font-size: calc(var(--p-font-size) - 1px); line-height: 1.35; color: #34465f !important; }
+    .p-table td.money { font-weight: 900 !important; white-space: nowrap; color: #10284a !important; }
+    .p-table td.idx { color: #5b6b82 !important; width: 26px; }
+    .p-table td .pts { display: inline-block; margin-inline-start: 3px; font-size: calc(var(--p-font-size) - 2.5px); color: #c2410c !important; font-weight: 800; white-space: nowrap; }
+    .p-table tbody tr:nth-child(even) td { background: #f5f8fc !important; }
+    .p-table tfoot td { background: #fff4ea !important; font-weight: 900 !important; border-top: 2px solid #f97316; border-bottom: 0; }
+
+    .inv-bottom { display: grid; grid-template-columns: 1fr 1.05fr; gap: 12px; align-items: start; margin-top: 2px; break-inside: avoid; page-break-inside: avoid; }
+    .inv-notes { border: 1.5px solid #dbe4f0; border-radius: 12px; padding: 10px 12px; background: #f7f9fc !important; font-size: calc(var(--p-font-size) - 1px); line-height: 1.7; color: #0b1b33 !important; }
+    .inv-notes h4 { font-size: 13px; font-weight: 900; color: #10284a !important; margin-bottom: 4px; }
+    .inv-notes ul { padding-right: 16px; }
+    .inv-totals { border: 1.5px solid #10284a; border-radius: 12px; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+    .inv-side { display: grid; gap: 10px; }
     .p-totals-table { width: 100%; border-collapse: collapse; font-size: var(--p-font-size); }
-    .p-totals-table td { border: 1.5px solid #0b1b33 !important; padding: var(--p-cell-pad-v) 7px; color: #000 !important; font-weight: 800 !important; background: #fff !important; }
-    .p-totals-table tr.final-row td { background-color: #ffe9d6 !important; color: #071226 !important; font-weight: 900 !important; font-size: calc(var(--p-font-size) + 2px); border: 2px solid #ea580c !important; }
+    .p-totals-table td { padding: calc(var(--p-cell-pad-v) + 1px) 10px; color: #0b1b33 !important; font-weight: 700 !important; border-bottom: 1px solid #e6ecf4; background: #fff !important; }
+    .p-totals-table td:last-child { text-align: left; font-weight: 900 !important; white-space: nowrap; }
+    .p-totals-table tr.sub td { background: #eef3fa !important; font-weight: 900 !important; }
+    .p-totals-table tr.minus td:last-child { color: #dc2626 !important; }
+    .p-totals-table tr.paid td:last-child { color: #0f9f6e !important; }
+    .inv-net { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: linear-gradient(135deg, #f97316, #ea580c) !important; color: #fff !important; padding: 11px 12px; }
+    .inv-net span { font-size: 14px; font-weight: 800; color: #fff !important; }
+    .inv-net strong { font-size: 22px; font-weight: 900; color: #fff !important; white-space: nowrap; }
 
-    @page { size: A4 portrait; margin: 5mm; }
+    .inv-sign { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; break-inside: avoid; page-break-inside: avoid; }
+    .inv-sign div { text-align: center; font-size: 12px; color: #34465f !important; padding-top: 34px; border-bottom: 1.5px dashed #9fb0c8; padding-bottom: 4px; }
+    .inv-foot { margin-top: 10px; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 11px; color: #5b6b82 !important; border-top: 1.5px solid #dbe4f0; }
+    .inv-foot b { color: #10284a !important; }
+
+    @page { size: A4 portrait; margin: 9mm; }
     @media print {
       html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
-      #editorApp, .preview-toolbar, .bottom-nav, .fab, .sheet, .backdrop, .dialog-wrap, .toast { display: none !important; }
+      #editorApp, .preview-toolbar, .page-label, .bottom-nav, .fab, .sheet, .backdrop, .dialog-wrap, .toast { display: none !important; }
       #printPreviewModal { display: block !important; position: static !important; background: transparent !important; padding: 0 !important; overflow: visible !important; }
-      #printSheet { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; }
+      #printViewport { height: auto !important; width: auto !important; overflow: visible !important; }
+      #printSheet { position: static !important; transform: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: auto !important; min-height: 0 !important; }
       #printSheet [contenteditable="true"] { outline: none !important; background: transparent !important; }
-      .p-bottom-grid { grid-template-columns: 1.25fr 1fr !important; page-break-inside: avoid; }
+      .p-table tr { break-inside: avoid; page-break-inside: avoid; }
+      .p-table thead { display: table-row-group; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
   </style>
@@ -414,7 +475,11 @@
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="user"></i></div><h2>بيانات العميل</h2></div>
         <div class="field"><label for="clientName">اسم العميل</label><input type="text" id="clientName" placeholder="مثال: أ. محمد فيصل" oninput="saveInvoiceMeta()"></div>
-        <div class="field" style="margin-bottom:0"><label for="invoiceDate">التاريخ</label><input type="text" id="invoiceDate" placeholder="2026/11/4" oninput="saveInvoiceMeta()"></div>
+        <div class="row-2 stack-sm">
+          <div class="field"><label for="clientPhone">رقم هاتف العميل</label><input type="text" inputmode="tel" dir="ltr" style="text-align:right" id="clientPhone" placeholder="01xxxxxxxxx" oninput="saveInvoiceMeta()"></div>
+          <div class="field"><label for="invoiceDate">التاريخ</label><input type="text" id="invoiceDate" placeholder="2026/11/4" oninput="saveInvoiceMeta()"></div>
+        </div>
+        <div class="field" style="margin-bottom:0"><label for="clientAddress">عنوان العميل</label><input type="text" id="clientAddress" placeholder="مثال: المعادي - شارع 9 - عمارة 12 - الدور 3" oninput="saveInvoiceMeta()"></div>
       </div>
 
       <div class="card">
@@ -493,7 +558,7 @@
         <button type="button" class="btn btn-accent" onclick="createNewInvoice()"><i data-icon="plus"></i> فاتورة جديدة</button>
         <button type="button" class="btn btn-ghost" onclick="manualSaveToast()"><i data-icon="check"></i> حفظ الحالية</button>
       </div>
-      <div class="field"><input type="search" id="invoiceSearch" placeholder="ابحث باسم العميل..." oninput="renderInvoiceList()"></div>
+      <div class="field"><input type="search" id="invoiceSearch" placeholder="ابحث باسم العميل أو رقمه أو عنوانه..." oninput="renderInvoiceList()"></div>
       <div id="invoiceList"></div>
       <button type="button" class="btn btn-danger" style="margin-top:4px" onclick="deleteCurrentInvoice()"><i data-icon="trash"></i> حذف الفاتورة المفتوحة حالياً</button>
     </section>
@@ -550,7 +615,7 @@
 
       <!-- عن المطور -->
       <div class="dev-card">
-        <div class="dev-avatar">أ ح</div>
+        <img class="dev-avatar" src="./icons/developer.jpg" alt="أحمد حسن عبدالله" width="96" height="96">
         <div class="dev-name">أحمد حسن عبدالله</div>
         <div class="dev-role">مطوّر ومصمّم التطبيق</div>
         <div class="dev-links">
@@ -645,17 +710,18 @@
 <div id="printPreviewModal">
   <div class="preview-toolbar">
     <div class="toolbar-row">
-      <button type="button" class="btn btn-accent btn-sm" onclick="triggerSystemPrint()"><i data-icon="printer"></i> طباعة / PDF</button>
+      <button type="button" class="tb-btn close" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button>
+      <button type="button" class="tb-print" onclick="triggerSystemPrint()"><i data-icon="printer"></i> طباعة / PDF</button>
       <span class="grow"></span>
-      <button type="button" class="btn btn-ghost btn-icon" onclick="adjustPrintSize(1)" aria-label="تكبير الخط">A+</button>
-      <button type="button" class="btn btn-ghost btn-icon" onclick="adjustPrintSize(-1)" aria-label="تصغير الخط">A−</button>
-      <button type="button" class="btn btn-ghost btn-icon" onclick="toggleLogoFromPreview()" aria-label="إظهار/إخفاء اللوجو"><i data-icon="image"></i></button>
-      <button type="button" class="btn btn-ghost btn-icon" onclick="toggleEditHighlights()" aria-label="حدود التعديل"><i data-icon="edit"></i></button>
-      <button type="button" class="btn btn-danger btn-icon" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button>
+      <button type="button" class="tb-btn" onclick="adjustPrintSize(1)" aria-label="تكبير الخط">A+</button>
+      <button type="button" class="tb-btn" onclick="adjustPrintSize(-1)" aria-label="تصغير الخط">A−</button>
+      <button type="button" class="tb-btn" onclick="toggleLogoFromPreview()" aria-label="إظهار/إخفاء اللوجو"><i data-icon="image"></i></button>
+      <button type="button" class="tb-btn on" id="editHlBtn" onclick="toggleEditHighlights()" aria-label="إظهار أماكن التعديل"><i data-icon="edit"></i></button>
     </div>
-    <div class="edit-hint">المعاينة مطابقة لورقة الطباعة — اضغط على أي كلمة أو رقم لتعديله مباشرة</div>
+    <div class="edit-hint">ورقة A4 بنفس مقاس الطباعة · اضغط على أي نص لتعديله</div>
   </div>
-  <div id="printSheet" class="show-edit-borders"></div>
+  <div class="page-label">صفحة A4 · 210 × 297 مم</div>
+  <div id="printViewport"><div id="printSheet" class="show-edit-borders"></div></div>
 </div>
 
 <!-- نافذة التأكيد -->
@@ -695,7 +761,7 @@
      تصميم وتطوير: أحمد حسن عبدالله  |  واتساب: +201015421255
      © 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة.
      ========================================================= */
-  const APP_VERSION = '2.0.0';
+  const APP_VERSION = '2.1.0';
   const STORAGE_KEY = 'ahmed_elec_invoices_v7';
   const DEFAULT_TITLE = 'كشف حساب ومستخلص أعمال كهرباء';
   const DEFAULT_TECH = 'م/ أحمد حسن - للأعمال والتشطيبات الكهربائية';
@@ -741,6 +807,9 @@
     edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
     alert: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
     gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+    phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
+    pin: '<path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',
+    calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>'
   };
   function icon(name) { return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`; }
@@ -882,6 +951,8 @@
       if (typeof inv.mainLines !== 'number') inv.mainLines = 0;
       if (typeof inv.mainRisers !== 'number') inv.mainRisers = 0;
       if (!Array.isArray(inv.rooms)) inv.rooms = [];
+      if (typeof inv.clientPhone !== 'string') inv.clientPhone = '';
+      if (typeof inv.clientAddress !== 'string') inv.clientAddress = '';
       inv.rooms.forEach(r => {
         if (r.lines > 0) { inv.mainLines += r.lines; r.lines = 0; }
         if (r.risers > 0) { inv.mainRisers += r.risers; r.risers = 0; }
@@ -927,6 +998,7 @@
       input.dispatchEvent(new Event('input', { bubbles: true }));
     });
     document.getElementById('roomSheet').addEventListener('input', updateRoomLivePreview);
+    document.getElementById('printSheet').addEventListener('input', () => requestAnimationFrame(fitPreview));
     document.getElementById('aboutVersion').textContent = APP_VERSION;
     document.getElementById('verCurrent').textContent = APP_VERSION;
     document.getElementById('copyYear').textContent = Math.max(2026, new Date().getFullYear());
@@ -948,6 +1020,8 @@
     const newInv = {
       id: 'inv_' + Date.now(),
       clientName: 'عميل جديد ' + (appData.invoices.length + 1),
+      clientPhone: '',
+      clientAddress: '',
       date: new Date().toLocaleDateString('ar-EG'),
       systemType: 'modern',
       oldPointPrice: 0,
@@ -1010,6 +1084,8 @@
     appData.showLogo = document.getElementById('showLogoCheck').checked;
     inv.clientName = document.getElementById('clientName').value.trim() || 'بدون اسم';
     inv.date = document.getElementById('invoiceDate').value;
+    inv.clientPhone = document.getElementById('clientPhone').value.trim();
+    inv.clientAddress = document.getElementById('clientAddress').value.trim();
     inv.oldPointPrice = num('oldPointPrice');
     inv.newPointPrice = num('newPointPrice');
     inv.profileMeterPrice = num('profileMeterPrice');
@@ -1232,6 +1308,8 @@
     setVal('techPhone', appData.techPhone || '');
     setVal('clientName', inv.clientName || '');
     setVal('invoiceDate', inv.date || '');
+    setVal('clientPhone', inv.clientPhone || '');
+    setVal('clientAddress', inv.clientAddress || '');
     setVal('oldPointPrice', inv.oldPointPrice || '');
     setVal('newPointPrice', inv.newPointPrice || '');
     setVal('profileMeterPrice', inv.profileMeterPrice || '');
@@ -1315,7 +1393,7 @@
   function renderInvoiceList() {
     const q = (document.getElementById('invoiceSearch').value || '').trim();
     const box = document.getElementById('invoiceList');
-    const items = appData.invoices.filter(inv => !q || (inv.clientName || '').includes(q));
+    const items = appData.invoices.filter(inv => !q || (inv.clientName || '').includes(q) || (inv.clientPhone || '').includes(q) || (inv.clientAddress || '').includes(q));
     if (!items.length) {
       box.innerHTML = `<div class="card empty"><div class="big">${icon('folder')}</div><p>لا توجد فواتير مطابقة للبحث.</p></div>`;
       return;
@@ -1329,7 +1407,7 @@
           <div class="inv-avatar">${initial}</div>
           <div class="inv-info">
             <div class="n">${esc(inv.clientName)}${isCur ? '<span class="badge-now">مفتوحة</span>' : ''}</div>
-            <div class="m">${esc(inv.date || '')} · ${inv.rooms.length} غرف · ${fmt(t.allPointsCount)} نقطة</div>
+            <div class="m">${esc(inv.date || '')}${inv.clientPhone ? ' · <span dir="ltr">' + esc(inv.clientPhone) + '</span>' : ''} · ${inv.rooms.length} غرف · ${fmt(t.allPointsCount)} نقطة</div>
           </div>
           <div class="inv-amount">${fmt(t.netRemaining)}<small>ج.م صافي</small></div>
         </div>`;
@@ -1339,10 +1417,10 @@
 
   /* ---------------- الفاتورة المطبوعة ---------------- */
   function autoFitTypographyForRoomCount(count) {
-    if (count <= 10) { currentPrintFontSize = 13.5; currentCellPadV = 6; }
-    else if (count <= 18) { currentPrintFontSize = 12.2; currentCellPadV = 4.2; }
-    else if (count <= 25) { currentPrintFontSize = 11.2; currentCellPadV = 3; }
-    else { currentPrintFontSize = 10.5; currentCellPadV = 2.1; }
+    if (count <= 10) { currentPrintFontSize = 13.5; currentCellPadV = 5; }
+    else if (count <= 18) { currentPrintFontSize = 12.5; currentCellPadV = 3.5; }
+    else if (count <= 25) { currentPrintFontSize = 11.5; currentCellPadV = 2.5; }
+    else { currentPrintFontSize = 10.5; currentCellPadV = 1.8; }
     applyPrintVariables();
   }
   function applyPrintVariables() {
@@ -1353,6 +1431,7 @@
     currentPrintFontSize = Math.min(16, Math.max(9, currentPrintFontSize + (delta * 0.6)));
     currentCellPadV = Math.min(10, Math.max(1.5, currentCellPadV + (delta * 0.5)));
     applyPrintVariables();
+    fitPreview();
   }
   function toggleLogoFromPreview() {
     if (!appData.logoData) { document.getElementById('logoInputFile').click(); return; }
@@ -1360,9 +1439,28 @@
     document.getElementById('showLogoCheck').checked = appData.showLogo;
     saveToStorage();
     const logoEl = document.getElementById('previewLogoContainer');
-    if (logoEl) logoEl.style.display = appData.showLogo ? 'block' : 'none';
+    if (logoEl) logoEl.style.display = appData.showLogo ? 'grid' : 'none';
+    fitPreview();
   }
-  function toggleEditHighlights() { document.getElementById('printSheet').classList.toggle('show-edit-borders'); }
+  function toggleEditHighlights() {
+    const on = document.getElementById('printSheet').classList.toggle('show-edit-borders');
+    document.getElementById('editHlBtn').classList.toggle('on', on);
+  }
+
+  // تصغير ورقة الـ A4 الحقيقية (210 مم) لتناسب عرض الشاشة دون تغيير ترتيبها
+  function fitPreview() {
+    const modal = document.getElementById('printPreviewModal');
+    if (modal.style.display !== 'block') return;
+    const vp = document.getElementById('printViewport');
+    const sheet = document.getElementById('printSheet');
+    const avail = Math.min(modal.clientWidth - 16, 900);
+    const w = sheet.offsetWidth;
+    const scale = Math.min(1, avail / w);
+    sheet.style.transform = `scale(${scale})`;
+    vp.style.width = (w * scale) + 'px';
+    vp.style.height = (sheet.offsetHeight * scale) + 'px';
+  }
+  window.addEventListener('resize', fitPreview);
 
   function buildSinglePageHTML() {
     const inv = getCurrentInvoice();
@@ -1370,158 +1468,175 @@
     const t = computeInvoice(inv);
     const p = t.panel;
     const avgRate = t.avgRate;
+    const isOld = inv.systemType === 'old';
+    const ce = 'contenteditable="true"';
+    const money = v => `${fmt(v)} ج.م`;
 
     let roomRowsHTML = '';
     inv.rooms.forEach((r, i) => {
       const c = t.rooms[i];
       const extraTexts = [];
-      if (r.ledProfile) extraTexts.push(`بروفايل: ${fmt(r.ledProfile)}م (${fmt(c.profileCost)} ج)`);
-      (r.extras || []).forEach(ex => extraTexts.push(`${esc(ex.name)}: ${fmt(ex.qty)}×${fmt(ex.price)} (${fmt(ex.qty * ex.price)} ج)`));
-      const spotsCellText = r.spots ? `${fmt(r.spots)} (${fmt(c.spotsPts)} ن)` : '-';
-      const stripCellText = r.ledStrip ? `${fmt(r.ledStrip)} م (${fmt(c.ledStripPts)} ن)` : '-';
+      if (r.ledProfile) extraTexts.push(`بروفايل ${fmt(r.ledProfile)} م = ${fmt(c.profileCost)} ج`);
+      (r.extras || []).forEach(ex => extraTexts.push(`${esc(ex.name)} ${fmt(ex.qty)}×${fmt(ex.price)} = ${fmt(ex.qty * ex.price)} ج`));
       roomRowsHTML += `
         <tr>
-          <td contenteditable="true">${i + 1}</td>
-          <td class="room-col" contenteditable="true">${esc(r.name)}</td>
-          <td contenteditable="true">${r.sockets ? fmt(r.sockets) : '-'}</td>
-          <td contenteditable="true">${spotsCellText}</td>
-          <td contenteditable="true">${stripCellText}</td>
-          <td contenteditable="true">${fmt(c.totalPoints)} ن</td>
-          <td class="extras-col" contenteditable="true">${extraTexts.length ? extraTexts.join(' ، ') : '-'}</td>
-          <td contenteditable="true">${fmt(c.totalCost)} ج.م</td>
+          <td class="idx" ${ce}>${i + 1}</td>
+          <td class="room-col" ${ce}>${esc(r.name)}</td>
+          <td ${ce}>${r.sockets ? `${fmt(r.sockets)}<span class="pts">(${fmt(c.socketsPts)} ن)</span>` : '-'}</td>
+          <td ${ce}>${r.spots ? `${fmt(r.spots)}<span class="pts">(${fmt(c.spotsPts)} ن)</span>` : '-'}</td>
+          <td ${ce}>${r.ledStrip ? `${fmt(r.ledStrip)} م<span class="pts">(${fmt(c.ledStripPts)} ن)</span>` : '-'}</td>
+          <td ${ce}><b>${fmt(c.totalPoints)}</b> ن</td>
+          <td class="extras-col" ${ce}>${extraTexts.length ? extraTexts.join('<br>') : '-'}</td>
+          <td class="money" ${ce}>${money(c.totalCost)}</td>
         </tr>`;
     });
 
     // لا يُذكر النظام الحديث نهائياً، ويُوضح النظام القديم فقط عند اختياره
-    const pricingHeaderBar = inv.systemType === 'old' ? `
-      <div class="p-pricing-bar" contenteditable="true">
-        <div>نظام الحساب: النظام القديم (متوسط التسعيرتين للتأسيس)</div>
-        <div>سعر النقطة وقت البداية: ${fmt(inv.oldPointPrice)} ج.م</div>
-        <div>سعر النقطة حالياً: ${fmt(inv.newPointPrice)} ج.م</div>
-        <div>متوسط التأسيس (برايز/خطوط/صواعد): ${fmt(avgRate)} ج.م</div>
-        ${inv.profileMeterPrice > 0 ? `<div>سعر متر البروفايل: ${fmt(inv.profileMeterPrice)} ج.م</div>` : ''}
-      </div>` : `
-      <div class="p-pricing-bar" contenteditable="true">
-        <div>سعر النقطة المعتمد: ${fmt(inv.newPointPrice)} ج.م</div>
-        ${inv.profileMeterPrice > 0 ? `<div>سعر متر الليد بروفايل: ${fmt(inv.profileMeterPrice)} ج.م</div>` : ''}
-      </div>`;
+    const chips = isOld ? [
+      `<span class="inv-chip navy" ${ce}>النظام القديم (متوسط التسعيرتين للتأسيس)</span>`,
+      `<span class="inv-chip" ${ce}>سعر البداية: <b>${money(inv.oldPointPrice)}</b></span>`,
+      `<span class="inv-chip" ${ce}>السعر الحالي: <b>${money(inv.newPointPrice)}</b></span>`,
+      `<span class="inv-chip" ${ce}>متوسط التأسيس: <b>${money(avgRate)}</b></span>`
+    ] : [`<span class="inv-chip" ${ce}>سعر النقطة المعتمد: <b>${money(inv.newPointPrice)}</b></span>`];
+    if (inv.profileMeterPrice > 0) chips.push(`<span class="inv-chip" ${ce}>متر البروفايل: <b>${money(inv.profileMeterPrice)}</b></span>`);
 
-    const panelTable = `
-      <div class="p-section-caption" contenteditable="true">ثانياً: جدول خطوط اللوحة الأتوماتيك الرئيسية والصواعد</div>
-      <table class="p-table">
-        <thead><tr>
-          <th contenteditable="true">البند</th>
-          <th contenteditable="true">العدد (النقاط المحسوبة)</th>
-          <th contenteditable="true">سعر النقطة المعتمد</th>
-          <th contenteditable="true">إجمالي البند</th>
-        </tr></thead>
-        <tbody>
-          <tr>
-            <td class="room-col" contenteditable="true">خطوط اللوحة الأتوماتيك الرئيسية (الخط = 2 نقطة)</td>
-            <td contenteditable="true">${p.linesCount ? `${fmt(p.linesCount)} خط (${fmt(p.linesPts)} ن)` : '-'}</td>
-            <td contenteditable="true">${fmt(p.rateUsed)} ج.م</td>
-            <td contenteditable="true">${fmt(p.linesCost)} ج.م</td>
-          </tr>
-          <tr>
-            <td class="room-col" contenteditable="true">الصواعد الرئيسية للشقة (الصاعد = 2 نقطة)</td>
-            <td contenteditable="true">${p.risersCount ? `${fmt(p.risersCount)} صاعد (${fmt(p.risersPts)} ن)` : '-'}</td>
-            <td contenteditable="true">${fmt(p.rateUsed)} ج.م</td>
-            <td contenteditable="true">${fmt(p.risersCost)} ج.م</td>
-          </tr>
-        </tbody>
-        <tfoot><tr>
-          <td style="text-align:right;" contenteditable="true">إجمالي اللوحة الأتوماتيك والصواعد</td>
-          <td contenteditable="true">${fmt(p.linesCount + p.risersCount)} (${fmt(p.totalPanelPts)} ن)</td>
-          <td contenteditable="true">-</td>
-          <td contenteditable="true">${fmt(p.totalPanelCost)} ج.م</td>
-        </tr></tfoot>
-      </table>`;
+    const field = (ic, label, value, wide = false) => `
+      <div class="inv-field${wide ? ' wide' : ''}"><span class="ic">${icon(ic)}</span>
+        <div style="min-width:0"><div class="lbl">${label}</div><div class="val" ${ce}>${value}</div></div></div>`;
+    const clientFields = [
+      field('user', 'العميل', esc(inv.clientName)),
+      inv.clientPhone ? field('phone', 'هاتف العميل', `<span dir="ltr">${esc(inv.clientPhone)}</span>`) : field('calendar', 'التاريخ', esc(inv.date || '-')),
+      inv.clientAddress ? field('pin', 'العنوان', esc(inv.clientAddress), true) : ''
+    ].join('');
 
+    const showLogo = appData.showLogo && appData.logoData;
     document.getElementById('printSheet').innerHTML = `
-      <div class="p-header">
-        <div class="p-brand-side">
-          <div class="p-logo-wrap" id="previewLogoContainer" style="display:${appData.showLogo && appData.logoData ? 'block' : 'none'};">
-            <img src="${appData.logoData || ''}" alt="Logo">
-          </div>
-          <div class="p-title-block">
-            <h1 contenteditable="true">⚡ ${esc(appData.invoiceTitle || DEFAULT_TITLE)}</h1>
-            <p contenteditable="true">${esc(appData.techName || 'للأعمال والتشطيبات الكهربائية')}</p>
-            ${appData.techPhone ? `<p contenteditable="true">هاتف: ${esc(appData.techPhone)}</p>` : ''}
+      <header class="inv-head">
+        <div class="inv-brand">
+          <div class="inv-logo" id="previewLogoContainer" style="display:${showLogo ? 'grid' : 'none'};"><img src="${appData.logoData || ''}" alt="Logo"></div>
+          <div style="min-width:0">
+            <h1 ${ce}>${esc(appData.invoiceTitle || DEFAULT_TITLE)}</h1>
+            <p ${ce}>${esc(appData.techName || 'للأعمال والتشطيبات الكهربائية')}</p>
+            ${appData.techPhone ? `<p ${ce}>هاتف: <b dir="ltr">${esc(appData.techPhone)}</b></p>` : ''}
           </div>
         </div>
-        <div class="p-meta-box">
-          <div contenteditable="true"><strong>العميل:</strong> ${esc(inv.clientName)}</div>
-          <div contenteditable="true"><strong>التاريخ:</strong> ${esc(inv.date || '-')}</div>
-          <div contenteditable="true"><strong>عدد الغرف:</strong> ${inv.rooms.length}</div>
+        <div class="inv-doc">
+          <span class="tag" ${ce}>كشف حساب</span>
+          <span class="d" ${ce}>التاريخ: <b>${esc(inv.date || '-')}</b></span>
+          <span class="d" ${ce}>عدد الغرف: <b>${inv.rooms.length}</b></span>
         </div>
-      </div>
+      </header>
+      <div class="inv-stripe"></div>
 
-      ${pricingHeaderBar}
+      <section class="inv-client">${clientFields}</section>
+      <div class="inv-pricing">${chips.join('')}</div>
 
-      <div class="p-section-caption" contenteditable="true">أولاً: بيان تفصيل الغرف والأقسام</div>
+      <h2 class="inv-sec"><span class="n">1</span><span ${ce}>تفصيل الغرف والأقسام</span></h2>
       <table class="p-table">
         <thead><tr>
-          <th style="width:28px;" contenteditable="true">م</th>
-          <th contenteditable="true">الغرفة / القسم</th>
-          <th contenteditable="true">برايز ومفاتيح (1 ن)</th>
-          <th contenteditable="true">إسبوتات (النقاط)</th>
-          <th contenteditable="true">شريط ليد (النقاط)</th>
-          <th contenteditable="true">مجموع نقاط الغرفة</th>
-          <th contenteditable="true">ليد بروفايل وإضافات</th>
-          <th contenteditable="true">إجمالي الغرفة</th>
+          <th ${ce}>م</th>
+          <th ${ce}>الغرفة / القسم</th>
+          <th ${ce}>برايز ومفاتيح</th>
+          <th ${ce}>إسبوتات</th>
+          <th ${ce}>شريط ليد</th>
+          <th ${ce}>نقاط الغرفة</th>
+          <th ${ce}>بروفايل وإضافات</th>
+          <th ${ce}>إجمالي الغرفة</th>
         </tr></thead>
         <tbody>${roomRowsHTML || '<tr><td colspan="8">لا توجد غرف مضافة</td></tr>'}</tbody>
         <tfoot><tr>
-          <td colspan="2" style="text-align:right;" contenteditable="true">إجمالي الغرف</td>
-          <td contenteditable="true">${fmt(t.totSockets)} (${fmt(t.totSockets)} ن)</td>
-          <td contenteditable="true">${fmt(t.totSpots)} (${fmt(t.totSpotsPts)} ن)</td>
-          <td contenteditable="true">${fmt(t.totStrip)} م (${fmt(t.totStripPts)} ن)</td>
-          <td contenteditable="true">${fmt(t.sumRoomsTotalPts)} نقطة</td>
-          <td contenteditable="true">${fmt(t.sumProfileCost + t.sumExtrasCost)} ج.م</td>
-          <td contenteditable="true">${fmt(t.sumRoomsTotalCost)} ج.م</td>
+          <td colspan="2" style="text-align:right;" ${ce}>إجمالي الغرف</td>
+          <td ${ce}>${fmt(t.totSockets)}<span class="pts">(${fmt(t.totSockets)} ن)</span></td>
+          <td ${ce}>${fmt(t.totSpots)}<span class="pts">(${fmt(t.totSpotsPts)} ن)</span></td>
+          <td ${ce}>${fmt(t.totStrip)} م<span class="pts">(${fmt(t.totStripPts)} ن)</span></td>
+          <td ${ce}>${fmt(t.sumRoomsTotalPts)} نقطة</td>
+          <td ${ce}>${money(t.sumProfileCost + t.sumExtrasCost)}</td>
+          <td class="money" ${ce}>${money(t.sumRoomsTotalCost)}</td>
         </tr></tfoot>
       </table>
 
-      ${panelTable}
+      <h2 class="inv-sec"><span class="n">2</span><span ${ce}>خطوط اللوحة الأتوماتيك والصواعد الرئيسية</span></h2>
+      <table class="p-table">
+        <thead><tr>
+          <th ${ce}>البند</th>
+          <th ${ce}>العدد</th>
+          <th ${ce}>النقاط</th>
+          <th ${ce}>سعر النقطة</th>
+          <th ${ce}>الإجمالي</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="room-col" ${ce}>خطوط اللوحة الأتوماتيك (الخط = 2 نقطة)</td>
+            <td ${ce}>${p.linesCount ? `${fmt(p.linesCount)} خط` : '-'}</td>
+            <td ${ce}>${fmt(p.linesPts)} ن</td>
+            <td ${ce}>${money(p.rateUsed)}</td>
+            <td class="money" ${ce}>${money(p.linesCost)}</td>
+          </tr>
+          <tr>
+            <td class="room-col" ${ce}>الصواعد الرئيسية للشقة (الصاعد = 2 نقطة)</td>
+            <td ${ce}>${p.risersCount ? `${fmt(p.risersCount)} صاعد` : '-'}</td>
+            <td ${ce}>${fmt(p.risersPts)} ن</td>
+            <td ${ce}>${money(p.rateUsed)}</td>
+            <td class="money" ${ce}>${money(p.risersCost)}</td>
+          </tr>
+        </tbody>
+        <tfoot><tr>
+          <td style="text-align:right;" ${ce}>إجمالي اللوحة والصواعد</td>
+          <td ${ce}>${fmt(p.linesCount + p.risersCount)}</td>
+          <td ${ce}>${fmt(p.totalPanelPts)} ن</td>
+          <td ${ce}>-</td>
+          <td class="money" ${ce}>${money(p.totalPanelCost)}</td>
+        </tr></tfoot>
+      </table>
 
-      <div class="p-bottom-grid">
-        <div class="p-notes-box">
-          <div contenteditable="true">
-            <strong style="font-size:.95rem;">قواعد حساب النقاط المعتمدة:</strong>
-            <ul style="margin-right:15px; margin-top:3px; line-height:1.4;">
-              <li>البريزة أو المفتاح = 1 نقطة | خط الأتوماتيك = 2 نقطة | الصاعد الرئيسي = 2 نقطة.</li>
-              <li>الإسبوت = 0.5 نقطة | متر شريط الليد = 0.5 نقطة.</li>
-              ${inv.systemType === 'old' ? `<li>النظام القديم: (${fmt(t.totalBasePtsAll)} ن) تأسيس ولوحة وصواعد بمتوسط السعر (${fmt(avgRate)} ج.م)، و(${fmt(t.sumFinishPts)} ن) إسبوتات وشريط ليد بالسعر الحالي (${fmt(inv.newPointPrice)} ج.م).</li>` : ''}
-            </ul>
-          </div>
-          <div contenteditable="true" style="display:flex; justify-content:space-between; margin-top:8px; padding-top:6px; border-top:1.5px dashed #0b1b33;">
-            <span>توقيع القائم بالأعمال: ....................</span>
-            <span>اعتماد العميل: ....................</span>
-          </div>
+      <div class="inv-bottom">
+        <div class="inv-side">
+        <div class="inv-notes" ${ce}>
+          <h4>طريقة حساب النقاط</h4>
+          <ul>
+            <li>البريزة أو المفتاح = 1 نقطة.</li>
+            <li>خط الأتوماتيك = 2 نقطة · الصاعد الرئيسي = 2 نقطة.</li>
+            <li>الإسبوت = ½ نقطة · متر شريط الليد = ½ نقطة.</li>
+            ${isOld ? `<li>النظام القديم: (${fmt(t.totalBasePtsAll)} ن) تأسيس ولوحة وصواعد بمتوسط السعر (${money(avgRate)})، و(${fmt(t.sumFinishPts)} ن) إسبوتات وشريط ليد بالسعر الحالي (${money(inv.newPointPrice)}).</li>` : ''}
+          </ul>
         </div>
+        <div class="inv-sign">
+          <div ${ce}>توقيع القائم بالأعمال</div>
+          <div ${ce}>اعتماد العميل</div>
+        </div>
+        </div>
+        <div class="inv-totals">
+          <table class="p-totals-table">
+            ${isOld ? `
+              <tr><td ${ce}>نقاط البرايز والخطوط والصواعد (${fmt(t.totalBasePtsAll)} ن × ${money(avgRate)})</td><td ${ce}>${money(t.totalBaseCostAll)}</td></tr>
+              <tr><td ${ce}>نقاط الإسبوتات وشريط الليد (${fmt(t.sumFinishPts)} ن × ${money(inv.newPointPrice)})</td><td ${ce}>${money(t.sumFinishCost)}</td></tr>
+            ` : `
+              <tr><td ${ce}>إجمالي النقاط (${fmt(t.allPointsCount)} ن × ${money(inv.newPointPrice)})</td><td ${ce}>${money(t.pointsCostTotal)}</td></tr>
+            `}
+            ${t.sumProfileCost > 0 ? `<tr><td ${ce}>الليد بروفايل (${fmt(t.sumProfileMeters)} م)</td><td ${ce}>${money(t.sumProfileCost)}</td></tr>` : ''}
+            ${t.sumExtrasCost > 0 ? `<tr><td ${ce}>البنود الإضافية</td><td ${ce}>${money(t.sumExtrasCost)}</td></tr>` : ''}
+            <tr class="sub"><td ${ce}>إجمالي المصنعية المستحقة</td><td ${ce}>${money(t.grandTotal)}</td></tr>
+            ${inv.discountAmount > 0 ? `<tr class="minus"><td ${ce}>الخصم</td><td ${ce}>- ${money(inv.discountAmount)}</td></tr>` : ''}
+            ${inv.paidAmount > 0 ? `<tr class="paid"><td ${ce}>المدفوع تحت الحساب</td><td ${ce}>- ${money(inv.paidAmount)}</td></tr>` : ''}
+          </table>
+          <div class="inv-net"><span ${ce}>الصافي المطلوب سداده</span><strong ${ce}>${money(t.netRemaining)}</strong></div>
+        </div>
+      </div>
 
-        <table class="p-totals-table">
-          ${inv.systemType === 'old' ? `
-            <tr><td contenteditable="true">نقاط البرايز والخطوط والصواعد (${fmt(t.totalBasePtsAll)} ن × ${fmt(avgRate)} ج.م)</td><td contenteditable="true" style="text-align:left;">${fmt(t.totalBaseCostAll)} ج.م</td></tr>
-            <tr><td contenteditable="true">نقاط الإسبوتات وشريط الليد (${fmt(t.sumFinishPts)} ن × ${fmt(inv.newPointPrice)} ج.م)</td><td contenteditable="true" style="text-align:left;">${fmt(t.sumFinishCost)} ج.م</td></tr>
-          ` : `
-            <tr><td contenteditable="true">إجمالي النقاط الكلي (${fmt(t.allPointsCount)} ن × ${fmt(inv.newPointPrice)} ج.م)</td><td contenteditable="true" style="text-align:left;">${fmt(t.pointsCostTotal)} ج.م</td></tr>
-          `}
-          ${t.sumProfileCost > 0 ? `<tr><td contenteditable="true">إجمالي الليد بروفايل (${fmt(t.sumProfileMeters)} م)</td><td contenteditable="true" style="text-align:left;">${fmt(t.sumProfileCost)} ج.م</td></tr>` : ''}
-          ${t.sumExtrasCost > 0 ? `<tr><td contenteditable="true">إجمالي البنود الإضافية</td><td contenteditable="true" style="text-align:left;">${fmt(t.sumExtrasCost)} ج.م</td></tr>` : ''}
-          <tr><td contenteditable="true">إجمالي المصنعية المستحقة</td><td contenteditable="true" style="text-align:left;">${fmt(t.grandTotal)} ج.م</td></tr>
-          ${inv.discountAmount > 0 ? `<tr><td contenteditable="true">الخصم</td><td contenteditable="true" style="text-align:left; color:#e11d48 !important;">- ${fmt(inv.discountAmount)} ج.م</td></tr>` : ''}
-          ${inv.paidAmount > 0 ? `<tr><td contenteditable="true">المدفوع تحت الحساب</td><td contenteditable="true" style="text-align:left; color:#0d9488 !important;">- ${fmt(inv.paidAmount)} ج.م</td></tr>` : ''}
-          <tr class="final-row"><td contenteditable="true">الصافي المطلوب سداده</td><td contenteditable="true" style="text-align:left;">${fmt(t.netRemaining)} ج.م</td></tr>
-        </table>
-      </div>`;
+      <footer class="inv-foot">
+        <span ${ce}>شكراً لثقتكم — <b>${esc(appData.techName || '')}</b>${appData.techPhone ? ` · <span dir="ltr">${esc(appData.techPhone)}</span>` : ''}</span>
+        <span>صدرت بواسطة تطبيق <b>حساباتي</b></span>
+      </footer>`;
   }
 
   function openSinglePagePreview(autoPrint = false) {
     buildSinglePageHTML();
     openOverlay('preview');
-    document.getElementById('printPreviewModal').scrollTop = 0;
-    if (autoPrint) setTimeout(() => window.print(), 250);
+    const modal = document.getElementById('printPreviewModal');
+    modal.scrollTop = 0;
+    fitPreview();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitPreview);
+    if (autoPrint) setTimeout(() => window.print(), 300);
   }
   function triggerSystemPrint() { window.print(); }
   function closeSinglePagePreview() { closeOverlay(); }
@@ -1534,6 +1649,8 @@
     let text = `*⚡ ${appData.invoiceTitle || 'كشف حساب أعمال كهرباء'}*\n`;
     if (appData.techName) text += `*${appData.techName}*\n`;
     text += `*العميل:* ${inv.clientName} | *التاريخ:* ${inv.date || '-'}\n`;
+    if (inv.clientPhone) text += `*هاتف العميل:* ${inv.clientPhone}\n`;
+    if (inv.clientAddress) text += `*العنوان:* ${inv.clientAddress}\n`;
     if (inv.systemType === 'old') text += `*نظام الحساب:* النظام القديم (متوسط النقطة ${fmt(t.avgRate)} ج.م / الحالي ${fmt(inv.newPointPrice)} ج.م)\n`;
     else text += `*سعر النقطة:* ${fmt(inv.newPointPrice)} ج.م\n`;
     text += `--------------------------------\n`;
