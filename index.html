@@ -1,513 +1,443 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <link rel="manifest" href="./manifest.json">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#3b0d32">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>حساباتي - حاسبة وفواتير الكهرباء</title>
+  <meta name="description" content="حسابات نقاط تأسيس الكهرباء وإعداد فواتير العملاء">
+  <meta name="author" content="أحمد حسن عبدالله">
+  <meta name="copyright" content="© 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة">
+  <meta name="theme-color" content="#1B2E4B">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>حاسبة وفواتير الكهرباء</title>
-  <!-- استدعاء خط القاهرة العريض (Cairo Bold) لكامل التطبيق والفاتورة -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <!--
+    حساباتي - حاسبة وفواتير الكهرباء
+    تصميم وتطوير: أحمد حسن عبدالله
+    © 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة. يُمنع النسخ أو التعديل أو إعادة النشر بدون إذن كتابي.
+  -->
   <style>
     :root {
-      --onion-darkest: #26071f;
-      --onion-deep: #3b0d32;
-      --onion-plum: #6a1b55;
-      --onion-magenta: #9c2f73;
-      --onion-copper: #d97736;
-      --onion-copper-soft: #fff4ec;
-      --onion-blush: #f5eaf1;
-      --onion-cream: #fcf8fb;
-      --onion-border: #d8b4c8;
-      --text-main: #1f0519;
-      --text-muted: #5e3a54;
-      --danger: #e11d48;
+      /* ألوان مأخوذة من أيقونة التطبيق */
+      --navy: #1B2E4B;
+      --navy-deep: #12223A;
+      --navy-soft: #EEF2F8;
+      --orange: #F28C28;
+      --orange-deep: #D9701A;
+      --orange-soft: #FFF3E6;
+      --volt: #FFC233;
+      --bg: #F4F6FA;
+      --card: #FFFFFF;
+      --line: #E2E8F0;
+      --line-strong: #CBD5E1;
+      --ink: #14213A;
+      --muted: #5C6B82;
+      --danger: #D9434E;
+      --danger-soft: #FDECEE;
+      --success: #12A27A;
+      --tab-h: 64px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+
       --p-font-size: 13px;
       --p-cell-pad-v: 5px;
       --p-cell-pad-h: 6px;
       --p-logo-height: 58px;
-      --font-ruqaa: 'Cairo', system-ui, -apple-system, sans-serif;
-      --font-bold: 'Cairo', system-ui, -apple-system, sans-serif;
+      --font-main: 'Cairo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --font-bold: var(--font-main);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: var(--font-bold) !important;
-      font-weight: 700;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body {
       width: 100%;
       max-width: 100vw;
       overflow-x: hidden;
-      background: var(--onion-cream);
-      color: var(--text-main);
-      line-height: 1.45;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-main);
+      font-weight: 600;
+      line-height: 1.5;
     }
+    html { font-size: 16px; }
+    body { font-size: 15px; }
+    button, input, select, textarea { font-family: inherit; color: inherit; }
+    button { cursor: pointer; }
+    .num { font-variant-numeric: tabular-nums; }
+    .ic { width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .ic-fill { fill: currentColor; stroke: none; }
+    :focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 
-    body { padding-bottom: 45px; }
-
-    /* تطبيق خط القاهرة العريض (Cairo Bold) على جميع العناوين والعناصر */
-    .ruqaa-text, h1, h2, h3, h4, .active-view-title, .drawer-head, button, input, select, textarea {
-      font-family: var(--font-bold) !important;
-      font-weight: 700 !important;
-    }
-
-    /* الشريط العلوي النحيف */
-    .top-bar {
-      background: linear-gradient(135deg, var(--onion-darkest), var(--onion-plum));
+    /* ========== الشريط العلوي + العداد ========== */
+    .top-wrap { position: sticky; top: 0; z-index: 300; }
+    .app-bar {
+      background: var(--navy);
       color: #fff;
-      height: 54px;
-      padding: 0 10px;
-      position: sticky;
-      top: 0;
-      z-index: 300;
+      padding: calc(env(safe-area-inset-top, 0px) + 8px) 14px 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      box-shadow: 0 2px 12px rgba(38,7,31,0.28);
+      gap: 10px;
     }
-    .nav-right-group { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
-    .dots-menu-btn {
-      background: rgba(255,255,255,0.14);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.25);
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      font-weight: 900;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .active-view-title { font-size: 1.05rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    /* القائمة المنسدلة للطباعة */
-    .print-dropdown-wrap { position: relative; flex-shrink: 0; }
-    .print-dropdown-btn {
-      background: linear-gradient(135deg, var(--onion-copper), #b85d1f);
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-icon { width: 38px; height: 38px; border-radius: 10px; background: #fff; flex-shrink: 0; }
+    .brand-text { min-width: 0; }
+    .brand-name { font-size: 1.05rem; font-weight: 800; line-height: 1.2; }
+    .brand-sub { font-size: 0.78rem; font-weight: 600; color: #B9C6DA; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 52vw; }
+    .bar-btn {
+      background: var(--orange);
       color: #fff;
       border: none;
-      height: 36px;
-      padding: 0 11px;
-      border-radius: 9px;
-      font-size: 0.82rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-    }
-    .print-dropdown-list {
-      display: none;
-      position: absolute;
-      left: 0;
-      top: 44px;
-      width: 245px;
-      max-width: 88vw;
-      background: #fff;
+      height: 40px;
+      padding: 0 14px;
       border-radius: 12px;
-      border: 2px solid var(--onion-plum);
-      box-shadow: 0 12px 28px rgba(38,7,31,0.28);
-      overflow: hidden;
-      z-index: 400;
-    }
-    .print-dropdown-list.open { display: block; }
-    .dropdown-action-item {
-      width: 100%;
-      padding: 11px 13px;
-      border: none;
-      background: #fff;
-      color: var(--text-main);
-      font-size: 0.84rem;
-      font-weight: 800;
-      text-align: right;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      border-bottom: 1px solid var(--onion-blush);
-      cursor: pointer;
-    }
-    .dropdown-action-item:last-child { border-bottom: none; }
-
-    /* القائمة الجانبية (الثلاث نقاط) */
-    .drawer-backdrop { display: none; position: fixed; inset: 0; background: rgba(38,7,31,0.55); z-index: 350; }
-    .drawer-backdrop.open { display: block; }
-    .side-drawer {
-      position: fixed;
-      top: 0;
-      right: -290px;
-      width: 275px;
-      max-width: 82vw;
-      height: 100vh;
-      background: #fff;
-      z-index: 360;
-      box-shadow: -5px 0 25px rgba(38,7,31,0.3);
-      transition: right 0.24s ease;
-      display: flex;
-      flex-direction: column;
-    }
-    .side-drawer.open { right: 0; }
-    .drawer-head {
-      background: linear-gradient(135deg, var(--onion-darkest), var(--onion-plum));
-      color: #fff;
-      padding: 16px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 1.1rem;
-    }
-    .drawer-close-btn { background: rgba(255,255,255,0.15); color: #fff; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; }
-    .drawer-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; }
-    .drawer-nav-item {
-      width: 100%;
-      padding: 12px 13px;
-      border-radius: 10px;
-      border: 1.5px solid var(--onion-border);
-      background: var(--onion-cream);
-      color: var(--text-main);
       font-size: 0.88rem;
       font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 3px 0 var(--orange-deep);
+    }
+    .bar-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--orange-deep); }
+
+    /* العداد: لوحة تشبه عداد الكهرباء الرقمي */
+    .meter {
+      background: var(--navy-deep);
+      color: #fff;
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 14px 10px;
+      border: none;
+      width: 100%;
+      text-align: right;
+      border-bottom: 3px solid var(--orange);
+    }
+    .meter-main { display: flex; flex-direction: column; min-width: 0; }
+    .meter-label { font-size: 0.74rem; color: #93A4BE; font-weight: 700; }
+    .meter-val {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--volt);
+      line-height: 1.15;
+      letter-spacing: 0.3px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      text-shadow: 0 0 14px rgba(255,194,51,0.35);
+    }
+    .meter-side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding-right: 12px;
+      border-right: 1px solid rgba(255,255,255,0.12);
+    }
+    .meter-side b { font-size: 1rem; font-weight: 800; color: #fff; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .meter-val.tick { animation: tick 0.42s ease-out; }
+    @keyframes tick { 0% { opacity: 0.35; transform: translateY(3px); } 100% { opacity: 1; transform: none; } }
+
+    /* ========== المحتوى ========== */
+    .container { width: 100%; max-width: 640px; margin: 0 auto; padding: 14px 12px calc(var(--tab-h) + var(--safe-b) + 24px); }
+    .view-panel { display: none; }
+    .view-panel.active { display: block; animation: panelIn 0.18s ease-out; }
+    @keyframes panelIn { from { opacity: 0; } to { opacity: 1; } }
+    .panel-title { font-size: 1.25rem; font-weight: 900; color: var(--navy); margin: 2px 4px 12px; }
+
+    .sec { background: var(--card); border: 1px solid var(--line); border-radius: 16px; margin-bottom: 12px; }
+    .sec-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 13px 14px 4px; }
+    .sec-head h3 { font-size: 1rem; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+    .sec-head h3 .ic { color: var(--orange); }
+    .sec-body { padding: 10px 14px 14px; }
+    .pill { background: var(--orange-soft); color: var(--orange-deep); font-size: 0.78rem; font-weight: 800; padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+    .pill.navy { background: var(--navy-soft); color: var(--navy); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    @media (max-width: 420px) { .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid-3 > :first-child { grid-column: 1 / -1; } }
+
+    .form-group { margin-bottom: 10px; min-width: 0; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+    .form-group label small { font-weight: 600; color: #8A97AB; }
+    input[type="text"], input[type="number"], input[type="tel"], select {
+      width: 100%;
+      min-width: 0;
+      height: 46px;
+      padding: 0 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      background: #FAFBFD;
+      color: var(--ink);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    input::placeholder { color: #A3AFC0; font-weight: 600; }
+    input:focus, select:focus { outline: none; border-color: var(--orange); background: #fff; }
+    input[type="number"] { font-variant-numeric: tabular-nums; }
+
+    /* عدّاد + و − */
+    .stepper { display: flex; align-items: stretch; height: 46px; border: 1.5px solid var(--line); border-radius: 12px; background: #FAFBFD; overflow: hidden; }
+    .stepper:focus-within { border-color: var(--orange); background: #fff; }
+    .stepper input { border: none !important; background: transparent !important; text-align: center; height: 100%; padding: 0 2px; border-radius: 0; -moz-appearance: textfield; }
+    .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .step-btn { width: 42px; flex-shrink: 0; border: none; background: var(--navy-soft); color: var(--navy); font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .step-btn:active { background: var(--orange); color: #fff; }
+
+    /* اختيار نظام الحساب */
+    .sys-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .sys-radio-card {
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: #FAFBFD;
       text-align: right;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
+      flex-direction: column;
+      gap: 2px;
+      transition: border-color 0.15s, background 0.15s;
     }
-    .drawer-nav-item.active {
-      background: linear-gradient(135deg, var(--onion-plum), var(--onion-magenta));
+    .sys-radio-card .sys-title { font-size: 0.92rem; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+    .sys-radio-card .sys-desc { font-size: 0.74rem; color: var(--muted); font-weight: 600; line-height: 1.4; }
+    .radio-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line-strong); flex-shrink: 0; }
+    .sys-radio-card.selected { border-color: var(--orange); background: var(--orange-soft); }
+    .sys-radio-card.selected .radio-dot { border-color: var(--orange); background: radial-gradient(var(--orange) 45%, transparent 50%); }
+    .rule-banner { background: var(--navy-soft); color: var(--navy); padding: 10px 12px; border-radius: 12px; font-size: 0.82rem; font-weight: 600; line-height: 1.7; margin-top: 10px; }
+    .rule-banner strong { font-weight: 800; }
+
+    .chips-wrap { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .chips-wrap::-webkit-scrollbar { display: none; }
+    .chip { background: #fff; color: var(--navy); border: 1.5px solid var(--line); padding: 6px 12px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+    .chip:active, .chip.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 48px; padding: 0 16px; border-radius: 13px; font-weight: 800; font-size: 0.92rem; border: none; width: 100%; transition: transform 0.08s; }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--navy); color: #fff; }
+    .btn-orange, .btn-copper { background: var(--orange); color: #fff; }
+    .btn-outline { background: #fff; border: 1.5px solid var(--line-strong); color: var(--navy); }
+    .btn-danger { background: var(--danger-soft); color: var(--danger); }
+    .btn-ghost { background: transparent; color: var(--muted); min-height: 42px; }
+    .btn-sm { min-height: 36px; padding: 0 12px; font-size: 0.8rem; width: auto; border-radius: 10px; }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .extra-item-row { display: grid; grid-template-columns: 1.6fr 0.8fr 0.9fr 40px; gap: 6px; margin-bottom: 8px; align-items: center; }
+    .extra-item-row input { height: 42px; font-size: 15px; padding: 0 8px; }
+    .extra-item-row .btn { min-height: 42px; width: 40px; padding: 0; }
+    .extras-head { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 8px; gap: 8px; }
+    .extras-head span { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+
+    /* الغرف */
+    .room-card { border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-bottom: 10px; background: #fff; }
+    .room-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .room-name { font-weight: 800; font-size: 1rem; color: var(--navy); }
+    .room-total-badge { background: var(--navy); color: var(--volt); padding: 3px 10px; border-radius: 8px; font-weight: 800; font-size: 0.86rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .room-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+    .room-detail-item { background: var(--bg); padding: 6px 9px; border-radius: 8px; display: flex; justify-content: space-between; gap: 6px; }
+    .room-detail-item strong { color: var(--ink); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .room-foot { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--muted); padding-top: 8px; border-top: 1px dashed var(--line); gap: 8px; }
+    .room-foot strong { color: var(--ink); }
+    .room-actions { display: flex; gap: 6px; }
+    .empty-state { text-align: center; color: var(--muted); padding: 20px 10px; font-size: 0.88rem; font-weight: 600; }
+    .empty-state .ic { width: 34px; height: 34px; color: var(--line-strong); margin-bottom: 6px; }
+
+    /* الملخص */
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .stat { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+    .stat span { display: block; font-size: 0.76rem; color: var(--muted); font-weight: 700; }
+    .stat b { font-size: 1.05rem; font-weight: 900; color: var(--navy); font-variant-numeric: tabular-nums; }
+    .summary-box { background: var(--navy-deep); color: #fff; border-radius: 18px; padding: 16px; margin-bottom: 12px; }
+    .summary-title { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.14); font-size: 0.86rem; gap: 10px; color: #D5DEEB; font-weight: 600; }
+    .summary-row strong { color: #fff; font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .summary-row.total { border-bottom: none; font-size: 1.15rem; font-weight: 900; color: var(--volt); padding-top: 12px; }
+    .summary-row.total span:last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+    /* الفواتير المحفوظة */
+    .inv-item { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px; border: 1.5px solid var(--line); border-radius: 14px; background: #fff; margin-bottom: 8px; text-align: right; }
+    .inv-item.current { border-color: var(--orange); background: var(--orange-soft); }
+    .inv-main { min-width: 0; }
+    .inv-name { font-weight: 800; font-size: 0.95rem; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .inv-meta { font-size: 0.76rem; color: var(--muted); font-weight: 600; }
+    .inv-net { font-weight: 900; color: var(--navy); white-space: nowrap; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+    .inv-tag { font-size: 0.7rem; font-weight: 800; color: var(--orange-deep); }
+
+    .logo-config-box { border: 1.5px dashed var(--line-strong); background: #FAFBFD; padding: 12px; border-radius: 14px; margin-top: 4px; }
+    .logo-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .check-label { font-size: 0.86rem; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+    .check-label input { width: 20px; height: 20px; accent-color: var(--orange); }
+    .logo-preview-thumb { max-height: 46px; max-width: 110px; object-fit: contain; border-radius: 8px; border: 1px solid var(--line); background: #fff; padding: 3px; }
+
+    /* المزيد: التحديثات وعن التطبيق */
+    .ver-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--bg); margin-bottom: 10px; font-size: 0.86rem; }
+    .ver-line b { font-variant-numeric: tabular-nums; color: var(--navy); }
+    .upd-status { font-size: 0.84rem; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+    .upd-status.available { color: var(--orange-deep); font-weight: 800; }
+    .about-card { text-align: center; padding: 22px 16px 18px; }
+    .about-icon { width: 76px; height: 76px; border-radius: 20px; margin: 0 auto 8px; display: block; }
+    .about-app { font-size: 1.35rem; font-weight: 900; color: var(--navy); }
+    .about-tag { font-size: 0.84rem; color: var(--muted); font-weight: 600; margin-bottom: 16px; }
+    .dev-box { border-top: 1px solid var(--line); padding-top: 16px; }
+    .dev-role { font-size: 0.78rem; color: var(--muted); font-weight: 700; }
+    .dev-name { font-size: 1.2rem; font-weight: 900; color: var(--ink); margin-bottom: 12px; }
+    .contact-btn { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; text-decoration: none; color: var(--ink); margin-bottom: 8px; text-align: right; }
+    .contact-btn .c-ic { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+    .contact-btn .c-ic .ic { width: 22px; height: 22px; }
+    .contact-btn .c-text { flex: 1; min-width: 0; }
+    .contact-btn .c-title { font-weight: 800; font-size: 0.92rem; }
+    .contact-btn .c-sub { font-size: 0.78rem; color: var(--muted); font-weight: 600; direction: ltr; text-align: right; unicode-bidi: plaintext; }
+    .wa .c-ic { background: #1FAF5A; }
+    .fb .c-ic { background: #1877F2; }
+    .copyright { font-size: 0.78rem; color: var(--muted); line-height: 1.8; font-weight: 600; padding: 4px 4px 0; }
+    .copyright strong { color: var(--ink); }
+    .copyright a { color: var(--navy); font-weight: 800; }
+    .credit-line { text-align: center; font-size: 0.74rem; color: #8A97AB; font-weight: 600; margin-top: 18px; }
+    .credit-line b { color: var(--muted); }
+
+    /* ========== التبويبات السفلية ========== */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 300;
+      height: calc(var(--tab-h) + var(--safe-b));
+      padding-bottom: var(--safe-b);
+      background: #fff;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      box-shadow: 0 -6px 20px rgba(18,34,58,0.06);
+    }
+    .tab-btn { position: relative; border: none; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 0.72rem; font-weight: 700; color: #7C8AA0; }
+    .tab-btn .ic { width: 23px; height: 23px; }
+    .tab-btn.active { color: var(--navy); }
+    .tab-btn.active .ic { color: var(--orange); }
+    .tab-btn.active::before { content: ''; position: absolute; top: 0; width: 32px; height: 3px; border-radius: 0 0 3px 3px; background: var(--orange); }
+    .tab-badge { position: absolute; top: 7px; left: calc(50% - 22px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--orange); color: #fff; font-size: 0.68rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .tab-badge:empty { display: none; }
+    .tab-dot { position: absolute; top: 9px; left: calc(50% - 16px); width: 9px; height: 9px; border-radius: 50%; background: var(--orange); border: 2px solid #fff; display: none; }
+    .tab-dot.on { display: block; }
+
+    /* ========== النوافذ السفلية ========== */
+    .sheet-backdrop { position: fixed; inset: 0; background: rgba(18,34,58,0.5); z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+    .sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 910;
+      background: #fff;
+      border-radius: 22px 22px 0 0;
+      padding: 8px 16px calc(16px + var(--safe-b));
+      max-width: 640px;
+      margin: 0 auto;
+      transform: translateY(105%);
+      transition: transform 0.24s cubic-bezier(.2,.8,.2,1);
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+    .sheet.open { transform: none; }
+    .sheet-grip { width: 42px; height: 5px; border-radius: 9px; background: var(--line-strong); margin: 0 auto 12px; }
+    .sheet h4 { font-size: 1.05rem; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
+    .sheet-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 6px; border: none; background: none; border-bottom: 1px solid var(--line); font-size: 0.95rem; font-weight: 700; color: var(--ink); text-align: right; }
+    .sheet-item:last-child { border-bottom: none; }
+    .sheet-item .ic { color: var(--orange); width: 22px; height: 22px; }
+    .upd-notes { list-style: none; margin: 4px 0 14px; }
+    .upd-notes li { position: relative; padding: 5px 18px 5px 0; font-size: 0.88rem; color: var(--ink); font-weight: 600; }
+    .upd-notes li::before { content: ''; position: absolute; right: 2px; top: 13px; width: 7px; height: 7px; border-radius: 50%; background: var(--orange); }
+    .upd-version { font-size: 0.84rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    .upd-version b { color: var(--orange-deep); }
+    .upd-actions { display: flex; flex-direction: column; gap: 8px; }
+    .upd-progress { display: none; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 700; color: var(--navy); padding: 12px 0; }
+    .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--navy-soft); border-top-color: var(--orange); animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sheet.busy .upd-actions { display: none; }
+    .sheet.busy .upd-progress { display: flex; }
+
+    .app-toast {
+      position: fixed;
+      bottom: calc(var(--tab-h) + var(--safe-b) + 14px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--navy-deep);
       color: #fff;
-      border-color: var(--onion-deep);
-    }
-    .drawer-badge { background: var(--onion-copper); color: #fff; font-size: 0.74rem; padding: 2px 8px; border-radius: 99px; font-weight: 800; }
-
-    /* البطاقات والحقول */
-    .container { width: 100%; max-width: 720px; margin: 0 auto; padding: 10px; }
-    .metrics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-bottom: 12px; }
-    .metric-box {
-      background: #fff;
-      border: 1.5px solid var(--onion-border);
-      border-radius: 10px;
-      padding: 7px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 4px;
-      min-width: 0;
-    }
-    .metric-box.net-highlight { background: var(--onion-copper-soft); border-color: var(--onion-copper); }
-    .metric-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 800; white-space: nowrap; }
-    .metric-val { font-size: 0.9rem; font-weight: 900; color: var(--onion-plum); white-space: nowrap; }
-    .metric-box.net-highlight .metric-val { color: var(--onion-copper); font-size: 0.95rem; }
-
-    .view-panel { display: none; }
-    .view-panel.active { display: block; }
-    .card {
-      background: #fff;
+      padding: 11px 18px;
       border-radius: 14px;
-      border: 1.5px solid var(--onion-border);
-      margin-bottom: 12px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(106,27,85,0.06);
-      width: 100%;
+      font-size: 0.88rem;
+      font-weight: 700;
+      z-index: 2000;
+      box-shadow: 0 8px 24px rgba(18,34,58,0.3);
+      display: none;
+      text-align: center;
+      width: max-content;
+      max-width: 90vw;
     }
-    .card-head-dark {
-      background: linear-gradient(135deg, var(--onion-deep), var(--onion-plum));
-      color: #fff;
-      padding: 10px 13px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+    .app-confirm-backdrop { display: none; position: fixed; inset: 0; background: rgba(18,34,58,0.55); z-index: 2100; align-items: center; justify-content: center; padding: 20px; }
+    .app-confirm-box { background: #fff; border-radius: 18px; padding: 20px; max-width: 340px; width: 100%; text-align: center; box-shadow: 0 14px 34px rgba(18,34,58,0.3); }
+    .app-confirm-box p { margin-bottom: 16px; font-size: 0.98rem; font-weight: 700; color: var(--ink); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
     }
-    .card-head-dark h3 { font-size: 1rem; color: #fff; }
-    .pill-copper { background: var(--onion-copper); color: #fff; font-size: 0.74rem; padding: 2px 9px; border-radius: 99px; font-weight: 800; }
-    .card-body { padding: 12px; }
-
-    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-    @media (max-width: 390px) { .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-
-    .form-group { margin-bottom: 9px; min-width: 0; }
-    .form-group label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    input[type="text"], input[type="number"], select {
-      width: 100%;
-      min-width: 0;
-      padding: 8px 10px;
-      border: 1.5px solid var(--onion-border);
-      border-radius: 9px;
-      font-size: 0.9rem;
-      font-weight: 800;
-      background: var(--onion-cream);
-      color: var(--text-main);
-    }
-    input:focus, select:focus { outline: none; border-color: var(--onion-magenta); background: #fff; }
-
-    .sys-radio-card { border: 1.5px solid var(--onion-border); border-radius: 11px; padding: 10px 12px; margin-bottom: 8px; background: var(--onion-cream); cursor: pointer; display: flex; align-items: flex-start; gap: 10px; }
-    .sys-radio-card.selected { border-color: var(--onion-copper); background: var(--onion-copper-soft); }
-    .radio-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--onion-plum); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
-    .sys-radio-card.selected .radio-circle { border-color: var(--onion-copper); }
-    .radio-dot { width: 10px; height: 10px; border-radius: 50%; background: transparent; }
-    .sys-radio-card.selected .radio-dot { background: var(--onion-copper); }
-    .sys-radio-info h4 { font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
-    .sys-radio-info p { font-size: 0.75rem; color: var(--text-muted); line-height: 1.35; }
-    .rule-banner { background: var(--onion-blush); border: 1.5px solid var(--onion-border); color: var(--onion-deep); padding: 8px 10px; border-radius: 9px; font-size: 0.8rem; font-weight: 800; margin-top: 6px; }
-
-    .chips-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 9px; }
-    .chip { background: var(--onion-blush); color: var(--onion-plum); border: 1px solid var(--onion-border); padding: 4px 9px; border-radius: 99px; font-size: 0.76rem; font-weight: 800; cursor: pointer; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 13px; border-radius: 10px; font-weight: 800; font-size: 0.86rem; border: none; cursor: pointer; width: 100%; }
-    .btn-primary { background: linear-gradient(135deg, var(--onion-plum), var(--onion-magenta)); color: #fff; }
-    .btn-copper { background: linear-gradient(135deg, var(--onion-copper), #b85d1f); color: #fff; }
-    .btn-outline { background: var(--onion-cream); border: 1.5px solid var(--onion-border); color: var(--onion-plum); }
-    .btn-danger { background: #ffe4e6; color: var(--danger); }
-    .btn-sm { padding: 5px 9px; font-size: 0.75rem; width: auto; }
-
-    .extra-item-row { display: grid; grid-template-columns: 1.5fr 0.85fr 0.85fr 32px; gap: 5px; margin-bottom: 6px; align-items: center; }
-    .room-card { border: 1.5px solid var(--onion-border); border-radius: 10px; padding: 10px; margin-bottom: 8px; background: var(--onion-cream); }
-    .room-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px dashed var(--onion-border); gap: 6px; }
-    .room-name { font-family: var(--font-bold) !important; font-weight: 700; font-size: 1.02rem; color: var(--onion-deep); }
-    .room-total-badge { background: var(--onion-plum); color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.82rem; white-space: nowrap; }
-    .room-details-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; font-size: 0.76rem; color: var(--text-muted); margin-bottom: 6px; }
-    .room-detail-item { background: #fff; padding: 4px 7px; border-radius: 5px; border: 1px solid var(--onion-blush); display: flex; justify-content: space-between; gap: 4px; }
-
-    .summary-box { background: linear-gradient(135deg, var(--onion-darkest), var(--onion-plum)); color: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
-    .summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.12); font-size: 0.85rem; gap: 8px; }
-    .summary-row.total { border-bottom: none; font-size: 1.08rem; font-weight: 900; color: #ffbe88; padding-top: 9px; }
-
-    .logo-config-box { border: 1.5px dashed var(--onion-border); background: var(--onion-cream); padding: 10px; border-radius: 10px; margin-top: 8px; }
-    .logo-preview-thumb { max-height: 46px; max-width: 100px; object-fit: contain; border-radius: 6px; border: 1px solid var(--onion-border); background: #fff; padding: 2px; }
 
     /* =====================================================
-       تصميم الفاتورة المطبوعة والمعاينة (تطابق 100% وتباين عالي جداً)
+       ورقة الفاتورة المطبوعة والمعاينة
        ===================================================== */
-    #printPreviewModal { display: none; position: fixed; inset: 0; background: rgba(38,7,31,0.94); z-index: 999; overflow-y: auto; padding: 8px; }
-    .preview-toolbar { max-width: 210mm; margin: 0 auto 8px auto; background: #fff; padding: 10px; border-radius: 12px; border: 2px solid var(--onion-copper); display: flex; flex-direction: column; gap: 7px; }
-    .toolbar-row { display: flex; flex-wrap: wrap; gap: 5px; justify-content: space-between; align-items: center; }
-    .edit-hint-banner { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 0.76rem; font-weight: 800; padding: 5px 8px; border-radius: 6px; text-align: center; }
+    #printPreviewModal { display: none; position: fixed; inset: 0; background: rgba(18,34,58,0.96); z-index: 999; overflow: auto; padding: 8px; }
+    .preview-toolbar { max-width: 210mm; margin: 0 auto 8px auto; background: #fff; padding: 10px; border-radius: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .toolbar-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: space-between; align-items: center; }
+    .toolbar-tools { display: flex; gap: 6px; flex-wrap: wrap; }
+    .edit-hint-banner { background: var(--orange-soft); color: var(--orange-deep); font-size: 0.78rem; font-weight: 700; padding: 6px 10px; border-radius: 10px; text-align: center; }
 
     #printSheet {
       background: #ffffff !important;
       color: #000000 !important;
-      width: 100%;
-      max-width: 210mm;
+      width: 210mm;
+      max-width: none;
       margin: 0 auto;
       padding: 6mm 7mm;
       border-radius: 4px;
       box-shadow: 0 6px 25px rgba(0,0,0,0.35);
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.45;
     }
+    #printSheet.show-edit-borders [contenteditable="true"] { outline: 1px dashed #F28C28; background-color: #fffaf3; border-radius: 2px; }
 
-    #printSheet.show-edit-borders [contenteditable="true"] {
-      outline: 1px dashed #d97736;
-      background-color: #fffdf9;
-      border-radius: 2px;
-    }
-
-    .p-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 3px solid #3b0d32;
-      padding-bottom: 6px;
-      margin-bottom: 7px;
-      gap: 10px;
-    }
+    .p-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #1B2E4B; padding-bottom: 6px; margin-bottom: 7px; gap: 10px; }
     .p-brand-side { display: flex; align-items: center; gap: 10px; }
     .p-logo-wrap img { height: var(--p-logo-height); max-width: 125px; object-fit: contain; display: block; }
-    .p-title-block h1 {
-      font-family: var(--font-bold) !important;
-      font-size: 1.45rem;
-      color: #3b0d32 !important;
-      font-weight: 700 !important;
-      margin-bottom: 2px;
-    }
-    .p-title-block p {
-      font-family: var(--font-bold) !important;
-      font-size: 0.98rem;
-      color: #000000 !important;
-      font-weight: 700 !important;
-    }
-    .p-meta-box {
-      text-align: right;
-      font-size: 0.84rem;
-      font-weight: 800;
-      background: #f8eff4 !important;
-      color: #000000 !important;
-      border: 2px solid #3b0d32;
-      padding: 5px 10px;
-      border-radius: 7px;
-      line-height: 1.4;
-    }
-
-    /* شريط التسعيرة (لا يذكر النظام الحديث، ويوضح النظام القديم بوضوح تام) */
-    .p-pricing-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 8px;
-      background: #fdf2f8 !important;
-      border: 2px solid #6a1b55;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 0.84rem;
-      font-weight: 900;
-      color: #26071f !important;
-      margin-bottom: 7px;
-    }
-
-    .p-section-caption {
-      font-family: var(--font-bold) !important;
-      font-size: 1.05rem;
-      font-weight: 700 !important;
-      color: #3b0d32 !important;
-      background: #f3e4ec !important;
-      border-right: 4px solid #6a1b55;
-      padding: 3px 8px;
-      margin-bottom: 4px;
-      margin-top: 4px;
-    }
-
-    /* جداول الفاتورة: خلفية رأس فاتحة ونص داكن عريض يستحيل اختفاؤه في الطباعة */
-    .p-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: var(--p-font-size);
-      margin-bottom: 7px;
-    }
-    .p-table th, .p-table td {
-      border: 1.5px solid #1f0519 !important;
-      padding: var(--p-cell-pad-v) var(--p-cell-pad-h);
-      text-align: center;
-      vertical-align: middle;
-      color: #000000 !important;
-      font-weight: 800 !important;
-    }
-    .p-table th {
-      font-family: var(--font-bold) !important;
-      background-color: #ead3e0 !important;
-      color: #1f0519 !important;
-      font-weight: 700 !important;
-      font-size: calc(var(--p-font-size) + 1px);
-      line-height: 1.25;
-      border-bottom: 2.5px solid #3b0d32 !important;
-    }
-    .p-table td.room-col {
-      font-family: var(--font-bold) !important;
-      text-align: right;
-      font-weight: 700 !important;
-      font-size: calc(var(--p-font-size) + 1px);
-      color: #26071f !important;
-    }
-    .p-table td.extras-col {
-      text-align: right;
-      font-size: calc(var(--p-font-size) - 0.5px);
-      line-height: 1.25;
-    }
-    .p-table tr:nth-child(even) td {
-      background-color: #faf5f8 !important;
-    }
-    .p-table tfoot td {
-      background-color: #ead3e0 !important;
-      color: #000000 !important;
-      font-weight: 900 !important;
-      border-top: 2.5px solid #3b0d32 !important;
-      font-size: var(--p-font-size);
-    }
-
-    .p-bottom-grid {
-      display: grid;
-      grid-template-columns: 1.25fr 1fr;
-      gap: 9px;
-      margin-top: 5px;
-      align-items: stretch;
-    }
+    .p-title-block h1 { font-size: 1.45rem; color: #1B2E4B !important; font-weight: 800 !important; margin-bottom: 2px; }
+    .p-title-block p { font-size: 0.98rem; color: #000000 !important; font-weight: 700 !important; }
+    .p-meta-box { text-align: right; font-size: 0.84rem; font-weight: 800; background: #F1F5FA !important; color: #000000 !important; border: 2px solid #1B2E4B; padding: 5px 10px; border-radius: 7px; line-height: 1.4; }
+    .p-pricing-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; background: #FFF5EA !important; border: 2px solid #F28C28; padding: 5px 10px; border-radius: 6px; font-size: 0.84rem; font-weight: 900; color: #12223A !important; margin-bottom: 7px; }
+    .p-section-caption { font-size: 1.05rem; font-weight: 800 !important; color: #1B2E4B !important; background: #E9EFF7 !important; border-right: 4px solid #F28C28; padding: 3px 8px; margin-bottom: 4px; margin-top: 4px; }
+    .p-table { width: 100%; border-collapse: collapse; font-size: var(--p-font-size); margin-bottom: 7px; }
+    .p-table th, .p-table td { border: 1.5px solid #14213A !important; padding: var(--p-cell-pad-v) var(--p-cell-pad-h); text-align: center; vertical-align: middle; color: #000000 !important; font-weight: 800 !important; }
+    .p-table th { background-color: #E3EAF4 !important; color: #12223A !important; font-weight: 800 !important; font-size: calc(var(--p-font-size) + 1px); line-height: 1.25; border-bottom: 2.5px solid #1B2E4B !important; }
+    .p-table td.room-col { text-align: right; font-weight: 800 !important; font-size: calc(var(--p-font-size) + 1px); color: #12223A !important; }
+    .p-table td.extras-col { text-align: right; font-size: calc(var(--p-font-size) - 0.5px); line-height: 1.25; }
+    .p-table tr:nth-child(even) td { background-color: #F7F9FC !important; }
+    .p-table tfoot td { background-color: #E3EAF4 !important; color: #000000 !important; font-weight: 900 !important; border-top: 2.5px solid #1B2E4B !important; font-size: var(--p-font-size); }
+    .p-bottom-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 9px; margin-top: 5px; align-items: stretch; }
     @media (max-width: 550px) { .p-bottom-grid { grid-template-columns: 1fr; } }
-
-    .p-notes-box {
-      border: 1.8px solid #1f0519;
-      border-radius: 6px;
-      padding: 6px 9px;
-      font-size: calc(var(--p-font-size) - 0.5px);
-      color: #000000 !important;
-      background: #fff !important;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .p-totals-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: var(--p-font-size);
-    }
-    .p-totals-table td {
-      border: 1.5px solid #1f0519 !important;
-      padding: var(--p-cell-pad-v) 7px;
-      color: #000000 !important;
-      font-weight: 800 !important;
-      background: #fff !important;
-    }
-    .p-totals-table tr.final-row td {
-      background-color: #ead3e0 !important;
-      color: #1f0519 !important;
-      font-weight: 900 !important;
-      font-size: calc(var(--p-font-size) + 2px);
-      border: 2px solid #3b0d32 !important;
-    }
-
-        .app-toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--onion-darkest);
-      color: #fff;
-      border: 2px solid var(--onion-copper);
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      z-index: 2000;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-      display: none;
-      text-align: center;
-      max-width: 90vw;
-    }
-    .app-confirm-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(38,7,31,0.6);
-      z-index: 2100;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .app-confirm-box {
-      background: #fff;
-      border: 2px solid var(--onion-plum);
-      border-radius: 14px;
-      padding: 18px;
-      max-width: 340px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    }
+    .p-notes-box { border: 1.8px solid #14213A; border-radius: 6px; padding: 6px 9px; font-size: calc(var(--p-font-size) - 0.5px); color: #000000 !important; background: #fff !important; display: flex; flex-direction: column; justify-content: space-between; }
+    .p-totals-table { width: 100%; border-collapse: collapse; font-size: var(--p-font-size); }
+    .p-totals-table td { border: 1.5px solid #14213A !important; padding: var(--p-cell-pad-v) 7px; color: #000000 !important; font-weight: 800 !important; background: #fff !important; }
+    .p-totals-table tr.final-row td { background-color: #FFE8CF !important; color: #12223A !important; font-weight: 900 !important; font-size: calc(var(--p-font-size) + 2px); border: 2px solid #1B2E4B !important; }
 
     @page { size: A4 portrait; margin: 5mm; }
     @media print {
       html, body { background: #ffffff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
-      #editorApp, .preview-toolbar { display: none !important; }
+      #editorApp, .preview-toolbar, .sheet, .sheet-backdrop, .app-toast, .app-confirm-backdrop { display: none !important; }
       #printPreviewModal { display: block !important; position: static !important; background: transparent !important; padding: 0 !important; overflow: visible !important; }
-      #printSheet { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; }
+      #printSheet { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; zoom: 1 !important; }
       #printSheet [contenteditable="true"] { outline: none !important; background: transparent !important; }
       .p-bottom-grid { grid-template-columns: 1.25fr 1fr !important; page-break-inside: avoid; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -516,155 +446,154 @@
 </head>
 <body>
 
+  <!-- أيقونات التطبيق -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-price" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="i-rooms" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v12h14V9"/><path d="M10 21v-6h4v6"/></symbol>
+    <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 6.5h7"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="i-invoice" viewBox="0 0 24 24"><path d="M6 2.5h9l4 4V21.5H6z"/><path d="M14.5 2.5V7H19"/><path d="M9 11h7M9 14.5h7M9 18h4"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V2.5h12V9"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7.5H6z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 21h16"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6"/><path d="M6 7l1 14h10l1-14M9 7V4h6v3"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.5-4.5L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8 8 0 0 0 14.5 4.5L21 15"/><path d="M21 20v-5h-5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.5 4 6v6c0 5 3.5 8.5 8 9.5 4.5-1 8-4.5 8-9.5V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-panel" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7v4M12 7v4M16 7v4M8 15h8"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9.5v5M18 9.5v5"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path class="ic-fill" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.4.8 3.2.6.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3z"/></symbol>
+    <symbol id="i-fb" viewBox="0 0 24 24"><path class="ic-fill" d="M13.5 21.9v-7.4H16l.4-2.9h-2.9V9.8c0-.8.2-1.4 1.4-1.4h1.6V5.8a20 20 0 0 0-2.3-.1c-2.2 0-3.8 1.4-3.8 3.9v2h-2.6v2.9h2.6v7.4A10 10 0 1 1 13.5 21.9z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  </svg>
+
   <div id="editorApp">
-    <header class="top-bar">
-      <div class="nav-right-group">
-        <button type="button" class="dots-menu-btn" onclick="toggleDrawer()" aria-label="أقسام التطبيق">⋮</button>
-        <span class="active-view-title" id="headerSectionTitle">1. التسعير والبيانات</span>
-      </div>
-
-      <div class="print-dropdown-wrap">
-        <button type="button" class="print-dropdown-btn" onclick="togglePrintMenu(event)">
-          <span>🖨️ الفاتورة والحفظ</span>
-          <span>▾</span>
-        </button>
-        <div class="print-dropdown-list" id="printDropdownList">
-          <button type="button" class="dropdown-action-item" onclick="openSinglePagePreview(false)"><span>👁️</span><span>معاينة وتعديل الفاتورة (PDF)</span></button>
-          <button type="button" class="dropdown-action-item" onclick="openSinglePagePreview(true)"><span>🖨️</span><span>طباعة / حفظ PDF فوري</span></button>
-          <button type="button" class="dropdown-action-item" onclick="manualSaveToast()"><span>✔️</span><span>حفظ الفاتورة الحالية</span></button>
-          <button type="button" class="dropdown-action-item" onclick="copyInvoiceForWhatsApp()"><span>📋</span><span>نسخ الفاتورة للواتساب</span></button>
-          <button type="button" class="dropdown-action-item" onclick="createNewInvoice()"><span>➕</span><span>فاتورة زبون جديدة</span></button>
-          <button type="button" class="dropdown-action-item" onclick="downloadSelfHTML()"><span>📥</span><span>تنزيل ملف index.html جاهز</span></button>
-        </div>
-      </div>
-    </header>
-
-    <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
-    <aside class="side-drawer" id="sideDrawer">
-      <div class="drawer-head">
-        <span>⚡ أقسام حاسبة الكهرباء</span>
-        <button type="button" class="drawer-close-btn" onclick="closeDrawer()">✕</button>
-      </div>
-      <div class="drawer-body">
-        <button type="button" class="drawer-nav-item active" id="navBtn-pricing" onclick="switchView('pricing', '1. التسعير والبيانات')"><span>1. التسعير والبيانات واللوجو</span><span>⚙️</span></button>
-        <button type="button" class="drawer-nav-item" id="navBtn-rooms" onclick="switchView('rooms', '2. الغرف واللوحة والصواعد')"><span>2. الغرف واللوحة والصواعد</span><span class="drawer-badge" id="drawerRoomCount">0</span></button>
-        <button type="button" class="drawer-nav-item" id="navBtn-summary" onclick="switchView('summary', '3. الدفعات والملخص النهائي')"><span>3. الدفعات والملخص النهائي</span><span>📊</span></button>
-        <button type="button" class="drawer-nav-item" id="navBtn-saved" onclick="switchView('saved', '4. الفواتير المحفوظة')"><span>4. الفواتير المحفوظة والنسخ</span><span>📂</span></button>
-      </div>
-    </aside>
-
-    <div class="container">
-      <div class="metrics-grid">
-        <div class="metric-box"><span class="metric-label">إجمالي النقاط:</span><span class="metric-val" id="topTotalPoints">0 نقطة</span></div>
-        <div class="metric-box"><span class="metric-label">حساب النقاط:</span><span class="metric-val" id="topPointsCost">0 ج.م</span></div>
-        <div class="metric-box"><span class="metric-label">البروفايل والإضافي:</span><span class="metric-val" id="topExtrasCost">0 ج.م</span></div>
-        <div class="metric-box net-highlight"><span class="metric-label">الصافي المطلوب:</span><span class="metric-val" id="topNetRequired">0 ج.م</span></div>
-      </div>
-
-      <!-- القسم 1: التسعير والبيانات واللوجو -->
-      <section class="view-panel active" id="panel-pricing">
-        <div class="card">
-          <div class="card-head-dark">
-            <h3>● نظام تسعير النقاط والعملية الحسابية</h3>
-            <span class="pill-copper" id="activeSystemBadge">تسعيرة موحدة</span>
+    <div class="top-wrap">
+      <header class="app-bar">
+        <div class="brand">
+          <img class="brand-icon" src="./icons/icon-192.png" alt="">
+          <div class="brand-text">
+            <div class="brand-name" id="headerSectionTitle">الأسعار والبيانات</div>
+            <div class="brand-sub" id="hdrClient">حساباتي</div>
           </div>
-          <div class="card-body">
-            <div class="sys-radio-card selected" id="cardModern" onclick="setSystemType('modern')">
-              <div class="radio-circle"><div class="radio-dot"></div></div>
-              <div class="sys-radio-info">
-                <h4>النظام الحديث (تسعيرة واحدة - لا يُذكر اسم النظام في الفاتورة)</h4>
-                <p>جميع النقاط (البرايز، المفاتيح، الخطوط الرئيسية، الصواعد، الإسبوتات، وشريط الليد) تُحسب بسعر نقطة واحد ثابت.</p>
-              </div>
+        </div>
+        <button type="button" class="bar-btn" onclick="openActionSheet()">
+          <svg class="ic"><use href="#i-invoice"/></svg><span>الفاتورة</span>
+        </button>
+      </header>
+      <button type="button" class="meter" onclick="switchView('summary')" aria-label="عرض كشف الحساب">
+        <div class="meter-main">
+          <span class="meter-label">الصافي المطلوب</span>
+          <span class="meter-val" id="topNetRequired">0 ج.م</span>
+        </div>
+        <div class="meter-side">
+          <span class="meter-label">إجمالي النقاط</span>
+          <b id="topTotalPoints">0 نقطة</b>
+        </div>
+      </button>
+    </div>
+
+    <main class="container">
+
+      <!-- 1) الأسعار والبيانات -->
+      <section class="view-panel active" id="panel-pricing">
+        <div class="sec">
+          <div class="sec-head">
+            <h3><svg class="ic"><use href="#i-price"/></svg>طريقة حساب النقاط</h3>
+            <span class="pill" id="activeSystemBadge">تسعيرة موحدة</span>
+          </div>
+          <div class="sec-body">
+            <div class="sys-switch">
+              <button type="button" class="sys-radio-card selected" id="cardModern" onclick="setSystemType('modern')">
+                <span class="sys-title"><span class="radio-dot"></span>تسعيرة موحدة</span>
+                <span class="sys-desc">كل النقاط بسعر واحد. اسم النظام لا يظهر في الفاتورة.</span>
+              </button>
+              <button type="button" class="sys-radio-card" id="cardOld" onclick="setSystemType('old')">
+                <span class="sys-title"><span class="radio-dot"></span>النظام القديم</span>
+                <span class="sys-desc">التأسيس بمتوسط السعرين، والإسبوتات والليد بالسعر الحالي.</span>
+              </button>
             </div>
 
-            <div class="sys-radio-card" id="cardOld" onclick="setSystemType('old')">
-              <div class="radio-circle"><div class="radio-dot"></div></div>
-              <div class="sys-radio-info">
-                <h4>النظام القديم (متوسط التسعيرتين للتأسيس - يُوضح أعلى الفاتورة)</h4>
-                <p>نقاط (البرايز والمفاتيح والخطوط والصواعد) بمتوسط السعرين، والباقي (الإسبوتات وشريط الليد) بالسعر الجديد.</p>
-              </div>
+            <div id="oldPriceGroup" class="form-group" style="display:none; margin-top:12px;">
+              <label>سعر النقطة وقت بداية العمل (التأسيس) <small>ج.م</small></label>
+              <input type="number" inputmode="decimal" id="oldPointPrice" min="0" step="any" placeholder="40" oninput="saveInvoiceMeta()">
             </div>
 
-            <div id="oldPriceGroup" class="form-group" style="display:none; margin-top:10px;">
-              <label>سعر النقطة وقت بداية العمل (التأسيس - ج.م)</label>
-              <input type="number" id="oldPointPrice" min="0" step="any" placeholder="40" oninput="saveInvoiceMeta()">
-            </div>
-
-            <div class="grid-2" style="margin-top:10px;">
-              <div class="form-group"><label>سعر النقطة الحالي (ج.م)</label><input type="number" id="newPointPrice" min="0" step="any" placeholder="70" oninput="saveInvoiceMeta()"></div>
-              <div class="form-group"><label>سعر متر الليد بروفايل (ج.م)</label><input type="number" id="profileMeterPrice" min="0" step="any" placeholder="150" oninput="saveInvoiceMeta()"></div>
+            <div class="grid-2" style="margin-top:12px;">
+              <div class="form-group"><label>سعر النقطة الحالي <small>ج.م</small></label><input type="number" inputmode="decimal" id="newPointPrice" min="0" step="any" placeholder="70" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>سعر متر الليد بروفايل <small>ج.م</small></label><input type="number" inputmode="decimal" id="profileMeterPrice" min="0" step="any" placeholder="150" oninput="saveInvoiceMeta()"></div>
             </div>
             <div class="rule-banner" id="systemRuleNotice"></div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-head-dark"><h3>🖼️ بيانات الفاتورة واللوجو الشخصي</h3></div>
-          <div class="card-body">
-            <div class="grid-2">
-              <div class="form-group"><label>عنوان الفاتورة الرئيسي</label><input type="text" id="invoiceTitle" placeholder="كشف حساب ومستخلص أعمال كهرباء" oninput="saveInvoiceMeta()"></div>
-              <div class="form-group"><label>اسم الزبون / العميل</label><input type="text" id="clientName" placeholder="أ. محمد فيصل" oninput="saveInvoiceMeta()"></div>
-            </div>
+        <div class="sec">
+          <div class="sec-head"><h3><svg class="ic"><use href="#i-invoice"/></svg>بيانات الفاتورة</h3></div>
+          <div class="sec-body">
+            <div class="form-group"><label>اسم الزبون / العميل</label><input type="text" id="clientName" placeholder="أ. محمد فيصل" oninput="saveInvoiceMeta()"></div>
+            <div class="form-group"><label>عنوان الفاتورة</label><input type="text" id="invoiceTitle" placeholder="كشف حساب ومستخلص أعمال كهرباء" oninput="saveInvoiceMeta()"></div>
             <div class="grid-3">
-              <div class="form-group"><label>التاريخ</label><input type="text" id="invoiceDate" placeholder="2026/11/4" oninput="saveInvoiceMeta()"></div>
               <div class="form-group"><label>اسمك / لقبك المهني</label><input type="text" id="techName" placeholder="م/ أحمد حسن" oninput="saveInvoiceMeta()"></div>
-              <div class="form-group"><label>رقم الهاتف</label><input type="text" id="techPhone" placeholder="010xxxxxxxx" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="techPhone" placeholder="010xxxxxxxx" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>التاريخ</label><input type="text" id="invoiceDate" placeholder="2026/11/4" oninput="saveInvoiceMeta()"></div>
             </div>
 
             <div class="logo-config-box">
-              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
-                <label style="font-size:0.8rem; font-weight:800; color:var(--onion-plum); display:flex; align-items:center; gap:6px; cursor:pointer;">
-                  <input type="checkbox" id="showLogoCheck" onchange="saveInvoiceMeta()" style="width:17px; height:17px;">
-                  <span>إظهار اللوجو أعلى الفاتورة</span>
+              <div class="logo-row">
+                <label class="check-label">
+                  <input type="checkbox" id="showLogoCheck" onchange="saveInvoiceMeta()">
+                  <span>إظهار اللوجو في الفاتورة</span>
                 </label>
                 <div style="display:flex; gap:6px;">
-                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('logoInputFile').click()">📁 اختيار لوجو</button>
-                  <button type="button" class="btn btn-danger btn-sm" onclick="removeLogo()">حذف اللوجو</button>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('logoInputFile').click()"><svg class="ic"><use href="#i-image"/></svg>اختيار لوجو</button>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="removeLogo()">حذف</button>
                 </div>
                 <input type="file" id="logoInputFile" accept="image/*" style="display:none;" onchange="uploadLogoFile(event)">
               </div>
-              <div id="logoPreviewContainer" style="display:none; align-items:center; gap:10px;">
+              <div id="logoPreviewContainer" style="display:none; align-items:center; gap:10px; margin-top:10px;">
                 <img id="logoThumbImg" class="logo-preview-thumb" src="" alt="لوجو">
-                <span style="font-size:0.74rem; color:var(--text-muted);">اللوجو جاهز للطباعة.</span>
+                <span style="font-size:0.8rem; color:var(--muted);">اللوجو جاهز للطباعة.</span>
               </div>
             </div>
-
-            <button type="button" class="btn btn-primary" style="margin-top:12px;" onclick="switchView('rooms', '2. الغرف واللوحة والصواعد')">الانتقال إلى الغرف واللوحة والصواعد ⬅</button>
           </div>
         </div>
+
+        <button type="button" class="btn btn-primary" onclick="switchView('rooms')"><svg class="ic"><use href="#i-rooms"/></svg>التالي: الغرف واللوحة</button>
       </section>
 
-      <!-- القسم 2: اللوحة الرئيسية والصواعد (في قسم مستقل) + الغرف -->
+      <!-- 2) الغرف واللوحة والصواعد -->
       <section class="view-panel" id="panel-rooms">
-
-        <!-- بطاقة اللوحة الرئيسية والصواعد المستقلة عن الغرف -->
-        <div class="card">
-          <div class="card-head-dark">
-            <h3>⚡ اللوحة الأتوماتيك الرئيسية والصواعد (مستقل عن الغرف)</h3>
-            <span class="pill-copper" id="mainPanelBadge">0 نقطة</span>
+        <div class="sec">
+          <div class="sec-head">
+            <h3><svg class="ic"><use href="#i-panel"/></svg>اللوحة والصواعد</h3>
+            <span class="pill navy" id="mainPanelBadge">0 نقطة</span>
           </div>
-          <div class="card-body">
+          <div class="sec-body">
             <div class="grid-2">
               <div class="form-group">
-                <label>عدد خطوط اللوحة الأتوماتيك (الخط = 2 ن)</label>
-                <input type="number" id="mainPanelLines" min="0" step="any" placeholder="0" oninput="saveMainPanelData()">
+                <label>خطوط الأتوماتيك <small>(= 2 ن)</small></label>
+                <div class="stepper"><button type="button" class="step-btn" data-step="1" aria-label="زيادة">+</button><input type="number" inputmode="decimal" id="mainPanelLines" min="0" step="any" placeholder="0" oninput="saveMainPanelData()"><button type="button" class="step-btn" data-step="-1" aria-label="نقص">−</button></div>
               </div>
               <div class="form-group">
-                <label>عدد الصواعد الرئيسية للشقة (الصاعد = 2 ن)</label>
-                <input type="number" id="mainRisersCount" min="0" step="any" placeholder="0" oninput="saveMainPanelData()">
+                <label>الصواعد الرئيسية <small>(= 2 ن)</small></label>
+                <div class="stepper"><button type="button" class="step-btn" data-step="1" aria-label="زيادة">+</button><input type="number" inputmode="decimal" id="mainRisersCount" min="0" step="any" placeholder="0" oninput="saveMainPanelData()"><button type="button" class="step-btn" data-step="-1" aria-label="نقص">−</button></div>
               </div>
             </div>
-            <div id="mainPanelLiveSummary" class="rule-banner" style="margin-top:4px;"></div>
+            <div id="mainPanelLiveSummary" class="rule-banner" style="margin-top:2px;"></div>
           </div>
         </div>
 
-        <!-- بطاقة إضافة غرفة (بدون خطوط لوحة أو صواعد) -->
-        <div class="card" id="roomFormCard">
-          <div class="card-head-dark">
-            <h3 id="roomFormTitle">➕ إضافة غرفة أو قسم</h3>
-            <button type="button" id="cancelEditBtn" class="btn btn-copper btn-sm" style="display:none;" onclick="resetRoomForm()">إلغاء التعديل</button>
+        <div class="sec" id="roomFormCard">
+          <div class="sec-head">
+            <h3 id="roomFormTitle">إضافة غرفة أو قسم</h3>
+            <button type="button" id="cancelEditBtn" class="btn btn-outline btn-sm" style="display:none;" onclick="resetRoomForm()">إلغاء التعديل</button>
           </div>
-          <div class="card-body">
+          <div class="sec-body">
             <div class="chips-wrap">
               <button type="button" class="chip" onclick="setRoomName('الريسبشن')">الريسبشن</button>
               <button type="button" class="chip" onclick="setRoomName('الصالة')">الصالة</button>
@@ -677,105 +606,181 @@
               <button type="button" class="chip" onclick="setRoomName('البلكونة')">البلكونة</button>
             </div>
 
-            <div class="form-group"><label>اسم الغرفة حسب الزبون</label><input type="text" id="roomName" placeholder="اكتب اسم الغرفة أو اختر من الأعلى"></div>
+            <div class="form-group"><label>اسم الغرفة</label><input type="text" id="roomName" placeholder="اكتب الاسم أو اختر من الأعلى"></div>
 
             <div class="grid-2">
-              <div class="form-group"><label>برايز ومفاتيح (الواحدة = 1 ن)</label><input type="number" id="roomSockets" min="0" step="any" placeholder="0"></div>
-              <div class="form-group"><label>عدد الإسبوتات (الواحد = ½ ن)</label><input type="number" id="roomSpots" min="0" step="any" placeholder="0"></div>
+              <div class="form-group"><label>برايز ومفاتيح <small>(= 1 ن)</small></label><div class="stepper"><button type="button" class="step-btn" data-step="1" aria-label="زيادة">+</button><input type="number" inputmode="decimal" id="roomSockets" min="0" step="any" placeholder="0"><button type="button" class="step-btn" data-step="-1" aria-label="نقص">−</button></div></div>
+              <div class="form-group"><label>إسبوتات <small>(= ½ ن)</small></label><div class="stepper"><button type="button" class="step-btn" data-step="1" aria-label="زيادة">+</button><input type="number" inputmode="decimal" id="roomSpots" min="0" step="any" placeholder="0"><button type="button" class="step-btn" data-step="-1" aria-label="نقص">−</button></div></div>
             </div>
-
             <div class="grid-2">
-              <div class="form-group"><label>شريط ليد بالمتر (المتر = ½ ن)</label><input type="number" id="roomLedStrip" min="0" step="any" placeholder="0"></div>
-              <div class="form-group"><label>ليد بروفايل بالمتر (بسعر المتر)</label><input type="number" id="roomLedProfile" min="0" step="any" placeholder="0"></div>
+              <div class="form-group"><label>شريط ليد بالمتر <small>(= ½ ن)</small></label><div class="stepper"><button type="button" class="step-btn" data-step="1" aria-label="زيادة">+</button><input type="number" inputmode="decimal" id="roomLedStrip" min="0" step="any" placeholder="0"><button type="button" class="step-btn" data-step="-1" aria-label="نقص">−</button></div></div>
+              <div class="form-group"><label>ليد بروفايل بالمتر <small>(بسعر المتر)</small></label><div class="stepper"><button type="button" class="step-btn" data-step="1" aria-label="زيادة">+</button><input type="number" inputmode="decimal" id="roomLedProfile" min="0" step="any" placeholder="0"><button type="button" class="step-btn" data-step="-1" aria-label="نقص">−</button></div></div>
             </div>
 
-            <div style="margin-top:6px; margin-bottom:12px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <label style="font-size:0.76rem; font-weight:800; color:var(--onion-plum);">بنود إضافية بسعر مستقل في الغرفة (اختياري):</label>
-                <button type="button" class="btn btn-outline btn-sm" onclick="addExtraItemRow()">+ إضافة بند</button>
-              </div>
-              <div id="extraItemsContainer"></div>
+            <div class="extras-head">
+              <span>بنود إضافية بسعر مستقل (اختياري)</span>
+              <button type="button" class="btn btn-outline btn-sm" onclick="addExtraItemRow()"><svg class="ic"><use href="#i-plus"/></svg>بند</button>
             </div>
+            <div id="extraItemsContainer"></div>
 
-            <button type="button" id="saveRoomBtn" class="btn btn-primary" onclick="saveRoom()">حفظ الغرفة في الفاتورة</button>
+            <button type="button" id="saveRoomBtn" class="btn btn-orange" style="margin-top:6px;" onclick="saveRoom()">حفظ الغرفة في الفاتورة</button>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-head-dark"><h3>🏠 قائمة الغرف المسجلة</h3><span class="pill-copper" id="roomsCountBadge">0 غرف</span></div>
-          <div class="card-body" id="roomsListContainer"></div>
+        <div class="sec">
+          <div class="sec-head"><h3><svg class="ic"><use href="#i-rooms"/></svg>الغرف المسجلة</h3><span class="pill navy" id="roomsCountBadge">0 غرف</span></div>
+          <div class="sec-body" id="roomsListContainer"></div>
         </div>
       </section>
 
-      <!-- القسم 3: الدفعات والملخص النهائي -->
+      <!-- 3) الحساب: الدفعات والملخص -->
       <section class="view-panel" id="panel-summary">
-        <div class="card">
-          <div class="card-head-dark"><h3>💵 الدفعات المستلمة والخصم</h3></div>
-          <div class="card-body">
+        <div class="stat-row">
+          <div class="stat"><span>حساب النقاط</span><b id="topPointsCost">0 ج.م</b></div>
+          <div class="stat"><span>البروفايل والإضافي</span><b id="topExtrasCost">0 ج.م</b></div>
+        </div>
+        <div class="sec">
+          <div class="sec-head"><h3><svg class="ic"><use href="#i-cash"/></svg>الدفعات والخصم</h3></div>
+          <div class="sec-body">
             <div class="grid-2">
-              <div class="form-group"><label>المدفوع تحت الحساب (ج.م)</label><input type="number" id="paidAmount" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
-              <div class="form-group"><label>خصم خاص للزبون (ج.م)</label><input type="number" id="discountAmount" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>المدفوع تحت الحساب <small>ج.م</small></label><input type="number" inputmode="decimal" id="paidAmount" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
+              <div class="form-group"><label>خصم خاص للزبون <small>ج.م</small></label><input type="number" inputmode="decimal" id="discountAmount" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
             </div>
           </div>
         </div>
         <div class="summary-box" id="finalSummaryBox"></div>
-        <div class="grid-2">
-          <button type="button" class="btn btn-copper" onclick="openSinglePagePreview(false)">👁️ معاينة وتعديل ورقة الـ PDF</button>
-          <button type="button" class="btn btn-primary" onclick="copyInvoiceForWhatsApp()">📋 نسخ الفاتورة للواتساب</button>
+        <div class="btn-row">
+          <button type="button" class="btn btn-orange" onclick="openSinglePagePreview(false)"><svg class="ic"><use href="#i-eye"/></svg>معاينة الفاتورة</button>
+          <button type="button" class="btn btn-primary" onclick="copyInvoiceForWhatsApp()"><svg class="ic"><use href="#i-copy"/></svg>نسخ للواتساب</button>
         </div>
       </section>
 
-      <!-- القسم 4: الفواتير المحفوظة والنسخ الاحتياطي -->
+      <!-- 4) الفواتير المحفوظة -->
       <section class="view-panel" id="panel-saved">
-        <div class="card">
-          <div class="card-head-dark"><h3>📂 سجل فواتير الزبائن المحفوظة</h3></div>
-          <div class="card-body">
-            <div class="form-group"><label>اختر فاتورة لفتحها أو تعديلها:</label><select id="invoiceSelector" onchange="switchInvoice(this.value)"></select></div>
-            <div class="grid-2" style="margin-top:10px;">
-              <button type="button" class="btn btn-primary" onclick="createNewInvoice()">+ فاتورة زبون جديدة</button>
-              <button type="button" class="btn btn-danger" onclick="deleteCurrentInvoice()">🗑️ حذف الفاتورة الحالية</button>
+        <div class="btn-row" style="margin-bottom:12px;">
+          <button type="button" class="btn btn-orange" onclick="createNewInvoice()"><svg class="ic"><use href="#i-plus"/></svg>فاتورة جديدة</button>
+          <button type="button" class="btn btn-danger" onclick="deleteCurrentInvoice()"><svg class="ic"><use href="#i-trash"/></svg>حذف المفتوحة</button>
+        </div>
+        <div class="sec">
+          <div class="sec-head"><h3><svg class="ic"><use href="#i-folder"/></svg>فواتير الزبائن</h3><span class="pill navy" id="invoiceCountBadge">0</span></div>
+          <div class="sec-body" id="invoiceList"></div>
+        </div>
+      </section>
+
+      <!-- 5) المزيد: التحديثات والنسخ الاحتياطي وعن التطبيق -->
+      <section class="view-panel" id="panel-more">
+        <div class="sec">
+          <div class="sec-head"><h3><svg class="ic"><use href="#i-refresh"/></svg>تحديثات التطبيق</h3></div>
+          <div class="sec-body">
+            <div class="ver-line"><span>الإصدار الحالي</span><b id="curVersion">—</b></div>
+            <p class="upd-status" id="updStatus">تقدر تختار تحدّث التطبيق أو تفضل على إصدارك الحالي.</p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button type="button" class="btn btn-orange" id="btnShowUpdate" style="display:none;" onclick="openUpdateSheet()">عرض التحديث الجديد</button>
+              <button type="button" class="btn btn-outline" id="btnCheckUpdate" onclick="checkForUpdates(true)">التحقق من التحديثات</button>
             </div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-head-dark"><h3>💾 نسخ احتياطي وتحميل ملف التطبيق</h3></div>
-          <div class="card-body">
-            <div class="grid-2" style="margin-bottom:8px;">
-              <button type="button" class="btn btn-outline" onclick="exportBackupJSON()">⬇️ تنزيل نسخة احتياطية</button>
-              <button type="button" class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆️ استعادة من ملف</button>
-              <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importBackupJSON(event)">
+        <div class="sec">
+          <div class="sec-head"><h3><svg class="ic"><use href="#i-shield"/></svg>النسخ الاحتياطي</h3></div>
+          <div class="sec-body">
+            <p style="font-size:0.82rem; color:var(--muted); margin-bottom:10px;">كل الفواتير محفوظة على هاتفك فقط. نزّل نسخة احتياطية من وقت للتاني.</p>
+            <div class="btn-row" style="margin-bottom:10px;">
+              <button type="button" class="btn btn-outline" onclick="exportBackupJSON()"><svg class="ic"><use href="#i-down"/></svg>تنزيل نسخة</button>
+              <button type="button" class="btn btn-outline" onclick="document.getElementById('importFile').click()"><svg class="ic"><use href="#i-up"/></svg>استعادة نسخة</button>
+              <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importBackupJSON(event)">
             </div>
-            <button type="button" class="btn btn-copper" onclick="downloadSelfHTML()">📥 تنزيل ملف index.html جاهز على الهاتف</button>
+            <button type="button" class="btn btn-ghost" onclick="downloadSelfHTML()"><svg class="ic"><use href="#i-down"/></svg>تنزيل التطبيق كملف index.html</button>
           </div>
         </div>
+
+        <div class="sec about-card">
+          <img class="about-icon" src="./icons/icon-192.png" alt="أيقونة حساباتي">
+          <div class="about-app">حساباتي</div>
+          <div class="about-tag">حاسبة نقاط الكهرباء وفواتير العملاء</div>
+          <div class="dev-box">
+            <div class="dev-role">تصميم وتطوير التطبيق</div>
+            <div class="dev-name">أحمد حسن عبدالله</div>
+            <a class="contact-btn wa" href="https://wa.me/201015421255" target="_blank" rel="noopener">
+              <span class="c-ic"><svg class="ic"><use href="#i-wa"/></svg></span>
+              <span class="c-text"><span class="c-title" style="display:block;">تواصل عبر واتساب</span><span class="c-sub" style="display:block;">+20 101 542 1255</span></span>
+            </a>
+            <a class="contact-btn fb" href="https://www.facebook.com/share/1CTcsmiTif/" target="_blank" rel="noopener">
+              <span class="c-ic"><svg class="ic"><use href="#i-fb"/></svg></span>
+              <span class="c-text"><span class="c-title" style="display:block;">صفحة المطور على فيسبوك</span><span class="c-sub" style="display:block;">أحمد حسن عبدالله</span></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="copyright">
+          <p><strong>© 2026 أحمد حسن عبدالله. جميع الحقوق محفوظة.</strong></p>
+          <p>تطبيق «حساباتي» بفكرته وتصميمه وطريقة الحساب فيه ملكية فكرية خاصة بأحمد حسن عبدالله. ممنوع نسخ التطبيق أو تعديله أو إعادة نشره أو بيعه بأي شكل بدون إذن كتابي من المطور.</p>
+          <p><a href="./privacy.html">سياسة الخصوصية</a></p>
+        </div>
       </section>
+
+      <p class="credit-line">تصميم وتطوير <b>أحمد حسن عبدالله</b> ©</p>
+    </main>
+
+    <nav class="tab-bar" aria-label="أقسام التطبيق">
+      <button type="button" class="tab-btn active" id="navBtn-pricing" onclick="switchView('pricing')"><svg class="ic"><use href="#i-price"/></svg>الأسعار</button>
+      <button type="button" class="tab-btn" id="navBtn-rooms" onclick="switchView('rooms')"><svg class="ic"><use href="#i-rooms"/></svg>الغرف<span class="tab-badge" id="drawerRoomCount"></span></button>
+      <button type="button" class="tab-btn" id="navBtn-summary" onclick="switchView('summary')"><svg class="ic"><use href="#i-calc"/></svg>الحساب</button>
+      <button type="button" class="tab-btn" id="navBtn-saved" onclick="switchView('saved')"><svg class="ic"><use href="#i-folder"/></svg>الفواتير</button>
+      <button type="button" class="tab-btn" id="navBtn-more" onclick="switchView('more')"><svg class="ic"><use href="#i-more"/></svg>المزيد<span class="tab-dot" id="updDot"></span></button>
+    </nav>
+  </div>
+
+  <!-- نافذة إجراءات الفاتورة -->
+  <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheets()"></div>
+  <div class="sheet" id="actionSheet" role="dialog" aria-label="إجراءات الفاتورة">
+    <div class="sheet-grip"></div>
+    <h4 id="actionSheetTitle">الفاتورة</h4>
+    <button type="button" class="sheet-item" onclick="openSinglePagePreview(false)"><svg class="ic"><use href="#i-eye"/></svg>معاينة وتعديل الفاتورة (PDF)</button>
+    <button type="button" class="sheet-item" onclick="openSinglePagePreview(true)"><svg class="ic"><use href="#i-print"/></svg>طباعة / حفظ PDF فوري</button>
+    <button type="button" class="sheet-item" onclick="copyInvoiceForWhatsApp()"><svg class="ic"><use href="#i-copy"/></svg>نسخ الفاتورة للواتساب</button>
+    <button type="button" class="sheet-item" onclick="manualSaveToast()"><svg class="ic"><use href="#i-save"/></svg>حفظ الفاتورة الحالية</button>
+    <button type="button" class="sheet-item" onclick="createNewInvoice()"><svg class="ic"><use href="#i-plus"/></svg>فاتورة زبون جديدة</button>
+  </div>
+
+  <!-- نافذة التحديث الاختياري -->
+  <div class="sheet" id="updateSheet" role="dialog" aria-label="تحديث متاح">
+    <div class="sheet-grip"></div>
+    <h4>إصدار جديد متاح</h4>
+    <p class="upd-version">الإصدار <b id="updNewVer"></b> · إصدارك الحالي <span id="updCurVer"></span></p>
+    <ul class="upd-notes" id="updNotes"></ul>
+    <div class="upd-actions">
+      <button type="button" class="btn btn-orange" onclick="installUpdate()"><svg class="ic"><use href="#i-refresh"/></svg>تحديث الآن</button>
+      <button type="button" class="btn btn-outline" onclick="remindLater()">لاحقاً</button>
+      <button type="button" class="btn btn-ghost" onclick="stayOnCurrent()">البقاء على الإصدار الحالي</button>
     </div>
+    <div class="upd-progress"><span class="spinner"></span><span>جاري تنزيل التحديث... فواتيرك محفوظة كما هي.</span></div>
   </div>
 
   <!-- نافذة المعاينة الحية والتعديل المباشر قبل الطباعة -->
   <div id="printPreviewModal">
     <div class="preview-toolbar">
       <div class="toolbar-row">
-        <button type="button" class="btn btn-copper btn-sm" onclick="triggerSystemPrint()">🖨️ طباعة / حفظ PDF الآن</button>
-        <div style="display:flex; gap:5px; flex-wrap:wrap;">
-          <button type="button" class="btn btn-outline btn-sm" onclick="adjustPrintSize(1)">🔍 تكبير الخط +</button>
-          <button type="button" class="btn btn-outline btn-sm" onclick="adjustPrintSize(-1)">🔍 تصغير الخط -</button>
-          <button type="button" class="btn btn-outline btn-sm" onclick="toggleLogoFromPreview()">🖼️ إظهار/إخفاء اللوجو</button>
-          <button type="button" class="btn btn-outline btn-sm" onclick="toggleEditHighlights()">✏️ حدود التعديل</button>
-        </div>
-        <button type="button" class="btn btn-danger btn-sm" onclick="closeSinglePagePreview()">✕ إغلاق</button>
+        <button type="button" class="btn btn-orange btn-sm" onclick="triggerSystemPrint()"><svg class="ic"><use href="#i-print"/></svg>طباعة / حفظ PDF</button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="closeSinglePagePreview()"><svg class="ic"><use href="#i-x"/></svg>إغلاق</button>
       </div>
-      <div class="edit-hint-banner">💡 المعاينة بالأسفل مطابقة 100% لورقة الطباعة، واضغط على أي كلمة أو رقم داخلها لتعديله مباشرة!</div>
+      <div class="toolbar-tools">
+        <button type="button" class="btn btn-outline btn-sm" onclick="adjustPrintSize(1)">تكبير الخط +</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="adjustPrintSize(-1)">تصغير الخط −</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="toggleLogoFromPreview()">إظهار/إخفاء اللوجو</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="toggleEditHighlights()">حدود التعديل</button>
+        <button type="button" class="btn btn-outline btn-sm" id="previewZoomBtn" onclick="togglePreviewZoom()">عرض بالحجم الكامل</button>
+      </div>
+      <div class="edit-hint-banner">المعاينة مطابقة لورقة الطباعة. اضغط على أي كلمة أو رقم لتعديله مباشرة.</div>
     </div>
     <div id="printSheet" class="show-edit-borders"></div>
   </div>
 
-  <div id="appToast" class="app-toast"></div>
+  <div id="appToast" class="app-toast" role="status" aria-live="polite"></div>
   <div id="appConfirmModal" class="app-confirm-backdrop">
     <div class="app-confirm-box">
-      <p id="appConfirmText" style="margin-bottom:14px; font-size:0.95rem; color:var(--text-main);"></p>
-      <div class="grid-2">
+      <p id="appConfirmText"></p>
+      <div class="btn-row">
         <button type="button" class="btn btn-danger" id="appConfirmYesBtn">نعم، تأكيد</button>
         <button type="button" class="btn btn-outline" id="appConfirmNoBtn">إلغاء</button>
       </div>
@@ -783,6 +788,7 @@
   </div>
 
   <script>
+    /* حساباتي - تصميم وتطوير: أحمد حسن عبدالله © 2026 - جميع الحقوق محفوظة */
     const STORAGE_KEY = 'ahmed_elec_invoices_v7';
     let appData = {
       invoiceTitle: 'كشف حساب ومستخلص أعمال كهرباء',
@@ -797,6 +803,20 @@
     let currentPrintFontSize = 13;
     let currentCellPadV = 5;
 
+    const VIEW_TITLES = {
+      pricing: 'الأسعار والبيانات',
+      rooms: 'الغرف واللوحة والصواعد',
+      summary: 'الدفعات والحساب النهائي',
+      saved: 'الفواتير المحفوظة',
+      more: 'المزيد'
+    };
+
+    function esc(v) {
+      return String(v == null ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     function showAppToast(msg) {
       const t = document.getElementById('appToast');
       if (!t) return;
@@ -808,49 +828,58 @@
 
     function showAppConfirm(msg, onConfirm) {
       const modal = document.getElementById('appConfirmModal');
-      const txt = document.getElementById('appConfirmText');
-      const yesBtn = document.getElementById('appConfirmYesBtn');
-      const noBtn = document.getElementById('appConfirmNoBtn');
-      txt.textContent = msg;
+      document.getElementById('appConfirmText').textContent = msg;
       modal.style.display = 'flex';
-      yesBtn.onclick = () => { modal.style.display = 'none'; onConfirm(); };
-      noBtn.onclick = () => { modal.style.display = 'none'; };
+      document.getElementById('appConfirmYesBtn').onclick = () => { modal.style.display = 'none'; onConfirm(); };
+      document.getElementById('appConfirmNoBtn').onclick = () => { modal.style.display = 'none'; };
     }
 
-    function toggleDrawer() {
-      document.getElementById('sideDrawer').classList.toggle('open');
-      document.getElementById('drawerBackdrop').classList.toggle('open');
-      closePrintMenu();
+    /* ---------- النوافذ السفلية ---------- */
+    function openSheet(id) {
+      closeSheets();
+      document.getElementById('sheetBackdrop').classList.add('open');
+      document.getElementById(id).classList.add('open');
     }
-    function closeDrawer() {
-      document.getElementById('sideDrawer').classList.remove('open');
-      document.getElementById('drawerBackdrop').classList.remove('open');
+    function closeSheets() {
+      document.getElementById('sheetBackdrop').classList.remove('open');
+      document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
     }
-    function togglePrintMenu(e) {
-      e.stopPropagation();
-      document.getElementById('printDropdownList').classList.toggle('open');
+    function openActionSheet() {
+      const inv = getCurrentInvoice();
+      document.getElementById('actionSheetTitle').textContent = 'فاتورة: ' + (inv ? inv.clientName : '');
+      openSheet('actionSheet');
     }
     function closePrintMenu() {
-      const el = document.getElementById('printDropdownList');
-      if (el) el.classList.remove('open');
+      const s = document.getElementById('actionSheet');
+      if (s && s.classList.contains('open')) closeSheets();
     }
-    document.addEventListener('click', () => closePrintMenu());
+    function closeDrawer() {}
 
-    function switchView(panelKey, titleText) {
+    function switchView(panelKey) {
       document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
       document.getElementById('panel-' + panelKey).classList.add('active');
-      document.querySelectorAll('.drawer-nav-item').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('navBtn-' + panelKey).classList.add('active');
-      document.getElementById('headerSectionTitle').innerText = titleText;
-      closeDrawer();
+      document.getElementById('headerSectionTitle').innerText = VIEW_TITLES[panelKey] || '';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function manualSaveToast() {
       saveToStorage();
       closePrintMenu();
-      showAppToast('✔️ تم حفظ الفاتورة والبيانات على الهاتف.');
+      showAppToast('تم حفظ الفاتورة والبيانات على الهاتف.');
     }
+
+    // أزرار + و − (تزيد أو تنقص 1 ولا تنزل تحت الصفر)
+    document.addEventListener('click', e => {
+      const b = e.target.closest('.step-btn');
+      if (!b) return;
+      const input = b.parentElement.querySelector('input');
+      const step = parseFloat(b.dataset.step) || 0;
+      const next = Math.max(0, (parseFloat(input.value) || 0) + step);
+      input.value = next === 0 ? '' : String(Math.round(next * 1000) / 1000);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
 
     function uploadLogoFile(event) {
       const file = event.target.files[0];
@@ -871,10 +900,13 @@
           document.getElementById('showLogoCheck').checked = true;
           saveToStorage();
           renderLogoUI();
+          const logoEl = document.getElementById('previewLogoContainer');
+          if (logoEl) { logoEl.style.display = 'block'; logoEl.querySelector('img').src = appData.logoData; }
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+      event.target.value = '';
     }
 
     function removeLogo() {
@@ -940,7 +972,11 @@
     }
 
     function saveToStorage() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {
+        showAppToast('مساحة التخزين ممتلئة. نزّل نسخة احتياطية واحذف فواتير قديمة.');
+      }
     }
 
     function getCurrentInvoice() {
@@ -968,8 +1004,12 @@
       appData.currentId = newInv.id;
       editingRoomIndex = null;
       saveToStorage();
+      if (document.getElementById('roomName')) resetRoomForm();
       renderAll();
-      if (goPricing) switchView('pricing', '1. التسعير والبيانات');
+      if (goPricing) {
+        switchView('pricing');
+        showAppToast('تم إنشاء فاتورة جديدة.');
+      }
     }
 
     function deleteCurrentInvoice() {
@@ -980,11 +1020,12 @@
         });
         return;
       }
-      showAppConfirm('هل أنت متأكد من حذف هذه الفاتورة نهائياً؟', () => {
+      showAppConfirm('هل أنت متأكد من حذف فاتورة "' + getCurrentInvoice().clientName + '" نهائياً؟', () => {
         appData.invoices = appData.invoices.filter(inv => inv.id !== appData.currentId);
         appData.currentId = appData.invoices[0].id;
         editingRoomIndex = null;
         saveToStorage();
+        resetRoomForm();
         renderAll();
       });
     }
@@ -995,6 +1036,11 @@
       saveToStorage();
       resetRoomForm();
       renderAll();
+    }
+
+    function openInvoiceFromList(id) {
+      switchInvoice(id);
+      switchView('summary');
     }
 
     function setSystemType(type) {
@@ -1029,6 +1075,7 @@
       inv.mainRisers = parseFloat(document.getElementById('mainRisersCount').value) || 0;
       saveToStorage();
       renderRoomsAndSummary();
+      renderSelector();
     }
 
     function setRoomName(name) { document.getElementById('roomName').value = name; }
@@ -1038,10 +1085,10 @@
       const div = document.createElement('div');
       div.className = 'extra-item-row';
       div.innerHTML = `
-        <input type="text" class="ex-name" placeholder="البند (نجفة..)" value="${name}">
-        <input type="number" class="ex-qty" min="0" step="any" placeholder="العدد" value="${qty}">
-        <input type="number" class="ex-price" min="0" step="any" placeholder="السعر" value="${price}">
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>
+        <input type="text" class="ex-name" placeholder="البند (نجفة..)" value="${esc(name)}">
+        <input type="number" inputmode="decimal" class="ex-qty" min="0" step="any" placeholder="العدد" value="${esc(qty)}">
+        <input type="number" inputmode="decimal" class="ex-price" min="0" step="any" placeholder="السعر" value="${esc(price)}">
+        <button type="button" class="btn btn-danger btn-sm" aria-label="حذف البند" onclick="this.parentElement.remove()"><svg class="ic"><use href="#i-x"/></svg></button>
       `;
       container.appendChild(div);
     }
@@ -1069,18 +1116,21 @@
         ledProfile: parseFloat(document.getElementById('roomLedProfile').value) || 0,
         extras: getExtraItemsFromForm()
       };
-      if (editingRoomIndex !== null) inv.rooms[editingRoomIndex] = roomObj;
+      const wasEditing = editingRoomIndex !== null;
+      if (wasEditing) inv.rooms[editingRoomIndex] = roomObj;
       else inv.rooms.push(roomObj);
       saveToStorage();
       resetRoomForm();
       renderRoomsAndSummary();
+      renderSelector();
+      showAppToast(wasEditing ? 'تم تحديث "' + name + '".' : 'تمت إضافة "' + name + '" للفاتورة.');
     }
 
     function editRoom(index) {
       const inv = getCurrentInvoice();
       const r = inv.rooms[index];
       editingRoomIndex = index;
-      document.getElementById('roomFormTitle').innerText = '✏️ تعديل: ' + r.name;
+      document.getElementById('roomFormTitle').innerText = 'تعديل: ' + r.name;
       document.getElementById('saveRoomBtn').innerText = 'تحديث بيانات الغرفة';
       document.getElementById('cancelEditBtn').style.display = 'inline-flex';
       document.getElementById('roomName').value = r.name;
@@ -1091,7 +1141,7 @@
       const container = document.getElementById('extraItemsContainer');
       container.innerHTML = '';
       if (r.extras && r.extras.length > 0) r.extras.forEach(ex => addExtraItemRow(ex.name, ex.qty, ex.price));
-      document.getElementById('roomFormCard').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('roomFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function deleteRoom(index) {
@@ -1101,12 +1151,13 @@
         if (editingRoomIndex === index) resetRoomForm();
         saveToStorage();
         renderRoomsAndSummary();
+        renderSelector();
       });
     }
 
     function resetRoomForm() {
       editingRoomIndex = null;
-      document.getElementById('roomFormTitle').innerText = '➕ إضافة غرفة أو قسم';
+      document.getElementById('roomFormTitle').innerText = 'إضافة غرفة أو قسم';
       document.getElementById('saveRoomBtn').innerText = 'حفظ الغرفة في الفاتورة';
       document.getElementById('cancelEditBtn').style.display = 'none';
       document.getElementById('roomName').value = '';
@@ -1167,16 +1218,27 @@
       return { linesCount, risersCount, linesPts, risersPts, totalPanelPts, rateUsed, linesCost, risersCost, totalPanelCost };
     }
 
+    // الصافي لأي فاتورة (نفس معادلة الملخص: إجمالي الغرف + اللوحة - الخصم - المدفوع)
+    function calculateInvoiceNet(inv) {
+      let grandTotal = calculateMainPanel(inv).totalPanelCost;
+      (inv.rooms || []).forEach(r => { grandTotal += calculateRoom(r, inv).totalCost; });
+      return grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0);
+    }
+
     function renderSelector() {
-      const sel = document.getElementById('invoiceSelector');
-      sel.innerHTML = '';
-      appData.invoices.forEach(inv => {
-        const opt = document.createElement('option');
-        opt.value = inv.id;
-        opt.textContent = `${inv.clientName} (${inv.date || ''})`;
-        if (inv.id === appData.currentId) opt.selected = true;
-        sel.appendChild(opt);
-      });
+      const list = document.getElementById('invoiceList');
+      const cur = getCurrentInvoice();
+      document.getElementById('hdrClient').textContent = cur ? cur.clientName : '';
+      document.getElementById('invoiceCountBadge').textContent = appData.invoices.length;
+      list.innerHTML = appData.invoices.map(inv => `
+        <button type="button" class="inv-item ${inv.id === appData.currentId ? 'current' : ''}" onclick="openInvoiceFromList('${esc(inv.id)}')">
+          <span class="inv-main">
+            <span class="inv-name" style="display:block;">${esc(inv.clientName)}</span>
+            <span class="inv-meta" style="display:block;">${esc(inv.date || '')} · ${(inv.rooms || []).length} غرف ${inv.id === appData.currentId ? '<span class="inv-tag">· مفتوحة الآن</span>' : ''}</span>
+          </span>
+          <span class="inv-net">${calculateInvoiceNet(inv).toLocaleString()} ج.م</span>
+        </button>
+      `).join('');
     }
 
     function renderSystemNotice() {
@@ -1191,15 +1253,15 @@
         cardModern.classList.remove('selected');
         cardOld.classList.add('selected');
         oldGroup.style.display = 'block';
-        badge.innerText = 'النظام القديم (متوسط السعرين)';
+        badge.innerText = 'متوسط السعرين';
         const avg = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
-        notice.innerHTML = `<strong>النظام القديم مفعل (يُوضح أعلى الفاتورة):</strong><br>• متوسط النقطة (للبرايز والمفاتيح وخطوط اللوحة والصواعد) = <strong>${avg} ج.م</strong><br>• الإسبوتات وشريط الليد بالسعر الحالي = <strong>${inv.newPointPrice || 0} ج.م</strong>`;
+        notice.innerHTML = `<strong>النظام القديم مفعل (يظهر أعلى الفاتورة):</strong><br>• متوسط النقطة (للبرايز والمفاتيح وخطوط اللوحة والصواعد) = <strong>${avg} ج.م</strong><br>• الإسبوتات وشريط الليد بالسعر الحالي = <strong>${inv.newPointPrice || 0} ج.م</strong>`;
       } else {
         cardModern.classList.add('selected');
         cardOld.classList.remove('selected');
         oldGroup.style.display = 'none';
         badge.innerText = 'تسعيرة موحدة';
-        notice.innerHTML = `<strong>النظام الحديث مفعل:</strong> جميع النقاط تُحسب بتسعيرة موحدة (<strong>${inv.newPointPrice || 0} ج.م</strong> للنقطة)، ولن يُذكر اسم النظام في الفاتورة.`;
+        notice.innerHTML = `<strong>التسعيرة الموحدة مفعلة:</strong> كل النقاط بسعر <strong>${inv.newPointPrice || 0} ج.م</strong> للنقطة، ولن يُذكر اسم النظام في الفاتورة.`;
       }
     }
 
@@ -1223,6 +1285,14 @@
       renderRoomsAndSummary();
     }
 
+    function setMeter(el, text) {
+      if (el.innerText === text) return;
+      el.innerText = text;
+      el.classList.remove('tick');
+      void el.offsetWidth;
+      el.classList.add('tick');
+    }
+
     function renderRoomsAndSummary() {
       const inv = getCurrentInvoice();
       const panelCalc = calculateMainPanel(inv);
@@ -1235,13 +1305,13 @@
 
       const list = document.getElementById('roomsListContainer');
       document.getElementById('roomsCountBadge').innerText = `${inv.rooms.length} غرف`;
-      document.getElementById('drawerRoomCount').innerText = inv.rooms.length;
+      document.getElementById('drawerRoomCount').innerText = inv.rooms.length || '';
 
       let sumRoomsBasePts = 0, sumFinishPts = 0, sumRoomsTotalPts = 0;
       let sumRoomsBaseCost = 0, sumFinishCost = 0, sumProfileMeters = 0, sumProfileCost = 0, sumExtrasCost = 0, sumRoomsTotalCost = 0;
 
       if (inv.rooms.length === 0) {
-        list.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:14px; font-size:0.84rem;">لم تضف أي غرف بعد. املأ بيانات الغرفة بالأعلى واضغط حفظ.</p>`;
+        list.innerHTML = `<div class="empty-state"><svg class="ic"><use href="#i-rooms"/></svg><div>لسه مفيش غرف. املأ بيانات الغرفة فوق واضغط حفظ.</div></div>`;
       } else {
         list.innerHTML = '';
         inv.rooms.forEach((r, idx) => {
@@ -1262,17 +1332,17 @@
           if (r.ledStrip) detailsHTML += `<div class="room-detail-item"><span>شريط ليد</span><strong>${r.ledStrip} م (${calc.ledStripPts} ن)</strong></div>`;
           if (r.ledProfile) detailsHTML += `<div class="room-detail-item"><span>ليد بروفايل (${r.ledProfile} م)</span><strong>${calc.profileCost} ج.م</strong></div>`;
           if (r.extras && r.extras.length > 0) {
-            r.extras.forEach(ex => { detailsHTML += `<div class="room-detail-item"><span>${ex.name} (${ex.qty})</span><strong>${ex.qty * ex.price} ج.م</strong></div>`; });
+            r.extras.forEach(ex => { detailsHTML += `<div class="room-detail-item"><span>${esc(ex.name)} (${ex.qty})</span><strong>${ex.qty * ex.price} ج.م</strong></div>`; });
           }
 
           const card = document.createElement('div');
           card.className = 'room-card';
           card.innerHTML = `
-            <div class="room-top"><span class="room-name">${idx + 1}. ${r.name}</span><span class="room-total-badge">${calc.totalCost.toLocaleString()} ج.م</span></div>
+            <div class="room-top"><span class="room-name">${idx + 1}. ${esc(r.name)}</span><span class="room-total-badge">${calc.totalCost.toLocaleString()} ج.م</span></div>
             <div class="room-details-grid">${detailsHTML}</div>
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--text-muted); padding-top:5px; border-top:1px solid var(--onion-border);">
+            <div class="room-foot">
               <span>نقاط الغرفة: <strong>${calc.totalPoints} نقطة</strong></span>
-              <div style="display:flex; gap:6px;">
+              <div class="room-actions">
                 <button type="button" class="btn btn-outline btn-sm" onclick="editRoom(${idx})">تعديل</button>
                 <button type="button" class="btn btn-danger btn-sm" onclick="deleteRoom(${idx})">حذف</button>
               </div>
@@ -1291,13 +1361,13 @@
       const netRemaining = grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0);
       const avgRate = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
 
-      document.getElementById('topTotalPoints').innerText = `${allPointsCount} نقطة`;
+      setMeter(document.getElementById('topTotalPoints'), `${allPointsCount} نقطة`);
       document.getElementById('topPointsCost').innerText = `${pointsCostTotal.toLocaleString()} ج.م`;
       document.getElementById('topExtrasCost').innerText = `${profileAndExtrasTotal.toLocaleString()} ج.م`;
-      document.getElementById('topNetRequired').innerText = `${netRemaining.toLocaleString()} ج.م`;
+      setMeter(document.getElementById('topNetRequired'), `${netRemaining.toLocaleString()} ج.م`);
 
       document.getElementById('finalSummaryBox').innerHTML = `
-        <div class="ruqaa-text" style="font-size:1.1rem; margin-bottom:8px; color:#ffbe88;">📊 كشف الحساب النهائي: ${inv.clientName}</div>
+        <div class="summary-title">كشف الحساب النهائي: ${esc(inv.clientName)}</div>
         ${inv.systemType === 'old' ? `
           <div class="summary-row"><span>نقاط البرايز والخطوط والصواعد (${totalBasePtsAll} ن × ${avgRate} ج.م):</span><strong>${totalBaseCostAll.toLocaleString()} ج.م</strong></div>
           <div class="summary-row"><span>نقاط الإسبوتات وشريط الليد (${sumFinishPts} ن × ${inv.newPointPrice || 0} ج.م):</span><strong>${sumFinishCost.toLocaleString()} ج.م</strong></div>
@@ -1306,7 +1376,7 @@
         `}
         ${sumProfileCost > 0 ? `<div class="summary-row"><span>إجمالي الليد بروفايل (${sumProfileMeters} م):</span><strong>${sumProfileCost.toLocaleString()} ج.م</strong></div>` : ''}
         ${sumExtrasCost > 0 ? `<div class="summary-row"><span>إجمالي البنود الإضافية:</span><strong>${sumExtrasCost.toLocaleString()} ج.م</strong></div>` : ''}
-        <div class="summary-row" style="font-weight:900;"><span>إجمالي قيمة الأعمال:</span><strong>${grandTotal.toLocaleString()} ج.م</strong></div>
+        <div class="summary-row"><span>إجمالي قيمة الأعمال:</span><strong>${grandTotal.toLocaleString()} ج.م</strong></div>
         ${inv.discountAmount > 0 ? `<div class="summary-row"><span>الخصم:</span><strong>- ${inv.discountAmount.toLocaleString()} ج.م</strong></div>` : ''}
         ${inv.paidAmount > 0 ? `<div class="summary-row"><span>المدفوع تحت الحساب:</span><strong>- ${inv.paidAmount.toLocaleString()} ج.م</strong></div>` : ''}
         <div class="summary-row total"><span>الصافي المطلوب سداده:</span><span>${netRemaining.toLocaleString()} ج.م</span></div>
@@ -1348,7 +1418,7 @@
       document.getElementById('printSheet').classList.toggle('show-edit-borders');
     }
 
-    // بناء ورقة الـ A4 بتباين عالٍ جداً وخط Cairo Bold العريض وجدول مستقل للخطوط والصواعد
+    // بناء ورقة الـ A4 (نفس الجداول والحسابات بالضبط)
     function buildSinglePageHTML() {
       const inv = getCurrentInvoice();
       autoFitTypographyForRoomCount(inv.rooms.length);
@@ -1380,16 +1450,15 @@
 
         const extraTexts = [];
         if (r.ledProfile) extraTexts.push(`بروفايل: ${r.ledProfile}م (${c.profileCost} ج)`);
-        if (r.extras && r.extras.length > 0) r.extras.forEach(ex => extraTexts.push(`${ex.name}: ${ex.qty}×${ex.price} (${ex.qty * ex.price} ج)`));
+        if (r.extras && r.extras.length > 0) r.extras.forEach(ex => extraTexts.push(`${esc(ex.name)}: ${ex.qty}×${ex.price} (${ex.qty * ex.price} ج)`));
 
-        // كتابة الإسبوتات وشريط الليد بنظام النقاط بين قوسين
         const spotsCellText = r.spots ? `${r.spots} (${c.spotsPts} ن)` : '-';
         const stripCellText = r.ledStrip ? `${r.ledStrip} م (${c.ledStripPts} ن)` : '-';
 
         roomRowsHTML += `
           <tr>
             <td contenteditable="true">${i + 1}</td>
-            <td class="room-col" contenteditable="true">${r.name}</td>
+            <td class="room-col" contenteditable="true">${esc(r.name)}</td>
             <td contenteditable="true">${r.sockets || '-'}</td>
             <td contenteditable="true">${spotsCellText}</td>
             <td contenteditable="true">${stripCellText}</td>
@@ -1427,7 +1496,6 @@
         `;
       }
 
-      // جدول مستقل تماماً لخطوط اللوحة الأتوماتيك والصواعد مع النقاط بين قوسين
       const mainPanelTableHTML = `
         <div class="p-section-caption" contenteditable="true">أولاً: بيان تفصيل الغرف والأقسام</div>
       `;
@@ -1475,14 +1543,14 @@
               <img src="${appData.logoData || ''}" alt="Logo">
             </div>
             <div class="p-title-block">
-              <h1 contenteditable="true">⚡ ${appData.invoiceTitle || 'كشف حساب ومستخلص أعمال كهرباء'}</h1>
-              <p contenteditable="true">${appData.techName || 'للأعمال والتشطيبات الكهربائية'}</p>
-              ${appData.techPhone ? `<p contenteditable="true">هاتف: ${appData.techPhone}</p>` : ''}
+              <h1 contenteditable="true">⚡ ${esc(appData.invoiceTitle || 'كشف حساب ومستخلص أعمال كهرباء')}</h1>
+              <p contenteditable="true">${esc(appData.techName || 'للأعمال والتشطيبات الكهربائية')}</p>
+              ${appData.techPhone ? `<p contenteditable="true">هاتف: ${esc(appData.techPhone)}</p>` : ''}
             </div>
           </div>
           <div class="p-meta-box">
-            <div contenteditable="true"><strong>العميل:</strong> ${inv.clientName}</div>
-            <div contenteditable="true"><strong>التاريخ:</strong> ${inv.date || '-'}</div>
+            <div contenteditable="true"><strong>العميل:</strong> ${esc(inv.clientName)}</div>
+            <div contenteditable="true"><strong>التاريخ:</strong> ${esc(inv.date || '-')}</div>
             <div contenteditable="true"><strong>عدد الغرف:</strong> ${inv.rooms.length}</div>
           </div>
         </div>
@@ -1525,14 +1593,14 @@
         <div class="p-bottom-grid">
           <div class="p-notes-box">
             <div contenteditable="true">
-              <strong class="ruqaa-text" style="font-size:0.95rem;">قواعد حساب النقاط المعتمدة:</strong>
+              <strong style="font-size:0.95rem;">قواعد حساب النقاط المعتمدة:</strong>
               <ul style="margin-right:15px; margin-top:3px; line-height:1.4;">
                 <li>البريزة أو المفتاح = 1 نقطة | خط الأتوماتيك = 2 نقطة | الصاعد الرئيسي = 2 نقطة.</li>
                 <li>الإسبوت = 0.5 نقطة | متر شريط الليد = 0.5 نقطة.</li>
                 ${inv.systemType === 'old' ? `<li>النظام القديم: (${totalBasePtsAll} ن) تأسيس ولوحة وصواعد بمتوسط السعر (${avgRate} ج.م)، و(${sumFinishPts} ن) إسبوتات وشريط ليد بالسعر الحالي (${inv.newPointPrice} ج.م).</li>` : ''}
               </ul>
             </div>
-            <div contenteditable="true" style="display:flex; justify-content:space-between; margin-top:8px; padding-top:6px; border-top:1.5px dashed #1f0519;">
+            <div contenteditable="true" style="display:flex; justify-content:space-between; margin-top:8px; padding-top:6px; border-top:1.5px dashed #14213A;">
               <span>توقيع القائم بالأعمال: ....................</span>
               <span>اعتماد العميل: ....................</span>
             </div>
@@ -1548,26 +1616,41 @@
             ${sumProfileCost > 0 ? `<tr><td contenteditable="true">إجمالي الليد بروفايل (${sumProfileMeters} م)</td><td contenteditable="true" style="text-align:left;">${sumProfileCost.toLocaleString()} ج.م</td></tr>` : ''}
             ${sumExtrasCost > 0 ? `<tr><td contenteditable="true">إجمالي البنود الإضافية</td><td contenteditable="true" style="text-align:left;">${sumExtrasCost.toLocaleString()} ج.م</td></tr>` : ''}
             <tr><td contenteditable="true">إجمالي المصنعية المستحقة</td><td contenteditable="true" style="text-align:left;">${grandTotal.toLocaleString()} ج.م</td></tr>
-            ${inv.discountAmount > 0 ? `<tr><td contenteditable="true">الخصم</td><td contenteditable="true" style="text-align:left; color:#e11d48 !important;">- ${inv.discountAmount.toLocaleString()} ج.م</td></tr>` : ''}
+            ${inv.discountAmount > 0 ? `<tr><td contenteditable="true">الخصم</td><td contenteditable="true" style="text-align:left; color:#D9434E !important;">- ${inv.discountAmount.toLocaleString()} ج.م</td></tr>` : ''}
             ${inv.paidAmount > 0 ? `<tr><td contenteditable="true">المدفوع تحت الحساب</td><td contenteditable="true" style="text-align:left; color:#0d9488 !important;">- ${inv.paidAmount.toLocaleString()} ج.م</td></tr>` : ''}
-            <tr class="final-row"><td contenteditable="true" class="ruqaa-text">الصافي المطلوب سداده</td><td contenteditable="true" style="text-align:left;">${netRemaining.toLocaleString()} ج.م</td></tr>
+            <tr class="final-row"><td contenteditable="true">الصافي المطلوب سداده</td><td contenteditable="true" style="text-align:left;">${netRemaining.toLocaleString()} ج.م</td></tr>
           </table>
         </div>
       `;
     }
 
+    // عرض ورقة A4 كاملة مصغّرة على عرض شاشة الهاتف
+    let previewFullSize = false;
+    function fitPreviewToScreen() {
+      const sheet = document.getElementById('printSheet');
+      const a4 = 210 * 96 / 25.4;
+      sheet.style.zoom = previewFullSize ? '1' : Math.min(1, (window.innerWidth - 16) / a4).toFixed(3);
+      document.getElementById('previewZoomBtn').textContent = previewFullSize ? 'عرض الورقة كاملة' : 'عرض بالحجم الكامل';
+    }
+    function togglePreviewZoom() {
+      previewFullSize = !previewFullSize;
+      fitPreviewToScreen();
+    }
+    window.addEventListener('resize', fitPreviewToScreen);
+
     function openSinglePagePreview(autoPrint = false) {
-      closePrintMenu();
+      closeSheets();
       buildSinglePageHTML();
+      fitPreviewToScreen();
       document.getElementById('printPreviewModal').style.display = 'block';
+      document.getElementById('printPreviewModal').scrollTop = 0;
       if (autoPrint) setTimeout(() => window.print(), 150);
     }
 
     function triggerSystemPrint() { window.print(); }
     function closeSinglePagePreview() { document.getElementById('printPreviewModal').style.display = 'none'; }
 
-    function copyInvoiceForWhatsApp() {
-      closePrintMenu();
+    function buildWhatsAppText() {
       const inv = getCurrentInvoice();
       const panelCalc = calculateMainPanel(inv);
       const avgRate = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
@@ -1598,25 +1681,34 @@
       if (inv.discountAmount > 0) text += `*الخصم:* ${inv.discountAmount.toLocaleString()} ج.م\n`;
       if (inv.paidAmount > 0) text += `*المدفوع:* ${inv.paidAmount.toLocaleString()} ج.م\n`;
       text += `*الصافي المتبقي:* *${net.toLocaleString()} ج.م*`;
+      return text;
+    }
 
+    function copyInvoiceForWhatsApp() {
+      closeSheets();
+      const text = buildWhatsAppText();
+      const done = () => showAppToast('تم نسخ الفاتورة. الصقها مباشرة في واتساب.');
       const copyFallback = () => {
         const ta = document.createElement('textarea');
         ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
         document.body.appendChild(ta);
         ta.select();
         try { document.execCommand('copy'); } catch (e) {}
         ta.remove();
-        showAppToast('✔️ تم نسخ الفاتورة! يمكنك لصقها مباشرة في واتساب.');
+        done();
       };
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => showAppToast('✔️ تم نسخ الفاتورة! يمكنك لصقها مباشرة في واتساب.')).catch(copyFallback);
+        navigator.clipboard.writeText(text).then(done).catch(copyFallback);
       } else {
         copyFallback();
       }
     }
 
     function downloadSelfHTML() {
-      closePrintMenu();
+      closeSheets();
       const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const a = document.createElement('a');
@@ -1626,11 +1718,12 @@
     }
 
     function exportBackupJSON() {
-      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json;charset=utf-8' });
       const a = document.createElement('a');
-      a.href = dataStr;
+      a.href = URL.createObjectURL(blob);
       a.download = `فواتير_الكهرباء_${new Date().toISOString().slice(0,10)}.json`;
       a.click();
+      showAppToast('تم تنزيل النسخة الاحتياطية.');
     }
 
     function importBackupJSON(event) {
@@ -1643,24 +1736,172 @@
           if (imported && Array.isArray(imported.invoices)) {
             appData = imported;
             normalizeInvoicesMigration();
+            if (appData.invoices.length === 0) createNewInvoice(false);
+            if (!appData.invoices.find(inv => inv.id === appData.currentId)) appData.currentId = appData.invoices[0].id;
             saveToStorage();
+            resetRoomForm();
             renderAll();
-            showAppToast('✔️ تم استعادة جميع الفواتير بنجاح.');
+            showAppToast('تم استعادة جميع الفواتير بنجاح.');
+          } else {
+            showAppToast('الملف ده مش نسخة احتياطية من حساباتي.');
           }
-        } catch (err) { showAppToast('⚠️ ملف النسخة الاحتياطية غير صالح.'); }
+        } catch (err) { showAppToast('ملف النسخة الاحتياطية غير صالح.'); }
       };
       reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    /* =====================================================
+       التحديثات الاختيارية
+       - التطبيق يفتح دائماً من الإصدار المحفوظ على الهاتف.
+       - عند وجود إصدار أحدث يظهر اختيار: تحديث الآن / لاحقاً / البقاء على الحالي.
+       ===================================================== */
+    const SKIP_KEY = 'hesabaty_skipped_version';
+    const LATER_KEY = 'hesabaty_later_version';
+    const updateState = { current: null, latest: null, checking: false, lastCheck: 0 };
+
+    function compareVersions(a, b) {
+      const pa = String(a).split('.').map(n => parseInt(n, 10) || 0);
+      const pb = String(b).split('.').map(n => parseInt(n, 10) || 0);
+      for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+        const d = (pa[i] || 0) - (pb[i] || 0);
+        if (d) return d;
+      }
+      return 0;
+    }
+
+    async function fetchJSON(url, opts) {
+      const res = await fetch(url, opts);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }
+
+    function messageWorker(worker, msg, timeoutMs) {
+      return new Promise(resolve => {
+        const channel = new MessageChannel();
+        const timer = setTimeout(() => resolve(null), timeoutMs);
+        channel.port1.onmessage = e => { clearTimeout(timer); resolve(e.data); };
+        worker.postMessage(msg, [channel.port2]);
+      });
+    }
+
+    async function loadCurrentVersion() {
+      try { updateState.current = await fetchJSON('./version.json'); }
+      catch (e) { updateState.current = null; }
+      renderUpdateCard();
+    }
+
+    function renderUpdateCard() {
+      const cur = updateState.current;
+      const latest = updateState.latest;
+      document.getElementById('curVersion').textContent = cur ? cur.version : '—';
+      const status = document.getElementById('updStatus');
+      const btnShow = document.getElementById('btnShowUpdate');
+      const btnCheck = document.getElementById('btnCheckUpdate');
+      btnCheck.disabled = updateState.checking;
+      btnCheck.textContent = updateState.checking ? 'جاري التحقق...' : 'التحقق من التحديثات';
+      document.getElementById('updDot').classList.toggle('on', !!latest);
+      if (latest) {
+        status.className = 'upd-status available';
+        status.textContent = 'متاح إصدار جديد ' + latest.version + '. تقدر تحدّث دلوقتي أو تفضل على إصدارك.';
+        btnShow.style.display = '';
+      } else {
+        status.className = 'upd-status';
+        status.textContent = updateState.lastCheck
+          ? 'أنت على أحدث إصدار.'
+          : 'تقدر تختار تحدّث التطبيق أو تفضل على إصدارك الحالي.';
+        btnShow.style.display = 'none';
+      }
+    }
+
+    async function checkForUpdates(manual) {
+      if (updateState.checking) return;
+      updateState.checking = true;
+      renderUpdateCard();
+      try {
+        if (!updateState.current) await loadCurrentVersion();
+        const latest = await fetchJSON('./version.json?latest=' + Date.now(), { cache: 'no-store' });
+        const cur = updateState.current;
+        if (cur && compareVersions(latest.version, cur.version) > 0) {
+          updateState.latest = latest;
+          let skipped = null, later = null;
+          try { skipped = localStorage.getItem(SKIP_KEY); later = sessionStorage.getItem(LATER_KEY); } catch (e) {}
+          if (manual || (skipped !== latest.version && later !== latest.version)) openUpdateSheet();
+        } else {
+          updateState.latest = null;
+          if (manual) showAppToast('أنت على أحدث إصدار (' + (cur ? cur.version : latest.version) + ').');
+        }
+        updateState.lastCheck = Date.now();
+      } catch (e) {
+        if (manual) showAppToast('تعذر التحقق من التحديثات. تأكد من الاتصال بالإنترنت.');
+      } finally {
+        updateState.checking = false;
+        renderUpdateCard();
+      }
+    }
+
+    function openUpdateSheet() {
+      const latest = updateState.latest;
+      if (!latest) return;
+      document.getElementById('updNewVer').textContent = latest.version;
+      document.getElementById('updCurVer').textContent = updateState.current ? updateState.current.version : '—';
+      document.getElementById('updNotes').innerHTML = (latest.notes || []).map(n => `<li>${esc(n)}</li>`).join('');
+      document.getElementById('updateSheet').classList.remove('busy');
+      openSheet('updateSheet');
+    }
+
+    async function installUpdate() {
+      const sheet = document.getElementById('updateSheet');
+      const sw = navigator.serviceWorker && navigator.serviceWorker.controller;
+      saveToStorage();
+      if (!sw) { location.reload(); return; }
+      sheet.classList.add('busy');
+      const res = await messageWorker(sw, { type: 'INSTALL_LATEST' }, 90000);
+      if (res && res.ok) {
+        try { localStorage.removeItem(SKIP_KEY); sessionStorage.removeItem(LATER_KEY); } catch (e) {}
+        showAppToast('تم التحديث إلى الإصدار ' + res.version);
+        setTimeout(() => location.reload(), 600);
+      } else {
+        sheet.classList.remove('busy');
+        showAppToast('تعذر تنزيل التحديث. تأكد من الإنترنت وحاول تاني.');
+      }
+    }
+
+    function remindLater() {
+      if (updateState.latest) { try { sessionStorage.setItem(LATER_KEY, updateState.latest.version); } catch (e) {} }
+      closeSheets();
+      showAppToast('هنفكرك بالتحديث المرة الجاية اللي تفتح فيها التطبيق.');
+    }
+
+    function stayOnCurrent() {
+      if (updateState.latest) { try { localStorage.setItem(SKIP_KEY, updateState.latest.version); } catch (e) {} }
+      closeSheets();
+      const cur = updateState.current ? updateState.current.version : '';
+      showAppToast('هتفضل على الإصدار ' + cur + '. تقدر تحدّث في أي وقت من "المزيد".');
+    }
+
+    function startUpdateService() {
+      if (!('serviceWorker' in navigator)) { loadCurrentVersion(); return; }
+      // تحديث ملف الخدمة نفسه (لا يغيّر إصدار التطبيق اللي اختاره المستخدم)
+      const refreshWorker = () => navigator.serviceWorker.getRegistration()
+        .then(reg => reg && reg.update()).catch(() => {});
+      navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' })
+        .then(refreshWorker)
+        .catch(err => console.error('SW Error:', err));
+      // أول ما ملف الخدمة الجديد يستلم، نعرض الإصدار الصحيح
+      navigator.serviceWorker.addEventListener('controllerchange', () => loadCurrentVersion());
+      loadCurrentVersion().then(() => setTimeout(() => checkForUpdates(false), 1500));
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        if (Date.now() - updateState.lastCheck > 30 * 60 * 1000) {
+          refreshWorker();
+          checkForUpdates(false);
+        }
+      });
     }
 
     initApp();
+    window.addEventListener('load', startUpdateService);
   </script>
-  <script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js")
-      .catch(error => console.error("SW Error:", error));
-  });
-}
-</script>
 </body>
 </html>

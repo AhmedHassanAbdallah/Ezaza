@@ -1,25 +1,41 @@
-
 {
   "id": "/Ezaza/",
   "name": "حساباتي - حاسبة وفواتير الكهرباء",
   "short_name": "حساباتي",
-  "description": "حسابات تأسيسات الكهرباء وإعداد فواتير العملاء",
+  "description": "حسابات نقاط تأسيس الكهرباء وإعداد فواتير العملاء. تصميم وتطوير أحمد حسن عبدالله.",
+  "lang": "ar",
+  "dir": "rtl",
   "start_url": "/Ezaza/",
   "scope": "/Ezaza/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#fcf8fb",
-  "theme_color": "#3b0d32",
+  "background_color": "#F4F6FA",
+  "theme_color": "#1B2E4B",
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
       "src": "/Ezaza/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/Ezaza/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Ezaza/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Ezaza/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
