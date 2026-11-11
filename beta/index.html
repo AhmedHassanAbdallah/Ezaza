@@ -377,8 +377,10 @@
     .entry .e-meta { font-size: .74rem; color: var(--muted); overflow-wrap: anywhere; }
     .entry .e-amt { font-weight: 900; white-space: nowrap; color: var(--success); }
     .entry.mat .e-amt { color: var(--orange-600); }
-    .seg3 { grid-template-columns: repeat(3, 1fr); }
-    .seg3 button { font-size: .78rem; padding: 0 4px; }
+    .mini-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .mini-stats div { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 8px 10px; min-width: 0; }
+    .mini-stats span { display: block; font-size: .7rem; color: var(--muted); }
+    .mini-stats strong { display: block; font-size: .92rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .backup-line { font-size: .76rem; color: var(--muted); text-align: center; margin-top: 8px; }
     .backup-line.warn { color: var(--orange-600); font-weight: 800; }
     textarea { width: 100%; min-height: 76px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); font-size: .95rem; font-weight: 700; color: var(--text); resize: vertical; }
@@ -812,18 +814,14 @@
 <div class="backdrop" id="txnBackdrop" onclick="closeOverlay()"></div>
 <div class="sheet" id="txnSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
-  <div class="sheet-head"><h3 id="txnTitle">تسجيل مبلغ</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
-  <div class="segmented seg3" id="txnKindSeg">
-    <button type="button" data-kind="payment" onclick="setTxnKind('payment')">دفعة تحت الحساب</button>
-    <button type="button" data-kind="matpay" onclick="setTxnKind('matpay')">سداد خامات</button>
-    <button type="button" data-kind="material" onclick="setTxnKind('material')">خامات اشتريتها</button>
-  </div>
+  <div class="sheet-head"><h3 id="txnTitle">تسجيل دفعة</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
   <div class="note" id="txnKindHint" style="margin-bottom:12px"></div>
   <div class="field hidden" id="txnTitleField"><label for="txnDesc">بيان الخامات</label><input type="text" id="txnDesc" placeholder="مثال: سلك ومواسير وعلب"></div>
   <div class="row-2">
     <div class="field"><label for="txnAmount" id="txnAmountLabel">المبلغ (ج.م)</label><input type="number" inputmode="decimal" id="txnAmount" min="0" step="any" placeholder="0"></div>
     <div class="field"><label for="txnDate">التاريخ</label><input type="date" id="txnDate"></div>
   </div>
+  <button type="button" class="chip hidden" id="txnFillRemaining" style="margin:-4px 0 12px"></button>
   <div class="field"><label for="txnNote">ملاحظة / أمارة</label><textarea id="txnNote" placeholder="مثال: استلمتها كاش في الشقة بحضور فلان (اختياري)"></textarea></div>
   <div class="stack">
     <div class="btn-row">
@@ -925,6 +923,7 @@
   let editingCustomerId = null;
   let editingTxnId = null;
   let txnKind = 'payment';
+  let custTab = 'work';
   let editingRoomIndex = null;
   let currentView = 'pricing';
   let currentPrintFontSize = 13;
@@ -2086,8 +2085,20 @@
   function openCustomer(id) {
     if (!getCustomer(id)) return;
     currentCustomerId = id;
+    custTab = 'work';
     renderCustomerPage();
     openOverlay('customer');
+  }
+  function setCustTab(tab) { custTab = tab; renderCustomerPage(); }
+  function entryRowHTML(e) {
+    const cls = e.kind === 'material' ? 'mat' : (e.kind === 'matpay' ? 'matpay' : '');
+    const title = e.kind === 'material' ? (e.title ? esc(e.title) : 'خامات') : KIND_LABEL[e.kind];
+    return `
+      <div class="entry ${cls}" data-entry="${esc(e.id)}">
+        <div class="e-ic">${icon(e.kind === 'material' ? 'box' : 'cash')}</div>
+        <div class="e-info"><div class="e-title">${title}</div><div class="e-meta">${esc(fmtDate(e.date))}${e.note ? ' · ' + esc(e.note) : ''}</div></div>
+        <div class="e-amt">${e.kind === 'material' ? '' : '+ '}${fmt(e.amount)}</div>
+      </div>`;
   }
   function renderCustomerPage() {
     const c = getCustomer(currentCustomerId);
@@ -2098,6 +2109,9 @@
     const row = (label, value, cls = '') => `<div class="sum-row ${cls}"><span>${label}</span><strong>${value}</strong></div>`;
     const money = v => `${fmt(v)} ج.م`;
     const hasMat = st.matTotal > 0 || st.matPaid > 0;
+    const byNewest = (a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt - a.createdAt);
+    const workEntries = c.entries.filter(e => e.kind === 'payment').sort(byNewest);
+    const matEntries = c.entries.filter(e => e.kind !== 'payment').sort(byNewest);
 
     let heroLabel, heroValue;
     if (st.invs.length) { heroLabel = st.remaining >= 0 ? 'المتبقي على العميل' : 'زيادة للعميل'; heroValue = Math.abs(st.remaining); }
@@ -2109,26 +2123,48 @@
         <div class="hero-label">${heroLabel}</div>
         <div class="hero-value"><span id="custHeroValue">${fmt(heroValue)}</span><small>ج.م</small></div>
         <div class="hero-stats">
-          <div class="hero-stat"><span>إجمالي ما وصلك</span><strong>${money(st.received)}</strong></div>
+          <div class="hero-stat"><span>دفعات الشغل</span><strong>${money(st.paid)}</strong></div>
           <div class="hero-stat"><span>متبقي الخامات</span><strong>${money(Math.max(0, st.matRemaining))}</strong></div>
-          <div class="hero-stat"><span>صافي المصنعية</span><strong id="custNetPaid">${money(st.netPaid)}</strong></div>
+          <div class="hero-stat"><span>صافي ما وصلك</span><strong id="custNetPaid">${money(st.netPaid)}</strong></div>
         </div>
-      </section>
-      <div class="btn-row" style="margin-bottom:14px">
-        <button type="button" class="btn btn-accent" onclick="openTxn('payment')">${icon('plus')} تسجيل مبلغ</button>
-        <button type="button" class="btn btn-soft" onclick="openTxn('material')">${icon('box')} خامات</button>
-      </div>`;
+      </section>`;
 
     if (c.note) html += `<div class="note" style="margin-bottom:14px"><strong>ملاحظات:</strong> ${esc(c.note)}</div>`;
 
-    html += `<div class="card"><div class="card-title"><div class="t-ic orange">${icon('calc')}</div><h2>ملخص الحساب</h2></div><div class="sum-list">`;
-    html += row('المدفوع تحت الحساب', money(st.paid));
-    if (hasMat) {
-      html += row('إجمالي ثمن الخامات', money(st.matTotal));
-      html += row('وصلك من ثمن الخامات', money(st.matPaid));
-      html += row('المتبقي من الخامات (يُخصم من المدفوع)', `- ${money(Math.max(0, st.matRemaining))}`, 'minus');
+    // صفحتان منفصلتان: حساب الشغل / حساب الخامات
+    html += `
+      <div class="segmented" style="margin-bottom:12px">
+        <button type="button" id="custTabWork" class="${custTab === 'work' ? 'on' : ''}" onclick="setCustTab('work')">حساب الشغل (${workEntries.length})</button>
+        <button type="button" id="custTabMat" class="${custTab === 'mat' ? 'on' : ''}" onclick="setCustTab('mat')">حساب الخامات (${matEntries.length})</button>
+      </div>`;
+
+    if (custTab === 'work') {
+      html += `<div class="card"><div class="card-title"><div class="t-ic">${icon('wallet')}</div><h2>دفعات تحت الحساب</h2><span class="tag">${money(st.paid)}</span></div>
+        <p class="hint" style="margin:-6px 0 12px">المبالغ التي وصلتك من العميل من حساب الشغل نفسه (المصنعية)، كل مبلغ بتاريخه وملاحظته.</p>
+        <button type="button" class="btn btn-accent" id="btnAddPayment" onclick="openTxn('payment')">${icon('plus')} تسجيل دفعة تحت الحساب</button>
+        <div style="margin-top:8px">${workEntries.length ? workEntries.map(entryRowHTML).join('') : '<p class="hint" style="margin:10px 0 0;text-align:center">لم تسجل أي دفعة بعد.</p>'}</div>
+      </div>`;
+    } else {
+      html += `<div class="card"><div class="card-title"><div class="t-ic orange">${icon('box')}</div><h2>حساب الخامات</h2></div>
+        <p class="hint" style="margin:-6px 0 12px">خامات اشتريتها للعميل على حسابك، وما سدده من ثمنها، والمتبقي منها.</p>
+        <div class="mini-stats">
+          <div><span>ثمن الخامات</span><strong id="matTotalVal">${money(st.matTotal)}</strong></div>
+          <div><span>تم سداده</span><strong id="matPaidVal" style="color:var(--success)">${money(st.matPaid)}</strong></div>
+          <div><span>المتبقي</span><strong id="matRemVal" style="color:var(--danger)">${money(Math.max(0, st.matRemaining))}</strong></div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-accent" id="btnAddMaterial" onclick="openTxn('material')">${icon('plus')} إضافة خامات</button>
+          <button type="button" class="btn btn-soft" id="btnAddMatpay" onclick="openTxn('matpay')">${icon('cash')} سداد خامات</button>
+        </div>
+        <div style="margin-top:8px">${matEntries.length ? matEntries.map(entryRowHTML).join('') : '<p class="hint" style="margin:10px 0 0;text-align:center">لا توجد خامات مسجلة لهذا العميل.</p>'}</div>
+      </div>`;
     }
-    html += row('صافي ما وصلك (مصنعية)', money(st.netPaid), 'bold');
+
+    // ملخص الحساب: متبقي الخامات يُخصم من دفعات الشغل
+    html += `<div class="card"><div class="card-title"><div class="t-ic orange">${icon('calc')}</div><h2>ملخص الحساب</h2></div><div class="sum-list">`;
+    html += row('دفعات تحت الحساب (الشغل)', money(st.paid));
+    if (hasMat) html += row('المتبقي من الخامات (يُخصم من دفعات الشغل)', `- ${money(Math.max(0, st.matRemaining))}`, 'minus');
+    html += row('صافي ما وصلك من حساب الشغل', money(st.netPaid), 'bold');
     if (st.materialsDue > 0) html += row('خامات مستحقة على العميل (تُضاف على الفاتورة)', `+ ${money(st.materialsDue)}`, 'minus');
     if (st.invs.length) html += row('إجمالي فواتيره (بعد الخصم)', money(st.invoicesTotal));
     html += '</div>';
@@ -2152,26 +2188,10 @@
     if (cur && !cur.customerId) html += `<button type="button" class="btn btn-ghost" onclick="linkInvoiceToCustomer('${esc(cur.id)}', '${esc(c.id)}', false)">${icon('link')} ربط الفاتورة المفتوحة (${esc(cur.clientName)})</button>`;
     html += '</div></div>';
 
-    // سجل الحركات
-    const entries = c.entries.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt - a.createdAt));
-    html += `<div class="card"><div class="card-title"><div class="t-ic">${icon('wallet')}</div><h2>سجل المبالغ والخامات</h2><span class="tag">${entries.length}</span></div>`;
-    if (!entries.length) html += `<p class="hint" style="margin:-4px 0 4px">لم تسجل أي مبلغ بعد. اضغط «تسجيل مبلغ» لإضافة أول دفعة بتاريخها وملاحظتها.</p>`;
-    entries.forEach(e => {
-      const cls = e.kind === 'material' ? 'mat' : (e.kind === 'matpay' ? 'matpay' : '');
-      const title = e.kind === 'material' ? `خامات${e.title ? ': ' + esc(e.title) : ''}` : KIND_LABEL[e.kind];
-      html += `
-        <div class="entry ${cls}" data-entry="${esc(e.id)}">
-          <div class="e-ic">${icon(e.kind === 'material' ? 'box' : 'cash')}</div>
-          <div class="e-info"><div class="e-title">${title}</div><div class="e-meta">${esc(fmtDate(e.date))}${e.note ? ' · ' + esc(e.note) : ''}</div></div>
-          <div class="e-amt">${e.kind === 'material' ? '' : '+ '}${fmt(e.amount)}</div>
-        </div>`;
-    });
-    html += '</div>';
-
     html += `
       <div class="stack">
         <div class="btn-row">
-          <button type="button" class="btn btn-wa" onclick="sendCustomerStatement()">${icon('send')} كشف حساب واتساب</button>
+          <button type="button" class="btn btn-wa" onclick="sendCustomerStatement()">${icon('send')} كشف واتساب</button>
           <button type="button" class="btn btn-ghost" onclick="copyCustomerStatement()">${icon('copy')} نسخ الكشف</button>
         </div>
         <button type="button" class="btn btn-danger" onclick="deleteCustomer('${esc(c.id)}')">${icon('trash')} حذف العميل من النوتة</button>
@@ -2181,25 +2201,36 @@
     body.querySelectorAll('.entry[data-entry]').forEach(el => { el.onclick = () => openTxn(null, el.dataset.entry); });
   }
 
-  /* ---------- تسجيل مبلغ / خامات ---------- */
-  function setTxnKind(kind) {
+  /* ---------- تسجيل دفعة / خامات / سداد خامات (كل نوع في نافذة مستقلة) ---------- */
+  const TXN_UI = {
+    payment: { add: 'تسجيل دفعة تحت الحساب', edit: 'تعديل دفعة تحت الحساب', amount: 'المبلغ المستلم (ج.م)',
+      hint: () => 'مبلغ وصلك من العميل من <strong>حساب الشغل</strong> نفسه (المصنعية).' },
+    material: { add: 'إضافة خامات اشتريتها', edit: 'تعديل الخامات', amount: 'إجمالي ثمن الخامات (ج.م)',
+      hint: () => 'اكتب <strong>إجمالي ثمن الخامات</strong> التي اشتريتها للعميل على حسابك.' },
+    matpay: { add: 'تسجيل سداد خامات', edit: 'تعديل سداد الخامات', amount: 'المبلغ المسدد من الخامات (ج.م)',
+      hint: rem => `مبلغ وصلك من العميل <strong>مقابل الخامات</strong>. المتبقي من الخامات حالياً: <strong>${fmt(rem)} ج.م</strong>` }
+  };
+  function setTxnKind(kind, isEdit = false, matRemaining = 0) {
     txnKind = kind;
-    document.querySelectorAll('#txnKindSeg button').forEach(b => b.classList.toggle('on', b.dataset.kind === kind));
+    const ui = TXN_UI[kind];
+    document.getElementById('txnTitle').textContent = isEdit ? ui.edit : ui.add;
     document.getElementById('txnTitleField').classList.toggle('hidden', kind !== 'material');
-    document.getElementById('txnAmountLabel').textContent = kind === 'material' ? 'إجمالي ثمن الخامات (ج.م)' : 'المبلغ المستلم (ج.م)';
-    document.getElementById('txnKindHint').innerHTML = {
-      payment: '<strong>دفعة تحت الحساب:</strong> مبلغ وصلك من العميل من حساب الشغل (المصنعية).',
-      matpay: '<strong>سداد خامات:</strong> مبلغ وصلك من العميل مقابل خامات اشتريتها له على حسابك.',
-      material: '<strong>خامات اشتريتها:</strong> ثمن خامات دفعتها من جيبك للعميل. المتبقي منها يُخصم من المدفوع تحت الحساب.'
-    }[kind];
+    document.getElementById('txnAmountLabel').textContent = ui.amount;
+    document.getElementById('txnKindHint').innerHTML = ui.hint(matRemaining);
+    const fillBtn = document.getElementById('txnFillRemaining');
+    const showFill = kind === 'matpay' && !isEdit && matRemaining > 0;
+    fillBtn.classList.toggle('hidden', !showFill);
+    if (showFill) {
+      fillBtn.textContent = `سداد كل المتبقي (${fmt(matRemaining)} ج.م)`;
+      fillBtn.onclick = () => { document.getElementById('txnAmount').value = round2(matRemaining); };
+    }
   }
   function openTxn(kind, entryId = null) {
     const c = getCustomer(currentCustomerId);
     if (!c) return;
     const e = entryId ? c.entries.find(x => x.id === entryId) : null;
     editingTxnId = e ? e.id : null;
-    document.getElementById('txnTitle').textContent = e ? 'تعديل السجل' : (kind === 'material' ? 'إضافة خامات' : 'تسجيل مبلغ');
-    setTxnKind(e ? e.kind : (kind || 'payment'));
+    setTxnKind(e ? e.kind : (kind || 'payment'), !!e, Math.max(0, customerMoney(c).matRemaining));
     document.getElementById('txnDesc').value = e ? e.title : '';
     document.getElementById('txnAmount').value = e ? e.amount : '';
     document.getElementById('txnDate').value = e ? e.date : todayISO();
@@ -2354,21 +2385,21 @@
     if (appData.techName) text += `*${appData.techName}*\n`;
     text += `*تاريخ الكشف:* ${fmtDate(todayISO())}\n` + line;
     const byDate = (a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt - b.createdAt);
-    const pays = c.entries.filter(e => e.kind !== 'material').sort(byDate);
+    const pays = c.entries.filter(e => e.kind === 'payment').sort(byDate);
     const mats = c.entries.filter(e => e.kind === 'material').sort(byDate);
-    if (pays.length) {
-      text += '*المبالغ المستلمة:*\n';
-      pays.forEach((e, i) => { text += `${i + 1}) ${fmtDate(e.date)} — *${money(e.amount)}* (${KIND_LABEL[e.kind]})${e.note ? ' — ' + e.note : ''}\n`; });
-    } else text += '*لا توجد مبالغ مستلمة حتى الآن.*\n';
-    if (mats.length) {
-      text += line + '*الخامات:*\n';
+    const matPays = c.entries.filter(e => e.kind === 'matpay').sort(byDate);
+    text += '*أولاً: دفعات تحت الحساب (الشغل)*\n';
+    if (pays.length) pays.forEach((e, i) => { text += `${i + 1}) ${fmtDate(e.date)} — *${money(e.amount)}*${e.note ? ' — ' + e.note : ''}\n`; });
+    else text += 'لا توجد دفعات حتى الآن.\n';
+    text += `*إجمالي الدفعات:* ${money(st.paid)}\n`;
+    if (mats.length || matPays.length) {
+      text += line + '*ثانياً: حساب الخامات*\n';
       mats.forEach((e, i) => { text += `${i + 1}) ${fmtDate(e.date)} — ${e.title || 'خامات'}: *${money(e.amount)}*${e.note ? ' — ' + e.note : ''}\n`; });
+      matPays.forEach(e => { text += `• سداد ${fmtDate(e.date)} — *${money(e.amount)}*${e.note ? ' — ' + e.note : ''}\n`; });
+      text += `*ثمن الخامات:* ${money(st.matTotal)} | *تم سداده:* ${money(st.matPaid)} | *المتبقي:* ${money(Math.max(0, st.matRemaining))}\n`;
     }
-    text += line + `*إجمالي المستلم:* ${money(st.received)}\n`;
-    if (st.matTotal > 0 || st.matPaid > 0) {
-      text += `*إجمالي الخامات:* ${money(st.matTotal)} | *المسدد منها:* ${money(st.matPaid)} | *المتبقي:* ${money(Math.max(0, st.matRemaining))}\n`;
-    }
-    text += `*صافي المدفوع من المصنعية:* ${money(st.netPaid)}\n`;
+    text += line;
+    text += `*صافي المدفوع من حساب الشغل:* ${money(st.netPaid)}\n`;
     if (st.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${money(st.materialsDue)}\n`;
     if (st.invs.length) {
       text += `*إجمالي الفواتير:* ${money(st.invoicesTotal)}\n`;
