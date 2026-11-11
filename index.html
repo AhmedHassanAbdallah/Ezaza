@@ -277,15 +277,15 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
       background: var(--surface); border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: repeat(5, 1fr);
+      display: grid; grid-template-columns: repeat(6, 1fr);
       height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: var(--safe-b);
       box-shadow: 0 -6px 20px rgba(11,27,51,.07);
     }
-    .nav-item { border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: .72rem; font-weight: 700; position: relative; }
-    .nav-item .pill { width: 52px; height: 30px; border-radius: 99px; display: grid; place-items: center; transition: background .2s, color .2s; }
+    .nav-item { border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: .68rem; padding: 0; min-width: 0; font-weight: 700; position: relative; }
+    .nav-item .pill { width: 44px; height: 30px; border-radius: 99px; display: grid; place-items: center; transition: background .2s, color .2s; }
     .nav-item.active { color: var(--text); font-weight: 800; }
     .nav-item.active .pill { background: var(--accent-soft); color: var(--accent); }
-    .nav-badge { position: absolute; top: 6px; left: calc(50% - 24px); background: var(--accent); color: #fff; font-size: .62rem; min-width: 18px; height: 18px; border-radius: 99px; display: grid; place-items: center; padding: 0 4px; font-weight: 800; }
+    .nav-badge { position: absolute; top: 6px; left: calc(50% - 22px); background: var(--accent); color: #fff; font-size: .62rem; min-width: 18px; height: 18px; border-radius: 99px; display: grid; place-items: center; padding: 0 4px; font-weight: 800; }
 
     /* النوافذ المنبثقة من الأسفل */
     .backdrop { position: fixed; inset: 0; background: rgba(7,18,38,.55); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .22s; }
@@ -337,6 +337,55 @@
       box-shadow: var(--shadow-lg); border-inline-start: 4px solid var(--accent);
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+
+    /* ============ النسخة التجريبية ============ */
+    .beta-bar { background: repeating-linear-gradient(135deg, #7c2d12, #7c2d12 12px, #9a3412 12px, #9a3412 24px); color: #fff; font-size: .76rem; font-weight: 800; text-align: center; padding: 6px 12px; }
+
+    /* ============ اقتراحات العملاء وربط الفاتورة ============ */
+    input[type="date"] { width: 100%; min-width: 0; height: 48px; padding: 0 14px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); font-size: 1rem; font-weight: 700; color: var(--text); }
+    .suggest { border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface); margin-top: 6px; overflow: hidden; box-shadow: var(--shadow-md); }
+    .suggest button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; border-bottom: 1px solid var(--border); background: none; padding: 10px 12px; text-align: right; font-weight: 800; font-size: .9rem; color: var(--text); }
+    .suggest button:last-child { border-bottom: 0; }
+    .suggest button:active { background: var(--primary-soft); }
+    .suggest .s-av { width: 34px; height: 34px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); display: grid; place-items: center; flex-shrink: 0; font-weight: 900; }
+    .suggest .s-av.add { background: var(--accent-soft); color: var(--accent); }
+    .suggest small { display: block; font-size: .72rem; color: var(--muted); font-weight: 600; }
+    .link-box { display: flex; align-items: center; gap: 10px; background: var(--success-soft); border: 1.5px solid rgba(15,159,110,.35); border-radius: 13px; padding: 10px 12px; margin-top: 10px; }
+    .link-box .l-ic { width: 34px; height: 34px; border-radius: 10px; background: var(--success); color: #fff; display: grid; place-items: center; flex-shrink: 0; }
+    .link-box .l-txt { flex: 1; min-width: 0; font-size: .82rem; line-height: 1.5; }
+    .link-box .l-txt b { display: block; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .link-box .l-txt span { color: var(--muted); font-size: .74rem; }
+    input:disabled { opacity: .75; background: var(--primary-soft); }
+
+    /* ============ النوتة وصفحة العميل ============ */
+    .page-overlay { display: none; position: fixed; inset: 0; z-index: 150; background: var(--bg); overflow-y: auto; }
+    .page-overlay.open { display: block; animation: fadeUp .2s ease; }
+    .page-overlay .container { padding-bottom: 40px; }
+    .cust-card { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); cursor: pointer; }
+    .cust-amt { text-align: left; white-space: nowrap; font-weight: 900; font-size: .92rem; }
+    .cust-amt small { display: block; font-size: .68rem; color: var(--muted); font-weight: 700; }
+    .cust-amt.due { color: var(--danger); }
+    .cust-amt.ok { color: var(--success); }
+    .entry { display: flex; align-items: center; gap: 11px; padding: 11px 2px; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .entry:last-child { border-bottom: 0; }
+    .entry .e-ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; background: var(--success-soft); color: var(--success); }
+    .entry.mat .e-ic { background: var(--accent-soft); color: var(--accent); }
+    .entry.matpay .e-ic { background: var(--primary-soft); color: var(--primary); }
+    .entry .e-info { flex: 1; min-width: 0; }
+    .entry .e-title { font-weight: 800; font-size: .9rem; }
+    .entry .e-meta { font-size: .74rem; color: var(--muted); overflow-wrap: anywhere; }
+    .entry .e-amt { font-weight: 900; white-space: nowrap; color: var(--success); }
+    .entry.mat .e-amt { color: var(--orange-600); }
+    .mini-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .mini-stats div { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 8px 10px; min-width: 0; }
+    .mini-stats span { display: block; font-size: .7rem; color: var(--muted); }
+    .mini-stats strong { display: block; font-size: .92rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .backup-line { font-size: .76rem; color: var(--muted); text-align: center; margin-top: 8px; }
+    .backup-line.warn { color: var(--orange-600); font-weight: 800; }
+    textarea { width: 100%; min-height: 76px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); font-size: .95rem; font-weight: 700; color: var(--text); resize: vertical; }
+    textarea:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+    .field.wide { grid-column: 1 / -1; }
 
     /* =====================================================
        المعاينة: ورقة A4 حقيقية بنفس مقاس الطباعة، مصغّرة لتناسب الشاشة
@@ -433,7 +482,8 @@
 
     @page { size: A4 portrait; margin: 9mm; }
     @media print {
-      html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+      html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; overflow: visible !important; height: auto !important; }
+      .page-overlay, .beta-bar { display: none !important; }
       #editorApp, .preview-toolbar, .page-label, .bottom-nav, .fab, .sheet, .backdrop, .dialog-wrap, .toast { display: none !important; }
       #printPreviewModal { display: block !important; position: static !important; background: transparent !important; padding: 0 !important; overflow: visible !important; }
       #printViewport { height: auto !important; width: auto !important; overflow: visible !important; }
@@ -448,6 +498,7 @@
 <body>
 
 <div id="editorApp">
+  <div class="beta-bar hidden" id="betaBar">نسخة تجريبية للتحديث 2.2.0 — بيانات تطبيقك الأصلي لن تتأثر</div>
   <header class="app-header">
     <img class="brand-ic" src="./icons/icon-192.png" alt="">
     <div class="titles">
@@ -474,12 +525,15 @@
     <section class="view active" id="view-pricing">
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="user"></i></div><h2>بيانات العميل</h2></div>
-        <div class="field"><label for="clientName">اسم العميل</label><input type="text" id="clientName" placeholder="مثال: أ. محمد فيصل" oninput="saveInvoiceMeta()"></div>
+        <div class="field"><label for="clientName">اسم العميل</label><input type="text" id="clientName" autocomplete="off" placeholder="اكتب الاسم وسيقترح التطبيق من النوتة" oninput="saveInvoiceMeta(); renderClientSuggestions()" onfocus="renderClientSuggestions()" onblur="setTimeout(hideClientSuggestions, 250)">
+          <div class="suggest hidden" id="clientSuggest"></div>
+        </div>
         <div class="row-2 stack-sm">
           <div class="field"><label for="clientPhone">رقم هاتف العميل</label><input type="text" inputmode="tel" dir="ltr" style="text-align:right" id="clientPhone" placeholder="01xxxxxxxxx" oninput="saveInvoiceMeta()"></div>
           <div class="field"><label for="invoiceDate">التاريخ</label><input type="text" id="invoiceDate" placeholder="2026/11/4" oninput="saveInvoiceMeta()"></div>
         </div>
         <div class="field" style="margin-bottom:0"><label for="clientAddress">عنوان العميل</label><input type="text" id="clientAddress" placeholder="مثال: المعادي - شارع 9 - عمارة 12 - الدور 3" oninput="saveInvoiceMeta()"></div>
+        <div id="clientLinkBox"></div>
       </div>
 
       <div class="card">
@@ -492,9 +546,10 @@
           <label for="oldPointPrice">سعر النقطة وقت بداية العمل (التأسيس)</label>
           <input type="number" inputmode="decimal" id="oldPointPrice" min="0" step="any" placeholder="40" oninput="saveInvoiceMeta()">
         </div>
+        <div class="field"><label for="newPointPrice">سعر النقطة الحالي</label><input type="number" inputmode="decimal" id="newPointPrice" min="0" step="any" placeholder="70" oninput="saveInvoiceMeta()"></div>
         <div class="row-2">
-          <div class="field"><label for="newPointPrice">سعر النقطة الحالي</label><input type="number" inputmode="decimal" id="newPointPrice" min="0" step="any" placeholder="70" oninput="saveInvoiceMeta()"></div>
-          <div class="field"><label for="profileMeterPrice">سعر متر البروفايل</label><input type="number" inputmode="decimal" id="profileMeterPrice" min="0" step="any" placeholder="150" oninput="saveInvoiceMeta()"></div>
+          <div class="field"><label for="profileMeterPrice">متر الليد بروفايل</label><input type="number" inputmode="decimal" id="profileMeterPrice" min="0" step="any" placeholder="150" oninput="saveInvoiceMeta()"></div>
+          <div class="field"><label for="plasterProfilePrice">متر بروفايل (على المحارة)</label><input type="number" inputmode="decimal" id="plasterProfilePrice" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
         </div>
         <div class="note" id="systemRuleNotice"></div>
       </div>
@@ -510,12 +565,20 @@
           <div class="field">
             <label for="mainPanelLines">خطوط اللوحة الأتوماتيك</label>
             <div class="stepper"><button type="button" data-step="1" aria-label="زيادة">+</button><input type="number" inputmode="decimal" id="mainPanelLines" min="0" step="any" placeholder="0" oninput="saveMainPanelData()"><button type="button" data-step="-1" aria-label="نقصان">−</button></div>
-            <div class="hint">الخط = 2 نقطة</div>
+            <div class="hint" id="linePtsHint">الخط = 2 نقطة</div>
           </div>
           <div class="field">
             <label for="mainRisersCount">الصواعد الرئيسية</label>
             <div class="stepper"><button type="button" data-step="1" aria-label="زيادة">+</button><input type="number" inputmode="decimal" id="mainRisersCount" min="0" step="any" placeholder="0" oninput="saveMainPanelData()"><button type="button" data-step="-1" aria-label="نقصان">−</button></div>
-            <div class="hint">الصاعد = 2 نقطة</div>
+            <div class="hint" id="riserPtsHint">الصاعد = 2 نقطة</div>
+          </div>
+          <div class="field">
+            <label for="linePoints">الخط الواحد بكام نقطة؟</label>
+            <input type="number" inputmode="decimal" id="linePoints" min="0" step="any" placeholder="2" oninput="saveMainPanelData()">
+          </div>
+          <div class="field">
+            <label for="riserPoints">الصاعد الواحد بكام نقطة؟</label>
+            <input type="number" inputmode="decimal" id="riserPoints" min="0" step="any" placeholder="2" oninput="saveMainPanelData()">
           </div>
         </div>
         <div class="note orange" id="mainPanelLiveSummary"></div>
@@ -536,6 +599,7 @@
           <div class="field" style="margin-bottom:0"><label for="paidAmount">المدفوع تحت الحساب</label><input type="number" inputmode="decimal" id="paidAmount" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
           <div class="field" style="margin-bottom:0"><label for="discountAmount">خصم خاص للعميل</label><input type="number" inputmode="decimal" id="discountAmount" min="0" step="any" placeholder="0" oninput="saveInvoiceMeta()"></div>
         </div>
+        <div id="paidLinkBox"></div>
       </div>
 
       <div class="card">
@@ -563,7 +627,28 @@
       <button type="button" class="btn btn-danger" style="margin-top:4px" onclick="deleteCurrentInvoice()"><i data-icon="trash"></i> حذف الفاتورة المفتوحة حالياً</button>
     </section>
 
-    <!-- 5) المزيد: الإعدادات والتحديثات وعن التطبيق -->
+    <!-- 5) النوتة: حسابات العملاء -->
+    <section class="view" id="view-ledger">
+      <section class="hero">
+        <div class="hero-label">إجمالي المتبقي لك عند العملاء</div>
+        <div class="hero-value"><span id="ledgerTotalDue">0</span><small>ج.م</small></div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span>عدد العملاء</span><strong id="ledgerCount">0</strong></div>
+          <div class="hero-stat"><span>إجمالي ما وصلك</span><strong id="ledgerReceived">0 ج.م</strong></div>
+          <div class="hero-stat"><span>خامات متبقية</span><strong id="ledgerMaterials">0 ج.م</strong></div>
+        </div>
+      </section>
+      <div class="btn-row" style="margin-bottom:12px">
+        <button type="button" class="btn btn-accent" onclick="openCustomerEdit(null)"><i data-icon="plus"></i> عميل جديد</button>
+        <button type="button" class="btn btn-ghost" onclick="exportLedgerJSON()"><i data-icon="download"></i> نسخة للنوتة</button>
+      </div>
+      <div class="field"><input type="search" id="customerSearch" placeholder="ابحث باسم العميل أو رقمه..." oninput="renderLedger()"></div>
+      <div id="customerList"></div>
+      <button type="button" class="btn btn-ghost" style="margin-top:4px" onclick="document.getElementById('importFile').click()"><i data-icon="upload"></i> استعادة نسخة احتياطية</button>
+      <div class="backup-line" id="backupLine"></div>
+    </section>
+
+    <!-- 6) المزيد: الإعدادات والتحديثات وعن التطبيق -->
     <section class="view" id="view-more">
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="briefcase"></i></div><h2>بياناتك على الفاتورة</h2></div>
@@ -605,9 +690,9 @@
 
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="save"></i></div><h2>النسخ الاحتياطي</h2></div>
-        <p class="hint" style="margin:-6px 0 12px">احفظ نسخة من كل فواتيرك في ملف، واسترجعها في أي وقت أو على هاتف آخر.</p>
+        <p class="hint" style="margin:-6px 0 12px">النسخة الكاملة تحفظ كل الفواتير ونوتة العملاء في ملف واحد، وتسترجعها في أي وقت أو على هاتف آخر.</p>
         <div class="btn-row">
-          <button type="button" class="btn btn-ghost" onclick="exportBackupJSON()"><i data-icon="download"></i> تنزيل نسخة</button>
+          <button type="button" class="btn btn-ghost" onclick="exportBackupJSON()"><i data-icon="download"></i> نسخة كاملة</button>
           <button type="button" class="btn btn-ghost" onclick="document.getElementById('importFile').click()"><i data-icon="upload"></i> استعادة</button>
         </div>
         <input type="file" id="importFile" accept=".json,application/json" class="hidden" onchange="importBackupJSON(event)">
@@ -641,6 +726,7 @@
     <button type="button" class="nav-item" id="navBtn-rooms" onclick="switchView('rooms')"><span class="pill"><i data-icon="home"></i></span>الغرف<span class="nav-badge hidden" id="drawerRoomCount">0</span></button>
     <button type="button" class="nav-item" id="navBtn-summary" onclick="switchView('summary')"><span class="pill"><i data-icon="calc"></i></span>الحساب</button>
     <button type="button" class="nav-item" id="navBtn-saved" onclick="switchView('saved')"><span class="pill"><i data-icon="folder"></i></span>الفواتير</button>
+    <button type="button" class="nav-item" id="navBtn-ledger" onclick="switchView('ledger')"><span class="pill"><i data-icon="book"></i></span>النوتة</button>
     <button type="button" class="nav-item" id="navBtn-more" onclick="switchView('more')"><span class="pill"><i data-icon="grid"></i></span>المزيد</button>
   </nav>
 </div>
@@ -674,7 +760,12 @@
     <div class="field">
       <label for="roomLedProfile">ليد بروفايل (متر)</label>
       <div class="stepper"><button type="button" data-step="1">+</button><input type="number" inputmode="decimal" id="roomLedProfile" min="0" step="any" placeholder="0"><button type="button" data-step="-1">−</button></div>
-      <div class="hint">بسعر المتر</div>
+      <div class="hint" id="profileHint">بسعر المتر</div>
+    </div>
+    <div class="field wide">
+      <label for="roomLedPlaster">ليد بروفايل على المحارة (متر)</label>
+      <div class="stepper"><button type="button" data-step="1">+</button><input type="number" inputmode="decimal" id="roomLedPlaster" min="0" step="any" placeholder="0"><button type="button" data-step="-1">−</button></div>
+      <div class="hint" id="plasterHint">بسعر المتر</div>
     </div>
   </div>
 
@@ -688,6 +779,56 @@
   <div class="btn-row">
     <button type="button" id="saveRoomBtn" class="btn btn-primary" onclick="saveRoom()">حفظ الغرفة</button>
     <button type="button" id="cancelEditBtn" class="btn btn-ghost" onclick="closeOverlay()">إلغاء</button>
+  </div>
+</div>
+
+<!-- صفحة العميل في النوتة -->
+<div class="page-overlay" id="customerPage">
+  <header class="app-header">
+    <button type="button" class="icon-btn" onclick="closeOverlay()" aria-label="رجوع"><i data-icon="back"></i></button>
+    <div class="titles">
+      <h1 id="custPageName">العميل</h1>
+      <div class="sub" id="custPageSub"></div>
+    </div>
+    <button type="button" class="icon-btn" onclick="openCustomerEdit(currentCustomerId)" aria-label="تعديل بيانات العميل"><i data-icon="edit"></i></button>
+  </header>
+  <div class="container" id="customerBody"></div>
+</div>
+
+<!-- إضافة / تعديل عميل -->
+<div class="backdrop" id="custEditBackdrop" onclick="closeOverlay()"></div>
+<div class="sheet" id="custEditSheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div class="sheet-head"><h3 id="custEditTitle">عميل جديد</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
+  <div class="field"><label for="custName">اسم العميل</label><input type="text" id="custName" placeholder="مثال: أ. محمد فيصل"></div>
+  <div class="field"><label for="custPhone">رقم الهاتف</label><input type="text" inputmode="tel" dir="ltr" style="text-align:right" id="custPhone" placeholder="01xxxxxxxxx"></div>
+  <div class="field"><label for="custAddress">العنوان</label><input type="text" id="custAddress" placeholder="عنوان العميل"></div>
+  <div class="field"><label for="custNote">ملاحظات</label><textarea id="custNote" placeholder="أي ملاحظات عن العميل أو الاتفاق (اختياري)"></textarea></div>
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="saveCustomerEdit()">حفظ</button>
+    <button type="button" class="btn btn-ghost" onclick="closeOverlay()">إلغاء</button>
+  </div>
+</div>
+
+<!-- تسجيل مبلغ أو خامات -->
+<div class="backdrop" id="txnBackdrop" onclick="closeOverlay()"></div>
+<div class="sheet" id="txnSheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div class="sheet-head"><h3 id="txnTitle">تسجيل دفعة</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
+  <div class="note" id="txnKindHint" style="margin-bottom:12px"></div>
+  <div class="field hidden" id="txnTitleField"><label for="txnDesc">بيان الخامات</label><input type="text" id="txnDesc" placeholder="مثال: سلك ومواسير وعلب"></div>
+  <div class="row-2">
+    <div class="field"><label for="txnAmount" id="txnAmountLabel">المبلغ (ج.م)</label><input type="number" inputmode="decimal" id="txnAmount" min="0" step="any" placeholder="0"></div>
+    <div class="field"><label for="txnDate">التاريخ</label><input type="date" id="txnDate"></div>
+  </div>
+  <button type="button" class="chip hidden" id="txnFillRemaining" style="margin:-4px 0 12px"></button>
+  <div class="field"><label for="txnNote">ملاحظة / أمارة</label><textarea id="txnNote" placeholder="مثال: استلمتها كاش في الشقة بحضور فلان (اختياري)"></textarea></div>
+  <div class="stack">
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" onclick="saveTxn()">حفظ</button>
+      <button type="button" class="btn btn-ghost" onclick="closeOverlay()">إلغاء</button>
+    </div>
+    <button type="button" class="btn btn-danger hidden" id="txnDeleteBtn" onclick="deleteTxn()"><i data-icon="trash"></i> حذف هذا السجل</button>
   </div>
 </div>
 
@@ -761,14 +902,28 @@
      تصميم وتطوير: أحمد حسن عبدالله  |  واتساب: +201015421255
      © 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة.
      ========================================================= */
-  const APP_VERSION = '2.1.0';
-  const STORAGE_KEY = 'ahmed_elec_invoices_v7';
+  const APP_VERSION = '2.2.0';
+  // النسخة التجريبية (/beta/) تعمل على نسخة مستقلة من البيانات ولا تلمس بيانات التطبيق الأصلي
+  const IS_BETA = /\/beta\//.test(location.pathname);
+  const KEY_PREFIX = IS_BETA ? 'beta_' : '';
+  const MAIN_STORAGE_KEY = 'ahmed_elec_invoices_v7';
+  const STORAGE_KEY = KEY_PREFIX + MAIN_STORAGE_KEY;
+  const CUSTOMERS_KEY = KEY_PREFIX + 'hesabaty_customers_v1';
+  const SETTINGS_KEY = KEY_PREFIX + 'hesabaty_settings_v1';
+  const BACKUP_KEY = KEY_PREFIX + 'hesabaty_last_backup';
   const DEFAULT_TITLE = 'كشف حساب ومستخلص أعمال كهرباء';
   const DEFAULT_TECH = 'م/ أحمد حسن - للأعمال والتشطيبات الكهربائية';
   const ROOM_PRESETS = ['الريسبشن', 'الصالة', 'غرفة النوم الرئيسية', 'غرفة الأطفال', 'غرفة المعيشة', 'المطبخ', 'الحمام', 'الطرقة والمدخل', 'البلكونة'];
-  const VIEW_TITLES = { pricing: 'بيانات الفاتورة', rooms: 'الغرف واللوحة', summary: 'الحساب النهائي', saved: 'الفواتير المحفوظة', more: 'المزيد' };
+  const VIEW_TITLES = { pricing: 'بيانات الفاتورة', rooms: 'الغرف واللوحة', summary: 'الحساب النهائي', saved: 'الفواتير المحفوظة', ledger: 'نوتة العملاء', more: 'المزيد' };
 
   let appData = { invoiceTitle: DEFAULT_TITLE, techName: DEFAULT_TECH, techPhone: '', logoData: '', showLogo: false, currentId: null, invoices: [] };
+  let customers = [];
+  let settings = { linePoints: 2, riserPoints: 2, plasterProfilePrice: 0 };
+  let currentCustomerId = null;
+  let editingCustomerId = null;
+  let editingTxnId = null;
+  let txnKind = 'payment';
+  let custTab = 'work';
   let editingRoomIndex = null;
   let currentView = 'pricing';
   let currentPrintFontSize = 13;
@@ -810,6 +965,11 @@
     phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
     pin: '<path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',
     calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/>',
+    back: '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
+    link: '<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+    box: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
+    cash: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 10v4M18 10v4"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>'
   };
   function icon(name) { return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`; }
@@ -848,18 +1008,25 @@
   const OVERLAYS = {
     room: { open: () => toggleSheet('room', true), close: () => { toggleSheet('room', false); resetRoomForm(); } },
     actions: { open: () => toggleSheet('actions', true), close: () => toggleSheet('actions', false) },
+    custEdit: { open: () => toggleSheet('custEdit', true), close: () => toggleSheet('custEdit', false) },
+    txn: { open: () => toggleSheet('txn', true), close: () => toggleSheet('txn', false) },
+    customer: {
+      open: () => { const pg = document.getElementById('customerPage'); pg.classList.add('open'); pg.scrollTop = 0; },
+      close: () => { document.getElementById('customerPage').classList.remove('open'); currentCustomerId = null; if (currentView === 'ledger') renderLedger(); }
+    },
     preview: { open: () => { document.getElementById('printPreviewModal').style.display = 'block'; }, close: () => { document.getElementById('printPreviewModal').style.display = 'none'; } }
   };
   function toggleSheet(name, open) {
     document.getElementById(name + 'Sheet').classList.toggle('open', open);
     document.getElementById(name + 'Backdrop').classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
   }
+  function lockBodyScroll() { document.body.style.overflow = overlayStack.length ? 'hidden' : ''; }
   function openOverlay(name) {
     if (overlayStack[overlayStack.length - 1] === name) return;
     OVERLAYS[name].open();
     overlayStack.push(name);
-    try { history.pushState({ overlay: name }, ''); } catch (e) {}
+    lockBodyScroll();
+    try { history.pushState({ ovDepth: overlayStack.length }, ''); } catch (e) {}
   }
   function closeOverlay() {
     if (!overlayStack.length) return;
@@ -868,21 +1035,30 @@
   function popOverlay() {
     const name = overlayStack.pop();
     if (name) OVERLAYS[name].close();
+    lockBodyScroll();
   }
-  window.addEventListener('popstate', () => {
+  window.addEventListener('popstate', e => {
     const confirmModal = document.getElementById('appConfirmModal');
     if (confirmModal.classList.contains('open')) confirmModal.classList.remove('open');
-    popOverlay();
+    const depth = (e.state && e.state.ovDepth) || 0;
+    while (overlayStack.length > depth) popOverlay();
   });
-  function openActions() { openOverlay('actions'); }
-  function runAction(fn) {
-    // نغلق القائمة أولاً ثم ننفذ الإجراء بعد اكتمال الرجوع
-    if (overlayStack[overlayStack.length - 1] === 'actions') {
-      const handler = () => { window.removeEventListener('popstate', handler); setTimeout(fn, 30); };
-      window.addEventListener('popstate', handler);
-      closeOverlay();
-    } else fn();
+  // يغلق كل النوافذ المفتوحة ثم ينفذ الإجراء بعد اكتمال الرجوع
+  function closeAllThen(fn) {
+    const n = overlayStack.length;
+    if (!n) { fn(); return; }
+    const handler = () => { window.removeEventListener('popstate', handler); setTimeout(fn, 30); };
+    window.addEventListener('popstate', handler);
+    try { history.go(-n); } catch (e) { window.removeEventListener('popstate', handler); while (overlayStack.length) popOverlay(); fn(); }
   }
+  function closeTopThen(fn) {
+    if (!overlayStack.length) { fn(); return; }
+    const handler = () => { window.removeEventListener('popstate', handler); setTimeout(fn, 30); };
+    window.addEventListener('popstate', handler);
+    closeOverlay();
+  }
+  function openActions() { openOverlay('actions'); }
+  function runAction(fn) { closeAllThen(fn); }
   function closePrintMenu() {}  // للتوافق مع الإصدارات السابقة
 
   /* ---------------- التنقل بين الأقسام ---------------- */
@@ -891,9 +1067,10 @@
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + key));
     document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.id === 'navBtn-' + key));
     document.getElementById('headerTitle').textContent = VIEW_TITLES[key];
-    document.getElementById('heroCard').classList.toggle('hidden', key === 'saved' || key === 'more');
+    document.getElementById('heroCard').classList.toggle('hidden', key === 'saved' || key === 'more' || key === 'ledger');
     document.getElementById('addRoomFab').classList.toggle('hidden', key !== 'rooms');
     if (key === 'saved') renderInvoiceList();
+    if (key === 'ledger') renderLedger();
     if (key === 'more') renderUpdateUI();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -953,6 +1130,7 @@
       if (!Array.isArray(inv.rooms)) inv.rooms = [];
       if (typeof inv.clientPhone !== 'string') inv.clientPhone = '';
       if (typeof inv.clientAddress !== 'string') inv.clientAddress = '';
+      if (typeof inv.materialsDue !== 'number') inv.materialsDue = 0;
       inv.rooms.forEach(r => {
         if (r.lines > 0) { inv.mainLines += r.lines; r.lines = 0; }
         if (r.risers > 0) { inv.mainRisers += r.risers; r.risers = 0; }
@@ -976,10 +1154,23 @@
 
   function initApp() {
     hydrateIcons();
-    const saved = localStorage.getItem(STORAGE_KEY)
-      || localStorage.getItem('ahmed_elec_invoices_v6')
-      || localStorage.getItem('ahmed_elec_invoices_v5')
-      || localStorage.getItem('ahmed_elec_invoices_v4');
+    let saved = localStorage.getItem(STORAGE_KEY);
+    if (IS_BETA) {
+      document.getElementById('betaBar').classList.remove('hidden');
+      if (saved == null) {
+        // أول تشغيل للنسخة التجريبية: ننسخ بيانات التطبيق الأصلي مرة واحدة
+        saved = localStorage.getItem(MAIN_STORAGE_KEY);
+        const mainLedger = localStorage.getItem('hesabaty_customers_v1');
+        if (mainLedger && localStorage.getItem(CUSTOMERS_KEY) == null) localStorage.setItem(CUSTOMERS_KEY, mainLedger);
+      }
+    } else {
+      saved = saved
+        || localStorage.getItem('ahmed_elec_invoices_v6')
+        || localStorage.getItem('ahmed_elec_invoices_v5')
+        || localStorage.getItem('ahmed_elec_invoices_v4');
+    }
+    loadSettings();
+    loadCustomers();
     if (saved) { try { loadFromParsed(JSON.parse(saved)); } catch (e) {} }
     if (!appData.invoices || appData.invoices.length === 0) createNewInvoice(false);
     else if (!appData.currentId || !appData.invoices.some(i => i.id === appData.currentId)) appData.currentId = appData.invoices[0].id;
@@ -998,6 +1189,15 @@
       input.dispatchEvent(new Event('input', { bubbles: true }));
     });
     document.getElementById('roomSheet').addEventListener('input', updateRoomLivePreview);
+    const suggestBox = document.getElementById('clientSuggest');
+    suggestBox.addEventListener('pointerdown', e => e.preventDefault());
+    suggestBox.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.dataset.id) linkInvoiceToCustomer(getCurrentInvoice().id, b.dataset.id, true);
+      else saveClientAsCustomer();
+    });
+    document.getElementById('clientName').addEventListener('focus', e => { if (DEFAULT_CLIENT_RE.test(e.target.value.trim())) e.target.select(); });
     document.getElementById('printSheet').addEventListener('input', () => requestAnimationFrame(fitPreview));
     document.getElementById('aboutVersion').textContent = APP_VERSION;
     document.getElementById('verCurrent').textContent = APP_VERSION;
@@ -1008,6 +1208,7 @@
   }
 
   function saveToStorage() {
+    syncLinkedInvoices();
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
     catch (e) { showAppToast('⚠️ تعذر الحفظ: مساحة التخزين ممتلئة'); }
   }
@@ -1027,10 +1228,14 @@
       oldPointPrice: 0,
       newPointPrice: 70,
       profileMeterPrice: 150,
+      plasterProfilePrice: Number(settings.plasterProfilePrice) || 0,
       mainLines: 0,
       mainRisers: 0,
+      linePoints: ptsPer(settings.linePoints),
+      riserPoints: ptsPer(settings.riserPoints),
       paidAmount: 0,
       discountAmount: 0,
+      materialsDue: 0,
       rooms: []
     };
     appData.invoices.unshift(newInv);
@@ -1089,7 +1294,9 @@
     inv.oldPointPrice = num('oldPointPrice');
     inv.newPointPrice = num('newPointPrice');
     inv.profileMeterPrice = num('profileMeterPrice');
-    inv.paidAmount = num('paidAmount');
+    inv.plasterProfilePrice = num('plasterProfilePrice');
+    if (settings.plasterProfilePrice !== inv.plasterProfilePrice) { settings.plasterProfilePrice = inv.plasterProfilePrice; saveSettings(); }
+    if (!inv.customerId) inv.paidAmount = num('paidAmount');
     inv.discountAmount = num('discountAmount');
     saveToStorage();
     renderSystemNotice();
@@ -1100,6 +1307,9 @@
     const inv = getCurrentInvoice();
     inv.mainLines = num('mainPanelLines');
     inv.mainRisers = num('mainRisersCount');
+    inv.linePoints = readPts('linePoints');
+    inv.riserPoints = readPts('riserPoints');
+    if (settings.linePoints !== inv.linePoints || settings.riserPoints !== inv.riserPoints) { settings.linePoints = inv.linePoints; settings.riserPoints = inv.riserPoints; saveSettings(); }
     saveToStorage();
     renderRoomsAndSummary();
   }
@@ -1137,6 +1347,7 @@
       spots: num('roomSpots'),
       ledStrip: num('roomLedStrip'),
       ledProfile: num('roomLedProfile'),
+      ledProfilePlaster: num('roomLedPlaster'),
       extras: getExtraItemsFromForm()
     };
   }
@@ -1146,6 +1357,11 @@
     const c = calculateRoom(readRoomForm(''), inv);
     document.getElementById('roomLivePts').textContent = `إجمالي الغرفة · ${fmt(c.totalPoints)} نقطة`;
     document.getElementById('roomLiveTotal').textContent = `${fmt(c.totalCost)} ج.م`;
+    document.getElementById('profileHint').textContent = `بسعر المتر: ${fmt(inv.profileMeterPrice || 0)} ج.م`;
+    const noPlasterPrice = num('roomLedPlaster') > 0 && !(inv.plasterProfilePrice > 0);
+    const ph = document.getElementById('plasterHint');
+    ph.textContent = noPlasterPrice ? '⚠️ حدد سعر متر بروفايل المحارة من صفحة «البيانات» أولاً' : `بسعر المتر: ${fmt(inv.plasterProfilePrice || 0)} ج.م`;
+    ph.style.color = noPlasterPrice ? 'var(--danger)' : '';
   }
 
   function openRoomSheet() {
@@ -1176,6 +1392,7 @@
     document.getElementById('roomSpots').value = r.spots || '';
     document.getElementById('roomLedStrip').value = r.ledStrip || '';
     document.getElementById('roomLedProfile').value = r.ledProfile || '';
+    document.getElementById('roomLedPlaster').value = r.ledProfilePlaster || '';
     document.getElementById('extraItemsContainer').innerHTML = '';
     (r.extras || []).forEach(ex => addExtraItemRow(ex.name, ex.qty, ex.price));
     openRoomSheet();
@@ -1194,14 +1411,22 @@
     editingRoomIndex = null;
     document.getElementById('roomFormTitle').textContent = 'إضافة غرفة';
     document.getElementById('saveRoomBtn').textContent = 'حفظ الغرفة';
-    ['roomName', 'roomSockets', 'roomSpots', 'roomLedStrip', 'roomLedProfile'].forEach(id => { document.getElementById(id).value = ''; });
+    ['roomName', 'roomSockets', 'roomSpots', 'roomLedStrip', 'roomLedProfile', 'roomLedPlaster'].forEach(id => { document.getElementById(id).value = ''; });
     document.getElementById('extraItemsContainer').innerHTML = '';
   }
 
   /* =========================================================
-     العمليات الحسابية (بدون أي تغيير عن الإصدار السابق)
+     العمليات الحسابية
      ========================================================= */
   // حساب الغرفة (البرايز والمفاتيح، الإسبوتات، شريط الليد، البروفايل، والإضافات)
+  // عدد نقاط الخط أو الصاعد (الافتراضي 2 كما في الإصدارات السابقة)
+  function ptsPer(v) { return (typeof v === 'number' && isFinite(v) && v >= 0) ? v : 2; }
+  function readPts(id) {
+    const raw = document.getElementById(id).value.trim();
+    const v = parseFloat(raw);
+    return (raw !== '' && isFinite(v) && v >= 0) ? v : 2;
+  }
+
   function calculateRoom(r, inv) {
     const socketsPts = (r.sockets || 0) * 1;
     const basePoints = socketsPts;
@@ -1221,17 +1446,20 @@
     const profileCost = (r.ledProfile || 0) * (inv.profileMeterPrice || 0);
     let extrasCost = 0;
     if (r.extras && r.extras.length > 0) r.extras.forEach(ex => { extrasCost += (ex.qty || 0) * (ex.price || 0); });
-    const totalCost = baseCost + finishCost + profileCost + extrasCost;
+    const plasterCost = (r.ledProfilePlaster || 0) * (inv.plasterProfilePrice || 0);
+    const totalCost = baseCost + finishCost + profileCost + plasterCost + extrasCost;
 
-    return { socketsPts, basePoints, spotsPts, ledStripPts, finishPoints, totalPoints, effectiveBaseRate, effectiveFinishRate, baseCost, finishCost, profileCost, extrasCost, totalCost };
+    return { socketsPts, basePoints, spotsPts, ledStripPts, finishPoints, totalPoints, effectiveBaseRate, effectiveFinishRate, baseCost, finishCost, profileCost, plasterCost, extrasCost, totalCost };
   }
 
   // حساب اللوحة الرئيسية والصواعد المستقل بنفس نظام التسعير
   function calculateMainPanel(inv) {
     const linesCount = inv.mainLines || 0;
     const risersCount = inv.mainRisers || 0;
-    const linesPts = linesCount * 2;
-    const risersPts = risersCount * 2;
+    const linePtsEach = ptsPer(inv.linePoints);
+    const riserPtsEach = ptsPer(inv.riserPoints);
+    const linesPts = linesCount * linePtsEach;
+    const risersPts = risersCount * riserPtsEach;
     const totalPanelPts = linesPts + risersPts;
 
     const newRate = inv.newPointPrice || 0;
@@ -1242,7 +1470,7 @@
     const linesCost = linesPts * rateUsed;
     const risersCost = risersPts * rateUsed;
     const totalPanelCost = totalPanelPts * rateUsed;
-    return { linesCount, risersCount, linesPts, risersPts, totalPanelPts, rateUsed, linesCost, risersCost, totalPanelCost };
+    return { linesCount, risersCount, linePtsEach, riserPtsEach, linesPts, risersPts, totalPanelPts, rateUsed, linesCost, risersCost, totalPanelCost };
   }
 
   // تجميع حسابات الفاتورة بالكامل
@@ -1252,7 +1480,7 @@
       panel, rooms: [],
       totSockets: 0, totSpots: 0, totSpotsPts: 0, totStrip: 0, totStripPts: 0,
       sumRoomsBasePts: 0, sumFinishPts: 0, sumRoomsTotalPts: 0,
-      sumRoomsBaseCost: 0, sumFinishCost: 0, sumProfileMeters: 0, sumProfileCost: 0, sumExtrasCost: 0, sumRoomsTotalCost: 0
+      sumRoomsBaseCost: 0, sumFinishCost: 0, sumProfileMeters: 0, sumProfileCost: 0, sumPlasterMeters: 0, sumPlasterCost: 0, sumExtrasCost: 0, sumRoomsTotalCost: 0
     };
     (inv.rooms || []).forEach(r => {
       const c = calculateRoom(r, inv);
@@ -1269,6 +1497,8 @@
       t.sumFinishCost += c.finishCost;
       t.sumProfileMeters += (r.ledProfile || 0);
       t.sumProfileCost += c.profileCost;
+      t.sumPlasterMeters += (r.ledProfilePlaster || 0);
+      t.sumPlasterCost += c.plasterCost;
       t.sumExtrasCost += c.extrasCost;
       t.sumRoomsTotalCost += c.totalCost;
     });
@@ -1276,9 +1506,10 @@
     t.totalBaseCostAll = t.sumRoomsBaseCost + panel.totalPanelCost;
     t.allPointsCount = t.sumRoomsTotalPts + panel.totalPanelPts;
     t.pointsCostTotal = t.totalBaseCostAll + t.sumFinishCost;
-    t.profileAndExtrasTotal = t.sumProfileCost + t.sumExtrasCost;
+    t.profileAndExtrasTotal = t.sumProfileCost + t.sumPlasterCost + t.sumExtrasCost;
     t.grandTotal = t.sumRoomsTotalCost + panel.totalPanelCost;
-    t.netRemaining = t.grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0);
+    t.materialsDue = inv.materialsDue || 0;
+    t.netRemaining = t.grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0) + t.materialsDue;
     t.avgRate = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
     return t;
   }
@@ -1313,6 +1544,9 @@
     setVal('oldPointPrice', inv.oldPointPrice || '');
     setVal('newPointPrice', inv.newPointPrice || '');
     setVal('profileMeterPrice', inv.profileMeterPrice || '');
+    setVal('plasterProfilePrice', inv.plasterProfilePrice || '');
+    setVal('linePoints', ptsPer(inv.linePoints));
+    setVal('riserPoints', ptsPer(inv.riserPoints));
     setVal('mainPanelLines', inv.mainLines || '');
     setVal('mainRisersCount', inv.mainRisers || '');
     setVal('paidAmount', inv.paidAmount || '');
@@ -1323,6 +1557,7 @@
   }
 
   function renderRoomsAndSummary() {
+    syncLinkedInvoices();
     const inv = getCurrentInvoice();
     const t = computeInvoice(inv);
     const p = t.panel;
@@ -1332,6 +1567,8 @@
     document.getElementById('mainPanelLiveSummary').innerHTML =
       `• خطوط الأتوماتيك: <strong>${fmt(p.linesCount)} (${fmt(p.linesPts)} ن)</strong> = ${fmt(p.linesCost)} ج.م<br>` +
       `• الصواعد الرئيسية: <strong>${fmt(p.risersCount)} (${fmt(p.risersPts)} ن)</strong> = ${fmt(p.risersCost)} ج.م`;
+    document.getElementById('linePtsHint').textContent = `الخط = ${fmt(p.linePtsEach)} نقطة`;
+    document.getElementById('riserPtsHint').textContent = `الصاعد = ${fmt(p.riserPtsEach)} نقطة`;
 
     document.getElementById('roomsCountBadge').textContent = inv.rooms.length;
     const navBadge = document.getElementById('drawerRoomCount');
@@ -1349,6 +1586,7 @@
         if (r.spots) chips.push(`<span class="r-chip">إسبوتات <b>${fmt(r.spots)} (${fmt(c.spotsPts)} ن)</b></span>`);
         if (r.ledStrip) chips.push(`<span class="r-chip">شريط ليد <b>${fmt(r.ledStrip)} م (${fmt(c.ledStripPts)} ن)</b></span>`);
         if (r.ledProfile) chips.push(`<span class="r-chip">بروفايل ${fmt(r.ledProfile)} م <b>${fmt(c.profileCost)} ج.م</b></span>`);
+        if (r.ledProfilePlaster) chips.push(`<span class="r-chip">بروفايل محارة ${fmt(r.ledProfilePlaster)} م <b>${fmt(c.plasterCost)} ج.م</b></span>`);
         (r.extras || []).forEach(ex => chips.push(`<span class="r-chip">${esc(ex.name)} (${fmt(ex.qty)}) <b>${fmt(ex.qty * ex.price)} ج.م</b></span>`));
         return `
           <div class="room-card">
@@ -1380,13 +1618,16 @@
       html += row(`إجمالي حساب النقاط (${fmt(t.allPointsCount)} ن × ${fmt(inv.newPointPrice || 0)} ج.م)`, `${fmt(t.pointsCostTotal)} ج.م`);
     }
     if (t.sumProfileCost > 0) html += row(`إجمالي الليد بروفايل (${fmt(t.sumProfileMeters)} م)`, `${fmt(t.sumProfileCost)} ج.م`);
+    if (t.sumPlasterCost > 0) html += row(`إجمالي ليد بروفايل على المحارة (${fmt(t.sumPlasterMeters)} م)`, `${fmt(t.sumPlasterCost)} ج.م`);
     if (t.sumExtrasCost > 0) html += row('إجمالي البنود الإضافية', `${fmt(t.sumExtrasCost)} ج.م`);
     html += row('إجمالي قيمة الأعمال', `${fmt(t.grandTotal)} ج.م`, 'bold');
     if (inv.discountAmount > 0) html += row('الخصم', `- ${fmt(inv.discountAmount)} ج.م`, 'minus');
     if (inv.paidAmount > 0) html += row('المدفوع تحت الحساب', `- ${fmt(inv.paidAmount)} ج.م`, 'minus');
+    if (t.materialsDue > 0) html += row('خامات (مستحقة على العميل)', `+ ${fmt(t.materialsDue)} ج.م`, 'bold');
     html += `</div><div class="sum-total"><span>الصافي المطلوب سداده</span><strong>${fmt(t.netRemaining)} ج.م</strong></div>`;
     document.getElementById('finalSummaryBox').innerHTML = html;
 
+    renderLinkUI();
     if (currentView === 'saved') renderInvoiceList();
   }
 
@@ -1477,6 +1718,7 @@
       const c = t.rooms[i];
       const extraTexts = [];
       if (r.ledProfile) extraTexts.push(`بروفايل ${fmt(r.ledProfile)} م = ${fmt(c.profileCost)} ج`);
+      if (r.ledProfilePlaster) extraTexts.push(`بروفايل محارة ${fmt(r.ledProfilePlaster)} م = ${fmt(c.plasterCost)} ج`);
       (r.extras || []).forEach(ex => extraTexts.push(`${esc(ex.name)} ${fmt(ex.qty)}×${fmt(ex.price)} = ${fmt(ex.qty * ex.price)} ج`));
       roomRowsHTML += `
         <tr>
@@ -1503,6 +1745,8 @@
     const field = (ic, label, value, wide = false) => `
       <div class="inv-field${wide ? ' wide' : ''}"><span class="ic">${icon(ic)}</span>
         <div style="min-width:0"><div class="lbl">${label}</div><div class="val" ${ce}>${value}</div></div></div>`;
+    if (t.sumPlasterMeters > 0) chips.push(`<span class="inv-chip" ${ce}>متر بروفايل المحارة: <b>${money(inv.plasterProfilePrice)}</b></span>`);
+
     const clientFields = [
       field('user', 'العميل', esc(inv.clientName)),
       inv.clientPhone ? field('phone', 'هاتف العميل', `<span dir="ltr">${esc(inv.clientPhone)}</span>`) : field('calendar', 'التاريخ', esc(inv.date || '-')),
@@ -1550,7 +1794,7 @@
           <td ${ce}>${fmt(t.totSpots)}<span class="pts">(${fmt(t.totSpotsPts)} ن)</span></td>
           <td ${ce}>${fmt(t.totStrip)} م<span class="pts">(${fmt(t.totStripPts)} ن)</span></td>
           <td ${ce}>${fmt(t.sumRoomsTotalPts)} نقطة</td>
-          <td ${ce}>${money(t.sumProfileCost + t.sumExtrasCost)}</td>
+          <td ${ce}>${money(t.profileAndExtrasTotal)}</td>
           <td class="money" ${ce}>${money(t.sumRoomsTotalCost)}</td>
         </tr></tfoot>
       </table>
@@ -1566,14 +1810,14 @@
         </tr></thead>
         <tbody>
           <tr>
-            <td class="room-col" ${ce}>خطوط اللوحة الأتوماتيك (الخط = 2 نقطة)</td>
+            <td class="room-col" ${ce}>خطوط اللوحة الأتوماتيك (الخط = ${fmt(p.linePtsEach)} نقطة)</td>
             <td ${ce}>${p.linesCount ? `${fmt(p.linesCount)} خط` : '-'}</td>
             <td ${ce}>${fmt(p.linesPts)} ن</td>
             <td ${ce}>${money(p.rateUsed)}</td>
             <td class="money" ${ce}>${money(p.linesCost)}</td>
           </tr>
           <tr>
-            <td class="room-col" ${ce}>الصواعد الرئيسية للشقة (الصاعد = 2 نقطة)</td>
+            <td class="room-col" ${ce}>الصواعد الرئيسية للشقة (الصاعد = ${fmt(p.riserPtsEach)} نقطة)</td>
             <td ${ce}>${p.risersCount ? `${fmt(p.risersCount)} صاعد` : '-'}</td>
             <td ${ce}>${fmt(p.risersPts)} ن</td>
             <td ${ce}>${money(p.rateUsed)}</td>
@@ -1595,7 +1839,7 @@
           <h4>طريقة حساب النقاط</h4>
           <ul>
             <li>البريزة أو المفتاح = 1 نقطة.</li>
-            <li>خط الأتوماتيك = 2 نقطة · الصاعد الرئيسي = 2 نقطة.</li>
+            <li>خط الأتوماتيك = ${fmt(p.linePtsEach)} نقطة · الصاعد الرئيسي = ${fmt(p.riserPtsEach)} نقطة.</li>
             <li>الإسبوت = ½ نقطة · متر شريط الليد = ½ نقطة.</li>
             ${isOld ? `<li>النظام القديم: (${fmt(t.totalBasePtsAll)} ن) تأسيس ولوحة وصواعد بمتوسط السعر (${money(avgRate)})، و(${fmt(t.sumFinishPts)} ن) إسبوتات وشريط ليد بالسعر الحالي (${money(inv.newPointPrice)}).</li>` : ''}
           </ul>
@@ -1614,10 +1858,12 @@
               <tr><td ${ce}>إجمالي النقاط (${fmt(t.allPointsCount)} ن × ${money(inv.newPointPrice)})</td><td ${ce}>${money(t.pointsCostTotal)}</td></tr>
             `}
             ${t.sumProfileCost > 0 ? `<tr><td ${ce}>الليد بروفايل (${fmt(t.sumProfileMeters)} م)</td><td ${ce}>${money(t.sumProfileCost)}</td></tr>` : ''}
+            ${t.sumPlasterCost > 0 ? `<tr><td ${ce}>ليد بروفايل على المحارة (${fmt(t.sumPlasterMeters)} م)</td><td ${ce}>${money(t.sumPlasterCost)}</td></tr>` : ''}
             ${t.sumExtrasCost > 0 ? `<tr><td ${ce}>البنود الإضافية</td><td ${ce}>${money(t.sumExtrasCost)}</td></tr>` : ''}
             <tr class="sub"><td ${ce}>إجمالي المصنعية المستحقة</td><td ${ce}>${money(t.grandTotal)}</td></tr>
             ${inv.discountAmount > 0 ? `<tr class="minus"><td ${ce}>الخصم</td><td ${ce}>- ${money(inv.discountAmount)}</td></tr>` : ''}
             ${inv.paidAmount > 0 ? `<tr class="paid"><td ${ce}>المدفوع تحت الحساب</td><td ${ce}>- ${money(inv.paidAmount)}</td></tr>` : ''}
+            ${t.materialsDue > 0 ? `<tr class="sub"><td ${ce}>خامات (مستحقة على العميل)</td><td ${ce}>+ ${money(t.materialsDue)}</td></tr>` : ''}
           </table>
           <div class="inv-net"><span ${ce}>الصافي المطلوب سداده</span><strong ${ce}>${money(t.netRemaining)}</strong></div>
         </div>
@@ -1640,6 +1886,553 @@
   }
   function triggerSystemPrint() { window.print(); }
   function closeSinglePagePreview() { closeOverlay(); }
+
+  /* =========================================================
+     النوتة: حسابات العملاء (المبالغ المستلمة والخامات)
+     ========================================================= */
+  function uid(prefix) { return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+  function todayISO() { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
+  function fmtDate(iso) {
+    if (!iso) return '';
+    try {
+      const d = new Date(iso + 'T00:00:00');
+      if (isNaN(d)) return iso;
+      return d.toLocaleDateString('ar-EG-u-nu-latn', { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch (e) { return iso; }
+  }
+  const KIND_LABEL = { payment: 'دفعة تحت الحساب', matpay: 'سداد خامات', material: 'خامات' };
+
+  function normalizeCustomers(list) {
+    if (!Array.isArray(list)) return [];
+    return list.filter(c => c && typeof c === 'object').map(c => ({
+      id: c.id || uid('c_'),
+      name: String(c.name || 'بدون اسم'),
+      phone: String(c.phone || ''),
+      address: String(c.address || ''),
+      note: String(c.note || ''),
+      createdAt: c.createdAt || Date.now(),
+      entries: (Array.isArray(c.entries) ? c.entries : []).filter(e => e && KIND_LABEL[e.kind]).map(e => ({
+        id: e.id || uid('e_'),
+        kind: e.kind,
+        amount: Math.max(0, Number(e.amount) || 0),
+        date: String(e.date || ''),
+        title: String(e.title || ''),
+        note: String(e.note || ''),
+        createdAt: e.createdAt || Date.now()
+      }))
+    }));
+  }
+  function loadCustomers() {
+    try {
+      const raw = localStorage.getItem(CUSTOMERS_KEY);
+      if (raw) { const parsed = JSON.parse(raw); customers = normalizeCustomers(Array.isArray(parsed) ? parsed : parsed.customers); }
+    } catch (e) { customers = []; }
+  }
+  function saveCustomers() {
+    try { localStorage.setItem(CUSTOMERS_KEY, JSON.stringify({ version: 1, customers })); }
+    catch (e) { showAppToast('⚠️ تعذر حفظ النوتة: مساحة التخزين ممتلئة'); }
+  }
+  function loadSettings() {
+    try { const raw = localStorage.getItem(SETTINGS_KEY); if (raw) settings = Object.assign(settings, JSON.parse(raw)); } catch (e) {}
+  }
+  function saveSettings() { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {} }
+  function getCustomer(id) { return customers.find(c => c.id === id) || null; }
+  // فواتير العميل المرتبطة (الأقدم أولاً)
+  function linkedInvoices(customerId) { return appData.invoices.filter(i => i.customerId === customerId).slice().reverse(); }
+
+  // حساب العميل: صافي ما وصل = المدفوع تحت الحساب − المتبقي من ثمن الخامات
+  function customerMoney(c) {
+    let paid = 0, matPaid = 0, matTotal = 0;
+    c.entries.forEach(e => {
+      const a = Number(e.amount) || 0;
+      if (e.kind === 'payment') paid += a;
+      else if (e.kind === 'matpay') matPaid += a;
+      else if (e.kind === 'material') matTotal += a;
+    });
+    const matRemaining = matTotal - matPaid;
+    const net = paid - matRemaining;
+    return { paid, matPaid, matTotal, matRemaining, received: paid + matPaid, net, netPaid: Math.max(0, net), materialsDue: Math.max(0, -net) };
+  }
+  function customerStats(c) {
+    const m = customerMoney(c);
+    const invs = linkedInvoices(c.id);
+    let invoicesTotal = 0;
+    invs.forEach(inv => { invoicesTotal += computeInvoice(inv).grandTotal - (inv.discountAmount || 0); });
+    return Object.assign(m, { invs, invoicesTotal, remaining: invoicesTotal - m.net });
+  }
+
+  // تحديث «المدفوع» و«الخامات المستحقة» في الفواتير المرتبطة من واقع النوتة
+  function syncLinkedInvoices() {
+    const ids = new Set(customers.map(c => c.id));
+    appData.invoices.forEach(inv => {
+      if (inv.customerId && !ids.has(inv.customerId)) { delete inv.customerId; inv.materialsDue = 0; }
+    });
+    customers.forEach(c => {
+      const invs = linkedInvoices(c.id);
+      if (!invs.length) return;
+      const m = customerMoney(c);
+      let remaining = m.netPaid;
+      invs.forEach((inv, i) => {
+        inv.materialsDue = 0;
+        if (i < invs.length - 1) {
+          const due = Math.max(0, computeInvoice(inv).grandTotal - (inv.discountAmount || 0));
+          const pay = Math.min(remaining, due);
+          inv.paidAmount = round2(pay);
+          remaining -= pay;
+        } else {
+          inv.paidAmount = round2(remaining);
+          inv.materialsDue = round2(m.materialsDue);
+        }
+      });
+    });
+  }
+
+  function afterLedgerChange() {
+    saveCustomers();
+    saveToStorage();
+    renderAll();
+    if (currentView === 'ledger') renderLedger();
+    if (currentCustomerId) renderCustomerPage();
+  }
+
+  /* ---------- قائمة العملاء ---------- */
+  function customerInitial(name) { return esc((name || '؟').replace(/^(أ\.|م\/|د\.)\s*/, '').trim().charAt(0) || '؟'); }
+  function renderLedger() {
+    let totalDue = 0, received = 0, matRem = 0;
+    const stats = customers.map(c => { const st = customerStats(c); totalDue += Math.max(0, st.remaining); received += st.received; matRem += Math.max(0, st.matRemaining); return st; });
+    document.getElementById('ledgerTotalDue').textContent = fmt(totalDue);
+    document.getElementById('ledgerCount').textContent = customers.length;
+    document.getElementById('ledgerReceived').textContent = `${fmt(received)} ج.م`;
+    document.getElementById('ledgerMaterials').textContent = `${fmt(matRem)} ج.م`;
+
+    const q = (document.getElementById('customerSearch').value || '').trim();
+    const box = document.getElementById('customerList');
+    const items = customers.map((c, i) => ({ c, st: stats[i] })).filter(x => !q || x.c.name.includes(q) || x.c.phone.includes(q));
+    if (!customers.length) {
+      box.innerHTML = `<div class="card empty"><div class="big">${icon('book')}</div><p>النوتة فارغة.<br>أضف عملاءك وسجّل كل مبلغ يصلك بتاريخه وملاحظته.</p><button type="button" class="btn btn-accent" onclick="openCustomerEdit(null)">${icon('plus')} إضافة أول عميل</button></div>`;
+    } else if (!items.length) {
+      box.innerHTML = `<div class="card empty"><div class="big">${icon('book')}</div><p>لا يوجد عميل مطابق للبحث.</p></div>`;
+    } else {
+      box.innerHTML = items.map(({ c, st }) => {
+        let amt;
+        if (st.remaining > 0) amt = `<div class="cust-amt due">${fmt(st.remaining)}<small>ج.م متبقي عليه</small></div>`;
+        else if (st.invs.length && round2(st.remaining) === 0) amt = `<div class="cust-amt ok">خالص ✓<small>لا يوجد متبقي</small></div>`;
+        else if (st.remaining < 0) amt = `<div class="cust-amt ok">${fmt(-st.remaining)}<small>ج.م ${st.invs.length ? 'زيادة له' : 'وصلك مقدماً'}</small></div>`;
+        else amt = `<div class="cust-amt">0<small>لا توجد حركة</small></div>`;
+        const meta = [c.phone ? `<span dir="ltr">${esc(c.phone)}</span>` : '', `${c.entries.length} حركة`, st.invs.length ? `${st.invs.length} فاتورة` : 'بدون فاتورة'].filter(Boolean).join(' · ');
+        return `
+          <div class="cust-card" data-id="${esc(c.id)}">
+            <div class="inv-avatar">${customerInitial(c.name)}</div>
+            <div class="inv-info"><div class="n">${esc(c.name)}</div><div class="m">${meta}</div></div>
+            ${amt}
+          </div>`;
+      }).join('');
+      box.querySelectorAll('.cust-card').forEach(el => { el.onclick = () => openCustomer(el.dataset.id); });
+    }
+    renderBackupLine();
+  }
+
+  function renderBackupLine() {
+    const el = document.getElementById('backupLine');
+    const last = Number(localStorage.getItem(BACKUP_KEY)) || 0;
+    const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
+    if (!customers.length) { el.textContent = ''; return; }
+    if (days === null) { el.textContent = '⚠️ لم تأخذ نسخة احتياطية للنوتة بعد — يفضّل تنزيل نسخة للحفاظ على مستحقاتك.'; el.className = 'backup-line warn'; }
+    else if (days >= 7) { el.textContent = `⚠️ آخر نسخة احتياطية منذ ${days} يوم — يفضّل تنزيل نسخة جديدة.`; el.className = 'backup-line warn'; }
+    else { el.textContent = days === 0 ? 'آخر نسخة احتياطية: اليوم ✓' : `آخر نسخة احتياطية منذ ${days} يوم ✓`; el.className = 'backup-line'; }
+  }
+
+  /* ---------- إضافة / تعديل عميل ---------- */
+  function openCustomerEdit(id) {
+    editingCustomerId = id || null;
+    const c = id ? getCustomer(id) : null;
+    document.getElementById('custEditTitle').textContent = c ? 'تعديل بيانات العميل' : 'عميل جديد';
+    document.getElementById('custName').value = c ? c.name : '';
+    document.getElementById('custPhone').value = c ? c.phone : '';
+    document.getElementById('custAddress').value = c ? c.address : '';
+    document.getElementById('custNote').value = c ? c.note : '';
+    openOverlay('custEdit');
+  }
+  function saveCustomerEdit() {
+    const name = document.getElementById('custName').value.trim();
+    if (!name) { showAppToast('⚠️ اكتب اسم العميل أولاً'); return; }
+    const data = { name, phone: document.getElementById('custPhone').value.trim(), address: document.getElementById('custAddress').value.trim(), note: document.getElementById('custNote').value.trim() };
+    let c = editingCustomerId ? getCustomer(editingCustomerId) : null;
+    const isNew = !c;
+    if (isNew) {
+      if (customers.some(x => x.name.trim() === name)) { showAppToast('⚠️ يوجد عميل بنفس الاسم في النوتة'); return; }
+      c = { id: uid('c_'), createdAt: Date.now(), entries: [] };
+      customers.unshift(c);
+    } else if (c.name !== name) {
+      linkedInvoices(c.id).forEach(inv => { if (inv.clientName === c.name) inv.clientName = name; });
+    }
+    Object.assign(c, data);
+    afterLedgerChange();
+    showAppToast(isNew ? `✔️ تمت إضافة "${name}" إلى النوتة` : '✔️ تم تحديث بيانات العميل');
+    if (isNew) closeTopThen(() => openCustomer(c.id)); else closeOverlay();
+  }
+  function deleteCustomer(id) {
+    const c = getCustomer(id);
+    if (!c) return;
+    showAppConfirm(`حذف العميل "${c.name}" وكل سجلاته (${c.entries.length} حركة) نهائياً؟ الفواتير نفسها لن تُحذف.`, () => {
+      customers = customers.filter(x => x.id !== id);
+      closeAllThen(() => { afterLedgerChange(); showAppToast('تم حذف العميل من النوتة'); });
+    });
+  }
+
+  /* ---------- صفحة العميل ---------- */
+  function openCustomer(id) {
+    if (!getCustomer(id)) return;
+    currentCustomerId = id;
+    custTab = 'work';
+    renderCustomerPage();
+    openOverlay('customer');
+  }
+  function setCustTab(tab) { custTab = tab; renderCustomerPage(); }
+  function entryRowHTML(e) {
+    const cls = e.kind === 'material' ? 'mat' : (e.kind === 'matpay' ? 'matpay' : '');
+    const title = e.kind === 'material' ? (e.title ? esc(e.title) : 'خامات') : KIND_LABEL[e.kind];
+    return `
+      <div class="entry ${cls}" data-entry="${esc(e.id)}">
+        <div class="e-ic">${icon(e.kind === 'material' ? 'box' : 'cash')}</div>
+        <div class="e-info"><div class="e-title">${title}</div><div class="e-meta">${esc(fmtDate(e.date))}${e.note ? ' · ' + esc(e.note) : ''}</div></div>
+        <div class="e-amt">${e.kind === 'material' ? '' : '+ '}${fmt(e.amount)}</div>
+      </div>`;
+  }
+  function renderCustomerPage() {
+    const c = getCustomer(currentCustomerId);
+    if (!c) return;
+    const st = customerStats(c);
+    document.getElementById('custPageName').textContent = c.name;
+    document.getElementById('custPageSub').textContent = [c.phone, c.address].filter(Boolean).join(' · ') || 'صفحة العميل في النوتة';
+    const row = (label, value, cls = '') => `<div class="sum-row ${cls}"><span>${label}</span><strong>${value}</strong></div>`;
+    const money = v => `${fmt(v)} ج.م`;
+    const hasMat = st.matTotal > 0 || st.matPaid > 0;
+    const byNewest = (a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt - a.createdAt);
+    const workEntries = c.entries.filter(e => e.kind === 'payment').sort(byNewest);
+    const matEntries = c.entries.filter(e => e.kind !== 'payment').sort(byNewest);
+
+    let heroLabel, heroValue;
+    if (st.invs.length) { heroLabel = st.remaining >= 0 ? 'المتبقي على العميل' : 'زيادة للعميل'; heroValue = Math.abs(st.remaining); }
+    else if (st.materialsDue > 0) { heroLabel = 'خامات مستحقة على العميل'; heroValue = st.materialsDue; }
+    else { heroLabel = 'صافي ما وصلك من العميل'; heroValue = st.netPaid; }
+
+    let html = `
+      <section class="hero">
+        <div class="hero-label">${heroLabel}</div>
+        <div class="hero-value"><span id="custHeroValue">${fmt(heroValue)}</span><small>ج.م</small></div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span>دفعات الشغل</span><strong>${money(st.paid)}</strong></div>
+          <div class="hero-stat"><span>متبقي الخامات</span><strong>${money(Math.max(0, st.matRemaining))}</strong></div>
+          <div class="hero-stat"><span>صافي ما وصلك</span><strong id="custNetPaid">${money(st.netPaid)}</strong></div>
+        </div>
+      </section>`;
+
+    if (c.note) html += `<div class="note" style="margin-bottom:14px"><strong>ملاحظات:</strong> ${esc(c.note)}</div>`;
+
+    // صفحتان منفصلتان: حساب الشغل / حساب الخامات
+    html += `
+      <div class="segmented" style="margin-bottom:12px">
+        <button type="button" id="custTabWork" class="${custTab === 'work' ? 'on' : ''}" onclick="setCustTab('work')">حساب الشغل (${workEntries.length})</button>
+        <button type="button" id="custTabMat" class="${custTab === 'mat' ? 'on' : ''}" onclick="setCustTab('mat')">حساب الخامات (${matEntries.length})</button>
+      </div>`;
+
+    if (custTab === 'work') {
+      html += `<div class="card"><div class="card-title"><div class="t-ic">${icon('wallet')}</div><h2>دفعات تحت الحساب</h2><span class="tag">${money(st.paid)}</span></div>
+        <p class="hint" style="margin:-6px 0 12px">المبالغ التي وصلتك من العميل من حساب الشغل نفسه (المصنعية)، كل مبلغ بتاريخه وملاحظته.</p>
+        <button type="button" class="btn btn-accent" id="btnAddPayment" onclick="openTxn('payment')">${icon('plus')} تسجيل دفعة تحت الحساب</button>
+        <div style="margin-top:8px">${workEntries.length ? workEntries.map(entryRowHTML).join('') : '<p class="hint" style="margin:10px 0 0;text-align:center">لم تسجل أي دفعة بعد.</p>'}</div>
+      </div>`;
+    } else {
+      html += `<div class="card"><div class="card-title"><div class="t-ic orange">${icon('box')}</div><h2>حساب الخامات</h2></div>
+        <p class="hint" style="margin:-6px 0 12px">خامات اشتريتها للعميل على حسابك، وما سدده من ثمنها، والمتبقي منها.</p>
+        <div class="mini-stats">
+          <div><span>ثمن الخامات</span><strong id="matTotalVal">${money(st.matTotal)}</strong></div>
+          <div><span>تم سداده</span><strong id="matPaidVal" style="color:var(--success)">${money(st.matPaid)}</strong></div>
+          <div><span>المتبقي</span><strong id="matRemVal" style="color:var(--danger)">${money(Math.max(0, st.matRemaining))}</strong></div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-accent" id="btnAddMaterial" onclick="openTxn('material')">${icon('plus')} إضافة خامات</button>
+          <button type="button" class="btn btn-soft" id="btnAddMatpay" onclick="openTxn('matpay')">${icon('cash')} سداد خامات</button>
+        </div>
+        <div style="margin-top:8px">${matEntries.length ? matEntries.map(entryRowHTML).join('') : '<p class="hint" style="margin:10px 0 0;text-align:center">لا توجد خامات مسجلة لهذا العميل.</p>'}</div>
+      </div>`;
+    }
+
+    // ملخص الحساب: متبقي الخامات يُخصم من دفعات الشغل
+    html += `<div class="card"><div class="card-title"><div class="t-ic orange">${icon('calc')}</div><h2>ملخص الحساب</h2></div><div class="sum-list">`;
+    html += row('دفعات تحت الحساب (الشغل)', money(st.paid));
+    if (hasMat) html += row('المتبقي من الخامات (يُخصم من دفعات الشغل)', `- ${money(Math.max(0, st.matRemaining))}`, 'minus');
+    html += row('صافي ما وصلك من حساب الشغل', money(st.netPaid), 'bold');
+    if (st.materialsDue > 0) html += row('خامات مستحقة على العميل (تُضاف على الفاتورة)', `+ ${money(st.materialsDue)}`, 'minus');
+    if (st.invs.length) html += row('إجمالي فواتيره (بعد الخصم)', money(st.invoicesTotal));
+    html += '</div>';
+    if (st.invs.length) html += `<div class="sum-total"><span>${st.remaining >= 0 ? 'المتبقي على العميل' : 'زيادة للعميل'}</span><strong>${money(Math.abs(st.remaining))}</strong></div>`;
+    html += '</div>';
+
+    // الفواتير المرتبطة
+    const cur = getCurrentInvoice();
+    html += `<div class="card"><div class="card-title"><div class="t-ic">${icon('link')}</div><h2>فواتير العميل</h2><span class="tag">${st.invs.length}</span></div>`;
+    if (!st.invs.length) html += `<p class="hint" style="margin:-4px 0 12px">لا توجد فاتورة مرتبطة بهذا العميل بعد. عند الربط يظهر صافي المدفوع في الفاتورة تلقائياً.</p>`;
+    st.invs.slice().reverse().forEach(inv => {
+      const t = computeInvoice(inv);
+      html += `
+        <div class="entry" onclick="openInvoiceFromCustomer('${esc(inv.id)}')">
+          <div class="e-ic" style="background:var(--primary-soft);color:var(--primary)">${icon('file')}</div>
+          <div class="e-info"><div class="e-title">${esc(inv.clientName)}</div><div class="e-meta">${esc(inv.date || '')} · الإجمالي ${money(t.grandTotal)} · المدفوع ${money(inv.paidAmount || 0)}</div></div>
+          <div class="e-amt" style="color:var(--primary)">${fmt(t.netRemaining)}<small style="display:block;font-size:.66rem;color:var(--muted)">متبقي</small></div>
+        </div>`;
+    });
+    html += `<div class="stack" style="margin-top:12px"><button type="button" class="btn btn-primary" onclick="newInvoiceForCustomer('${esc(c.id)}')">${icon('plus')} فاتورة جديدة لهذا العميل</button>`;
+    if (cur && !cur.customerId) html += `<button type="button" class="btn btn-ghost" onclick="linkInvoiceToCustomer('${esc(cur.id)}', '${esc(c.id)}', false)">${icon('link')} ربط الفاتورة المفتوحة (${esc(cur.clientName)})</button>`;
+    html += '</div></div>';
+
+    html += `
+      <div class="stack">
+        <div class="btn-row">
+          <button type="button" class="btn btn-wa" onclick="sendCustomerStatement()">${icon('send')} كشف واتساب</button>
+          <button type="button" class="btn btn-ghost" onclick="copyCustomerStatement()">${icon('copy')} نسخ الكشف</button>
+        </div>
+        <button type="button" class="btn btn-danger" onclick="deleteCustomer('${esc(c.id)}')">${icon('trash')} حذف العميل من النوتة</button>
+      </div>`;
+    const body = document.getElementById('customerBody');
+    body.innerHTML = html;
+    body.querySelectorAll('.entry[data-entry]').forEach(el => { el.onclick = () => openTxn(null, el.dataset.entry); });
+  }
+
+  /* ---------- تسجيل دفعة / خامات / سداد خامات (كل نوع في نافذة مستقلة) ---------- */
+  const TXN_UI = {
+    payment: { add: 'تسجيل دفعة تحت الحساب', edit: 'تعديل دفعة تحت الحساب', amount: 'المبلغ المستلم (ج.م)',
+      hint: () => 'مبلغ وصلك من العميل من <strong>حساب الشغل</strong> نفسه (المصنعية).' },
+    material: { add: 'إضافة خامات اشتريتها', edit: 'تعديل الخامات', amount: 'إجمالي ثمن الخامات (ج.م)',
+      hint: () => 'اكتب <strong>إجمالي ثمن الخامات</strong> التي اشتريتها للعميل على حسابك.' },
+    matpay: { add: 'تسجيل سداد خامات', edit: 'تعديل سداد الخامات', amount: 'المبلغ المسدد من الخامات (ج.م)',
+      hint: rem => `مبلغ وصلك من العميل <strong>مقابل الخامات</strong>. المتبقي من الخامات حالياً: <strong>${fmt(rem)} ج.م</strong>` }
+  };
+  function setTxnKind(kind, isEdit = false, matRemaining = 0) {
+    txnKind = kind;
+    const ui = TXN_UI[kind];
+    document.getElementById('txnTitle').textContent = isEdit ? ui.edit : ui.add;
+    document.getElementById('txnTitleField').classList.toggle('hidden', kind !== 'material');
+    document.getElementById('txnAmountLabel').textContent = ui.amount;
+    document.getElementById('txnKindHint').innerHTML = ui.hint(matRemaining);
+    const fillBtn = document.getElementById('txnFillRemaining');
+    const showFill = kind === 'matpay' && !isEdit && matRemaining > 0;
+    fillBtn.classList.toggle('hidden', !showFill);
+    if (showFill) {
+      fillBtn.textContent = `سداد كل المتبقي (${fmt(matRemaining)} ج.م)`;
+      fillBtn.onclick = () => { document.getElementById('txnAmount').value = round2(matRemaining); };
+    }
+  }
+  function openTxn(kind, entryId = null) {
+    const c = getCustomer(currentCustomerId);
+    if (!c) return;
+    const e = entryId ? c.entries.find(x => x.id === entryId) : null;
+    editingTxnId = e ? e.id : null;
+    setTxnKind(e ? e.kind : (kind || 'payment'), !!e, Math.max(0, customerMoney(c).matRemaining));
+    document.getElementById('txnDesc').value = e ? e.title : '';
+    document.getElementById('txnAmount').value = e ? e.amount : '';
+    document.getElementById('txnDate').value = e ? e.date : todayISO();
+    document.getElementById('txnNote').value = e ? e.note : '';
+    document.getElementById('txnDeleteBtn').classList.toggle('hidden', !e);
+    openOverlay('txn');
+  }
+  function saveTxn() {
+    const c = getCustomer(currentCustomerId);
+    if (!c) return;
+    const amount = parseFloat(document.getElementById('txnAmount').value) || 0;
+    if (amount <= 0) { showAppToast('⚠️ اكتب المبلغ أولاً'); return; }
+    const data = {
+      kind: txnKind,
+      amount: round2(amount),
+      date: document.getElementById('txnDate').value || todayISO(),
+      title: txnKind === 'material' ? document.getElementById('txnDesc').value.trim() : '',
+      note: document.getElementById('txnNote').value.trim()
+    };
+    const existing = editingTxnId ? c.entries.find(x => x.id === editingTxnId) : null;
+    if (existing) Object.assign(existing, data);
+    else c.entries.push(Object.assign({ id: uid('e_'), createdAt: Date.now() }, data));
+    afterLedgerChange();
+    closeOverlay();
+    showAppToast(existing ? '✔️ تم تعديل السجل' : `✔️ تم تسجيل ${fmt(data.amount)} ج.م (${KIND_LABEL[data.kind]})`);
+  }
+  function deleteTxn() {
+    const c = getCustomer(currentCustomerId);
+    if (!c || !editingTxnId) return;
+    showAppConfirm('حذف هذا السجل نهائياً من حساب العميل؟', () => {
+      c.entries = c.entries.filter(x => x.id !== editingTxnId);
+      afterLedgerChange();
+      closeOverlay();
+    });
+  }
+
+  /* ---------- ربط الفاتورة بالنوتة ---------- */
+  function doLinkInvoice(inv, c, fillFields) {
+    inv.customerId = c.id;
+    if (fillFields) {
+      inv.clientName = c.name;
+      if (c.phone) inv.clientPhone = c.phone;
+      if (c.address && !inv.clientAddress) inv.clientAddress = c.address;
+    }
+    afterLedgerChange();
+    hideClientSuggestions();
+    const m = customerMoney(c);
+    showAppToast(m.materialsDue > 0
+      ? `✔️ تم الربط بنوتة "${c.name}" — خامات مستحقة: ${fmt(m.materialsDue)} ج.م`
+      : `✔️ تم الربط بنوتة "${c.name}" — المدفوع: ${fmt(inv.paidAmount || 0)} ج.م`);
+  }
+  function linkInvoiceToCustomer(invId, customerId, fillFields) {
+    const inv = appData.invoices.find(i => i.id === invId);
+    const c = getCustomer(customerId);
+    if (!inv || !c) return;
+    const m = customerMoney(c);
+    if ((inv.paidAmount || 0) > 0 && round2(inv.paidAmount) !== round2(m.netPaid)) {
+      showAppConfirm(`الفاتورة مسجل بها مدفوع ${fmt(inv.paidAmount)} ج.م. بعد الربط سيُحسب المدفوع من نوتة العميل (${fmt(m.netPaid)} ج.م). متابعة؟`, () => doLinkInvoice(inv, c, fillFields));
+    } else doLinkInvoice(inv, c, fillFields);
+  }
+  function unlinkInvoice(invId) {
+    const inv = appData.invoices.find(i => i.id === invId);
+    if (!inv) return;
+    delete inv.customerId;
+    inv.materialsDue = 0;
+    afterLedgerChange();
+    showAppToast('تم فك الربط — يمكنك كتابة المدفوع يدوياً الآن');
+  }
+  function saveClientAsCustomer() {
+    const inv = getCurrentInvoice();
+    const name = (inv.clientName || '').trim();
+    if (!name || name === 'بدون اسم') { showAppToast('⚠️ اكتب اسم العميل أولاً'); return; }
+    const existing = customers.find(c => c.name.trim() === name);
+    if (existing) { linkInvoiceToCustomer(inv.id, existing.id, true); return; }
+    const c = { id: uid('c_'), name, phone: inv.clientPhone || '', address: inv.clientAddress || '', note: '', createdAt: Date.now(), entries: [] };
+    if ((inv.paidAmount || 0) > 0) c.entries.push({ id: uid('e_'), kind: 'payment', amount: round2(inv.paidAmount), date: todayISO(), title: '', note: 'مدفوع مسجل في الفاتورة قبل إضافة العميل للنوتة', createdAt: Date.now() });
+    customers.unshift(c);
+    doLinkInvoice(inv, c, false);
+  }
+  function newInvoiceForCustomer(customerId) {
+    closeAllThen(() => {
+      const c = getCustomer(customerId);
+      if (!c) return;
+      createNewInvoice(true);
+      doLinkInvoice(getCurrentInvoice(), c, true);
+    });
+  }
+  function openInvoiceFromCustomer(invId) { closeAllThen(() => openInvoice(invId)); }
+  function openLinkedCustomer() {
+    const inv = getCurrentInvoice();
+    if (inv.customerId) openCustomer(inv.customerId);
+  }
+
+  const DEFAULT_CLIENT_RE = /^عميل جديد \d+$/;
+  function hideClientSuggestions() { document.getElementById('clientSuggest').classList.add('hidden'); }
+  function renderClientSuggestions() {
+    const inv = getCurrentInvoice();
+    const input = document.getElementById('clientName');
+    const box = document.getElementById('clientSuggest');
+    if (inv.customerId || document.activeElement !== input) { hideClientSuggestions(); return; }
+    let q = input.value.trim();
+    const isDefault = DEFAULT_CLIENT_RE.test(q) || q === 'بدون اسم';
+    if (isDefault) q = '';
+    const matches = customers.filter(c => !q || c.name.includes(q) || c.phone.includes(q)).slice(0, 5);
+    let html = matches.map(c => {
+      const m = customerMoney(c);
+      const info = m.materialsDue > 0 ? `خامات مستحقة ${fmt(m.materialsDue)} ج.م` : `صافي المدفوع ${fmt(m.netPaid)} ج.م`;
+      return `<button type="button" data-id="${esc(c.id)}"><span class="s-av">${customerInitial(c.name)}</span><span>${esc(c.name)}<small>${c.phone ? esc(c.phone) + ' · ' : ''}${info}</small></span></button>`;
+    }).join('');
+    if (q && !customers.some(c => c.name.trim() === q)) html += `<button type="button" data-new="1"><span class="s-av add">${icon('plus')}</span><span>حفظ «${esc(q)}» كعميل جديد في النوتة<small>لتسجيل دفعاته وربطها بهذه الفاتورة</small></span></button>`;
+    if (!html) { hideClientSuggestions(); return; }
+    box.innerHTML = html;
+    box.classList.remove('hidden');
+  }
+
+  function renderLinkUI() {
+    const inv = getCurrentInvoice();
+    const c = inv.customerId ? getCustomer(inv.customerId) : null;
+    const paidInput = document.getElementById('paidAmount');
+    const clientBox = document.getElementById('clientLinkBox');
+    const paidBox = document.getElementById('paidLinkBox');
+    paidInput.disabled = !!c;
+    if (c) {
+      if (document.activeElement !== paidInput) paidInput.value = inv.paidAmount || '';
+      const m = customerMoney(c);
+      const info = m.materialsDue > 0 ? `خامات مستحقة: ${fmt(m.materialsDue)} ج.م` : `صافي المدفوع: ${fmt(inv.paidAmount || 0)} ج.م`;
+      const box = extra => `
+        <div class="link-box">
+          <span class="l-ic">${icon('link')}</span>
+          <div class="l-txt"><b>مرتبطة بنوتة: ${esc(c.name)}</b><span>${info}${extra}</span></div>
+          <button type="button" class="btn btn-soft btn-sm" onclick="openLinkedCustomer()">فتح</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="unlinkInvoice('${esc(inv.id)}')">فك</button>
+        </div>`;
+      clientBox.innerHTML = box('');
+      paidBox.innerHTML = box(' · يتحدث تلقائياً من النوتة');
+    } else {
+      const name = (inv.clientName || '').trim();
+      const canSave = name && name !== 'بدون اسم' && !DEFAULT_CLIENT_RE.test(name);
+      clientBox.innerHTML = canSave
+        ? `<button type="button" class="btn btn-soft btn-sm" style="margin-top:10px;width:100%" onclick="saveClientAsCustomer()">${icon('book')} ${customers.some(x => x.name.trim() === name) ? 'ربط الفاتورة بنوتة هذا العميل' : 'حفظ العميل في النوتة وربط الفاتورة'}</button>`
+        : '';
+      paidBox.innerHTML = '';
+    }
+  }
+
+  /* ---------- كشف حساب العميل ---------- */
+  function buildCustomerStatement(c) {
+    const st = customerStats(c);
+    const money = v => `${fmt(v)} ج.م`;
+    const line = '--------------------------------\n';
+    let text = `*📒 كشف حساب العميل: ${c.name}*\n`;
+    if (appData.techName) text += `*${appData.techName}*\n`;
+    text += `*تاريخ الكشف:* ${fmtDate(todayISO())}\n` + line;
+    const byDate = (a, b) => (a.date || '').localeCompare(b.date || '') || (a.createdAt - b.createdAt);
+    const pays = c.entries.filter(e => e.kind === 'payment').sort(byDate);
+    const mats = c.entries.filter(e => e.kind === 'material').sort(byDate);
+    const matPays = c.entries.filter(e => e.kind === 'matpay').sort(byDate);
+    text += '*أولاً: دفعات تحت الحساب (الشغل)*\n';
+    if (pays.length) pays.forEach((e, i) => { text += `${i + 1}) ${fmtDate(e.date)} — *${money(e.amount)}*${e.note ? ' — ' + e.note : ''}\n`; });
+    else text += 'لا توجد دفعات حتى الآن.\n';
+    text += `*إجمالي الدفعات:* ${money(st.paid)}\n`;
+    if (mats.length || matPays.length) {
+      text += line + '*ثانياً: حساب الخامات*\n';
+      mats.forEach((e, i) => { text += `${i + 1}) ${fmtDate(e.date)} — ${e.title || 'خامات'}: *${money(e.amount)}*${e.note ? ' — ' + e.note : ''}\n`; });
+      matPays.forEach(e => { text += `• سداد ${fmtDate(e.date)} — *${money(e.amount)}*${e.note ? ' — ' + e.note : ''}\n`; });
+      text += `*ثمن الخامات:* ${money(st.matTotal)} | *تم سداده:* ${money(st.matPaid)} | *المتبقي:* ${money(Math.max(0, st.matRemaining))}\n`;
+    }
+    text += line;
+    text += `*صافي المدفوع من حساب الشغل:* ${money(st.netPaid)}\n`;
+    if (st.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${money(st.materialsDue)}\n`;
+    if (st.invs.length) {
+      text += `*إجمالي الفواتير:* ${money(st.invoicesTotal)}\n`;
+      text += st.remaining >= 0 ? `*المتبقي على العميل:* *${money(st.remaining)}*` : `*زيادة للعميل:* *${money(-st.remaining)}*`;
+    }
+    return text.trim();
+  }
+  function copyText(text, doneMsg) {
+    const done = () => showAppToast(doneMsg);
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      done();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(fallback);
+    else fallback();
+  }
+  function copyCustomerStatement() {
+    const c = getCustomer(currentCustomerId);
+    if (c) copyText(buildCustomerStatement(c), '✔️ تم نسخ كشف الحساب');
+  }
+  function sendCustomerStatement() {
+    const c = getCustomer(currentCustomerId);
+    if (!c) return;
+    let phone = (c.phone || '').replace(/\D/g, '');
+    if (/^01\d{9}$/.test(phone)) phone = '2' + phone;
+    window.open(`https://wa.me/${phone}?text=` + encodeURIComponent(buildCustomerStatement(c)), '_blank');
+  }
 
   /* ---------------- واتساب ---------------- */
   function buildWhatsAppText() {
@@ -1666,6 +2459,7 @@
     text += `--------------------------------\n*إجمالي عدد النقاط الكلي:* ${fmt(t.allPointsCount)} نقطة\n*إجمالي الحساب الكلي:* ${fmt(t.grandTotal)} ج.م\n`;
     if (inv.discountAmount > 0) text += `*الخصم:* ${fmt(inv.discountAmount)} ج.م\n`;
     if (inv.paidAmount > 0) text += `*المدفوع:* ${fmt(inv.paidAmount)} ج.م\n`;
+    if (t.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${fmt(t.materialsDue)} ج.م\n`;
     text += `*الصافي المتبقي:* *${fmt(t.netRemaining)} ج.م*`;
     return text;
   }
@@ -1692,33 +2486,70 @@
   }
 
   /* ---------------- النسخ الاحتياطي ---------------- */
-  function exportBackupJSON() {
-    const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+  function downloadJSON(obj, filename) {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `فواتير_الكهرباء_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    showAppToast('✔️ تم تنزيل النسخة الاحتياطية');
+    try { localStorage.setItem(BACKUP_KEY, String(Date.now())); } catch (e) {}
+    renderBackupLine();
   }
-
+  // نسخة كاملة: الفواتير + نوتة العملاء + الإعدادات
+  function exportBackupJSON() {
+    syncLinkedInvoices();
+    downloadJSON(Object.assign({}, appData, { app: 'hesabaty', backupVersion: 2, exportedAt: new Date().toISOString(), customers, settings }),
+      `حساباتي_نسخة_كاملة_${todayISO()}.json`);
+    showAppToast('✔️ تم تنزيل النسخة الكاملة (الفواتير + النوتة)');
+  }
+  // نسخة النوتة فقط
+  function exportLedgerJSON() {
+    if (!customers.length) { showAppToast('النوتة فارغة، لا يوجد ما يُنسخ'); return; }
+    downloadJSON({ app: 'hesabaty', type: 'hesabaty-ledger', version: 1, exportedAt: new Date().toISOString(), customers }, `نوتة_العملاء_${todayISO()}.json`);
+    showAppToast(`✔️ تم تنزيل نسخة النوتة (${customers.length} عميل)`);
+  }
+  // دمج نوتة من ملف دون فقد أي سجل موجود
+  function mergeCustomers(incoming) {
+    let added = 0, updated = 0;
+    normalizeCustomers(incoming).forEach(nc => {
+      const cur = customers.find(c => c.id === nc.id) || customers.find(c => c.name.trim() === nc.name.trim());
+      if (!cur) { customers.push(nc); added++; return; }
+      updated++;
+      ['phone', 'address', 'note'].forEach(k => { if (nc[k]) cur[k] = nc[k]; });
+      nc.entries.forEach(e => {
+        const i = cur.entries.findIndex(x => x.id === e.id);
+        if (i >= 0) cur.entries[i] = e; else cur.entries.push(e);
+      });
+    });
+    return { added, updated };
+  }
   function importBackupJSON(event) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function (e) {
-      try {
-        const imported = JSON.parse(e.target.result);
-        if (imported && Array.isArray(imported.invoices) && imported.invoices.length) {
+      let imported;
+      try { imported = JSON.parse(e.target.result); } catch (err) { showAppToast('⚠️ ملف النسخة الاحتياطية غير صالح.'); return; }
+      if (imported && imported.type === 'hesabaty-ledger' && Array.isArray(imported.customers)) {
+        showAppConfirm(`استعادة نوتة بها ${imported.customers.length} عميل؟ سيتم دمجها مع النوتة الحالية دون حذف أي سجل.`, () => {
+          const r = mergeCustomers(imported.customers);
+          afterLedgerChange();
+          showAppToast(`✔️ تمت استعادة النوتة: ${r.added} عميل جديد، ${r.updated} تم تحديثه`);
+        });
+      } else if (imported && Array.isArray(imported.invoices) && imported.invoices.length) {
+        const hasLedger = Array.isArray(imported.customers);
+        showAppConfirm(`استعادة النسخة الكاملة؟ سيتم استبدال الفواتير الحالية (${appData.invoices.length}) بفواتير الملف (${imported.invoices.length})${hasLedger ? ' ودمج نوتة العملاء' : ''}.`, () => {
           loadFromParsed(imported);
           if (!appData.currentId || !appData.invoices.some(i => i.id === appData.currentId)) appData.currentId = appData.invoices[0].id;
-          saveToStorage();
-          renderAll();
-          showAppToast('✔️ تم استعادة جميع الفواتير بنجاح.');
-        } else showAppToast('⚠️ ملف النسخة الاحتياطية غير صالح.');
-      } catch (err) { showAppToast('⚠️ ملف النسخة الاحتياطية غير صالح.'); }
+          if (hasLedger) mergeCustomers(imported.customers);
+          if (imported.settings && typeof imported.settings === 'object') { settings = Object.assign(settings, imported.settings); saveSettings(); }
+          afterLedgerChange();
+          showAppToast('✔️ تم استعادة النسخة الاحتياطية بنجاح.');
+        });
+      } else showAppToast('⚠️ ملف النسخة الاحتياطية غير صالح.');
     };
     reader.readAsText(file);
     event.target.value = '';
@@ -1767,6 +2598,11 @@
     const applyBtn = document.getElementById('btnApplyUpdate');
     const rollBtn = document.getElementById('btnRollback');
     const dot = document.getElementById('verDot');
+    if (IS_BETA) {
+      status.textContent = 'هذه نسخة تجريبية للمعاينة فقط. بعد موافقتك سيصل التحديث للتطبيق الأصلي مع خيار التحديث أو البقاء.';
+      document.getElementById('btnCheckUpdate').classList.add('hidden');
+      return;
+    }
     if (!('serviceWorker' in navigator)) {
       status.textContent = 'التحديثات التلقائية غير متاحة في هذا الوضع.';
       return;
@@ -1881,7 +2717,7 @@
   }
 
   function initServiceWorker() {
-    if (!('serviceWorker' in navigator)) { renderUpdateUI(); return; }
+    if (IS_BETA || !('serviceWorker' in navigator)) { renderUpdateUI(); return; }
     navigator.serviceWorker.addEventListener('message', e => {
       if (e.data && e.data.type === 'VERSION_AVAILABLE') evaluateUpdate(false);
     });
