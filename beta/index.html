@@ -343,6 +343,8 @@
     .beta-bar { background: repeating-linear-gradient(135deg, #7c2d12, #7c2d12 12px, #9a3412 12px, #9a3412 24px); color: #fff; font-size: .76rem; font-weight: 800; text-align: center; padding: 6px 12px; }
 
     /* ============ اقتراحات العملاء وربط الفاتورة ============ */
+    select { width: 100%; min-width: 0; height: 48px; padding: 0 14px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); font-size: .95rem; font-weight: 700; color: var(--text); }
+    select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(249,115,22,.14); }
     input[type="date"] { width: 100%; min-width: 0; height: 48px; padding: 0 14px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); font-size: 1rem; font-weight: 700; color: var(--text); }
     .suggest { border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface); margin-top: 6px; overflow: hidden; box-shadow: var(--shadow-md); }
     .suggest button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; border-bottom: 1px solid var(--border); background: none; padding: 10px 12px; text-align: right; font-weight: 800; font-size: .9rem; color: var(--text); }
@@ -554,11 +556,11 @@
     <!-- ملخص سريع -->
     <section class="hero" id="heroCard">
       <div class="hero-label">الصافي المطلوب</div>
-      <div class="hero-value"><span id="topNetRequired">0</span><small>ج.م</small></div>
+      <div class="hero-value"><span id="topNetRequired">0</span><small><span class="cur">ج.م</span></small></div>
       <div class="hero-stats">
         <div class="hero-stat"><span id="heroL1">إجمالي النقاط</span><strong id="topTotalPoints">0 نقطة</strong></div>
-        <div class="hero-stat"><span id="heroL2">حساب النقاط</span><strong id="topPointsCost">0 ج.م</strong></div>
-        <div class="hero-stat"><span id="heroL3">بروفايل وإضافي</span><strong id="topExtrasCost">0 ج.م</strong></div>
+        <div class="hero-stat"><span id="heroL2">حساب النقاط</span><strong id="topPointsCost">0 <span class="cur">ج.م</span></strong></div>
+        <div class="hero-stat"><span id="heroL3">بروفايل وإضافي</span><strong id="topExtrasCost">0 <span class="cur">ج.م</span></strong></div>
       </div>
     </section>
 
@@ -691,11 +693,11 @@
     <section class="view" id="view-ledger">
       <section class="hero">
         <div class="hero-label">إجمالي المتبقي لك عند العملاء</div>
-        <div class="hero-value"><span id="ledgerTotalDue">0</span><small>ج.م</small></div>
+        <div class="hero-value"><span id="ledgerTotalDue">0</span><small><span class="cur">ج.م</span></small></div>
         <div class="hero-stats">
           <div class="hero-stat"><span>عدد العملاء</span><strong id="ledgerCount">0</strong></div>
-          <div class="hero-stat"><span>إجمالي ما وصلك</span><strong id="ledgerReceived">0 ج.م</strong></div>
-          <div class="hero-stat"><span>خامات متبقية</span><strong id="ledgerMaterials">0 ج.م</strong></div>
+          <div class="hero-stat"><span>إجمالي ما وصلك</span><strong id="ledgerReceived">0 <span class="cur">ج.م</span></strong></div>
+          <div class="hero-stat"><span>خامات متبقية</span><strong id="ledgerMaterials">0 <span class="cur">ج.م</span></strong></div>
         </div>
       </section>
       <div class="btn-row" style="margin-bottom:12px">
@@ -712,7 +714,7 @@
     <section class="view" id="view-materials">
       <section class="hero">
         <div class="hero-label">خامات على حسابك عند العملاء</div>
-        <div class="hero-value"><span id="matHeroTotal">0</span><small>ج.م</small></div>
+        <div class="hero-value"><span id="matHeroTotal">0</span><small><span class="cur">ج.م</span></small></div>
         <div class="hero-stats">
           <div class="hero-stat"><span>عدد الكشوفات</span><strong id="matHeroCount">0</strong></div>
           <div class="hero-stat"><span>أنا هجيبها</span><strong id="matHeroMine">0</strong></div>
@@ -728,6 +730,11 @@
     <section class="view" id="view-more">
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="briefcase"></i></div><h2>بياناتك على الفاتورة</h2></div>
+        <div class="field">
+          <label for="currencySelect">عملة بلدك</label>
+          <select id="currencySelect" onchange="setCurrency(this.value)"></select>
+          <div class="hint">تتحدد مرة واحدة وتتطبق على كل الأسعار في التطبيق والفواتير وكشوفات الخامات والنوتة. (بتغيّر رمز العملة بس، مش بتحوّل المبالغ)</div>
+        </div>
         <div class="field"><label for="invoiceTitle">عنوان الفاتورة</label><input type="text" id="invoiceTitle" placeholder="كشف حساب ومستخلص أعمال كهرباء" oninput="saveInvoiceMeta()"></div>
         <div class="row-2 stack-sm">
           <div class="field"><label for="techName">اسمك / لقبك المهني</label><input type="text" id="techName" placeholder="م/ أحمد حسن" oninput="saveInvoiceMeta()"></div>
@@ -852,7 +859,7 @@
   </div>
   <div id="extraItemsContainer"></div>
 
-  <div class="live-total"><span id="roomLivePts">0 نقطة</span><strong id="roomLiveTotal">0 ج.م</strong></div>
+  <div class="live-total"><span id="roomLivePts">0 نقطة</span><strong id="roomLiveTotal">0 <span class="cur">ج.م</span></strong></div>
   <div class="btn-row">
     <button type="button" id="saveRoomBtn" class="btn btn-primary" onclick="saveRoom()">حفظ الغرفة</button>
     <button type="button" id="cancelEditBtn" class="btn btn-ghost" onclick="closeOverlay()">إلغاء</button>
@@ -889,11 +896,11 @@
       <label for="itemQty">الكمية</label>
       <div class="stepper"><button type="button" data-step="1">+</button><input type="number" inputmode="decimal" id="itemQty" min="0" step="any" placeholder="1"><button type="button" data-step="-1">−</button></div>
     </div>
-    <div class="field"><label for="itemPrice" id="itemPriceLabel">سعر الوحدة (ج.م)</label><input type="number" inputmode="decimal" id="itemPrice" min="0" step="any" placeholder="0"></div>
+    <div class="field"><label for="itemPrice" id="itemPriceLabel">سعر الوحدة (<span class="cur">ج.م</span>)</label><input type="number" inputmode="decimal" id="itemPrice" min="0" step="any" placeholder="0"></div>
   </div>
   <div class="field" style="margin-top:-4px"><label>الوحدة</label><div class="unit-chips" id="itemUnits"></div></div>
   <div class="field"><label for="itemNote">ملاحظة تظهر تحت البند <span class="hint">(اختياري)</span></label><input type="text" id="itemNote" placeholder="مثال: لوحة 12 خط شاملة الترقيم"></div>
-  <div class="live-total"><span id="itemLiveQty">الكمية × السعر</span><strong id="itemLiveTotal">0 ج.م</strong></div>
+  <div class="live-total"><span id="itemLiveQty">الكمية × السعر</span><strong id="itemLiveTotal">0 <span class="cur">ج.م</span></strong></div>
   <div class="stack">
     <div class="btn-row">
       <button type="button" class="btn btn-primary" id="saveItemBtn" onclick="saveItem()">حفظ البند</button>
@@ -937,8 +944,8 @@
     <div class="unit-chips hidden" id="miWireChips"></div>
   </div>
   <div class="field"><label for="miNote">ملاحظة <span class="hint">(اختياري)</span></label><input type="text" id="miNote" placeholder="مثال: لون أحمر وأسود"></div>
-  <div class="field hidden" id="miPriceField"><label for="miPrice">سعر الوحدة (ج.م) — لأنك هتجيبها على حسابك</label><input type="number" inputmode="decimal" id="miPrice" min="0" step="any" placeholder="0"></div>
-  <div class="live-total hidden" id="miLive"><span id="miLiveQty">الكمية × السعر</span><strong id="miLiveTotal">0 ج.م</strong></div>
+  <div class="field hidden" id="miPriceField"><label for="miPrice">سعر الوحدة (<span class="cur">ج.م</span>) — لأنك هتجيبها على حسابك</label><input type="number" inputmode="decimal" id="miPrice" min="0" step="any" placeholder="0"></div>
+  <div class="live-total hidden" id="miLive"><span id="miLiveQty">الكمية × السعر</span><strong id="miLiveTotal">0 <span class="cur">ج.م</span></strong></div>
   <div class="stack">
     <div class="btn-row">
       <button type="button" class="btn btn-primary" id="saveMatItemBtn" onclick="saveMatItem()">حفظ الخامة</button>
@@ -993,7 +1000,7 @@
   <div class="note" id="txnKindHint" style="margin-bottom:12px"></div>
   <div class="field hidden" id="txnTitleField"><label for="txnDesc">بيان الخامات</label><input type="text" id="txnDesc" placeholder="مثال: سلك ومواسير وعلب"></div>
   <div class="row-2">
-    <div class="field"><label for="txnAmount" id="txnAmountLabel">المبلغ (ج.م)</label><input type="number" inputmode="decimal" id="txnAmount" min="0" step="any" placeholder="0"></div>
+    <div class="field"><label for="txnAmount" id="txnAmountLabel">المبلغ (<span class="cur">ج.م</span>)</label><input type="number" inputmode="decimal" id="txnAmount" min="0" step="any" placeholder="0"></div>
     <div class="field"><label for="txnDate">التاريخ</label><input type="date" id="txnDate"></div>
   </div>
   <button type="button" class="chip hidden" id="txnFillRemaining" style="margin:-4px 0 12px"></button>
@@ -1100,6 +1107,51 @@
   const WIRE_SIZES = ['1.5', '2', '3', '4', '6', '10', '16', '25'];
   const isWireName = n => /سلك|كابل|كابلات|أسلاك/.test(n || '');
 
+  // العملة: تُختار مرة واحدة من «المزيد» وتُطبّق على كل الأسعار في التطبيق
+  const CURRENCIES = [
+    { code: 'EGP', country: 'مصر', name: 'جنيه مصري', sym: 'ج.م', short: 'ج', dec: 2 },
+    { code: 'SAR', country: 'السعودية', name: 'ريال سعودي', sym: 'ر.س', dec: 2 },
+    { code: 'AED', country: 'الإمارات', name: 'درهم إماراتي', sym: 'د.إ', dec: 2 },
+    { code: 'KWD', country: 'الكويت', name: 'دينار كويتي', sym: 'د.ك', dec: 3 },
+    { code: 'QAR', country: 'قطر', name: 'ريال قطري', sym: 'ر.ق', dec: 2 },
+    { code: 'BHD', country: 'البحرين', name: 'دينار بحريني', sym: 'د.ب', dec: 3 },
+    { code: 'OMR', country: 'عُمان', name: 'ريال عماني', sym: 'ر.ع', dec: 3 },
+    { code: 'JOD', country: 'الأردن', name: 'دينار أردني', sym: 'د.أ', dec: 3 },
+    { code: 'IQD', country: 'العراق', name: 'دينار عراقي', sym: 'د.ع', dec: 0 },
+    { code: 'SYP', country: 'سوريا', name: 'ليرة سورية', sym: 'ل.س', dec: 0 },
+    { code: 'LBP', country: 'لبنان', name: 'ليرة لبنانية', sym: 'ل.ل', dec: 0 },
+    { code: 'ILS', country: 'فلسطين', name: 'شيكل', sym: '₪', dec: 2 },
+    { code: 'YER', country: 'اليمن', name: 'ريال يمني', sym: 'ر.ي', dec: 0 },
+    { code: 'LYD', country: 'ليبيا', name: 'دينار ليبي', sym: 'د.ل', dec: 3 },
+    { code: 'TND', country: 'تونس', name: 'دينار تونسي', sym: 'د.ت', dec: 3 },
+    { code: 'DZD', country: 'الجزائر', name: 'دينار جزائري', sym: 'د.ج', dec: 2 },
+    { code: 'MAD', country: 'المغرب', name: 'درهم مغربي', sym: 'د.م', dec: 2 },
+    { code: 'SDG', country: 'السودان', name: 'جنيه سوداني', sym: 'ج.س', dec: 2 },
+    { code: 'MRU', country: 'موريتانيا', name: 'أوقية', sym: 'أ.م', dec: 2 },
+    { code: 'SOS', country: 'الصومال', name: 'شلن صومالي', sym: 'ش.ص', dec: 0 },
+    { code: 'DJF', country: 'جيبوتي', name: 'فرنك جيبوتي', sym: 'ف.ج', dec: 0 },
+    { code: 'KMF', country: 'جزر القمر', name: 'فرنك قمري', sym: 'ف.ق', dec: 0 },
+    { code: 'USD', country: 'دولار أمريكي', name: 'دولار', sym: '$', dec: 2 }
+  ];
+  let CUR = 'ج.م', CUR_SHORT = 'ج', CUR_DEC = 2;
+  function currentCurrency() { return CURRENCIES.find(c => c.code === settings.currency) || CURRENCIES[0]; }
+  function applyCurrency() {
+    const c = currentCurrency();
+    CUR = c.sym; CUR_SHORT = c.short || c.sym; CUR_DEC = c.dec;
+    document.querySelectorAll('.cur').forEach(el => { el.textContent = CUR; });
+    const sel = document.getElementById('currencySelect');
+    if (sel) sel.value = c.code;
+  }
+  function setCurrency(code) {
+    if (!CURRENCIES.some(c => c.code === code)) return;
+    settings.currency = code;
+    saveSettings();
+    applyCurrency();
+    renderAll();
+    const c = currentCurrency();
+    showAppToast(`✔️ العملة: ${c.name} (${c.sym}) — اتطبقت على كل الأسعار`);
+  }
+
   let appData = { invoiceTitle: DEFAULT_TITLE, techName: DEFAULT_TECH, techPhone: '', logoData: '', showLogo: false, currentId: null, invoices: [] };
   let customers = [];
   let settings = { linePoints: 2, riserPoints: 2, plasterProfilePrice: 0 };
@@ -1175,8 +1227,9 @@
     return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
   function fmt(n) {
-    const v = Math.round((Number(n) || 0) * 100) / 100;
-    return v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const f = Math.pow(10, CUR_DEC);
+    const v = Math.round((Number(n) || 0) * f) / f;
+    return v.toLocaleString('en-US', { maximumFractionDigits: CUR_DEC });
   }
   function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
 
@@ -1388,6 +1441,7 @@
         || localStorage.getItem('ahmed_elec_invoices_v4');
     }
     loadSettings();
+    applyCurrency();
     loadCustomers();
     loadMatLists();
     if (saved) { try { loadFromParsed(JSON.parse(saved)); } catch (e) {} }
@@ -1409,6 +1463,8 @@
     });
     document.getElementById('roomSheet').addEventListener('input', updateRoomLivePreview);
     initItemSheet();
+    document.getElementById('currencySelect').innerHTML = CURRENCIES.map(c => `<option value="${c.code}">${esc(c.country)} — ${esc(c.name)} (${esc(c.sym)})</option>`).join('');
+    applyCurrency();
     initMatItemSheet();
     const suggestBox = document.getElementById('clientSuggest');
     suggestBox.addEventListener('pointerdown', e => e.preventDefault());
@@ -1611,11 +1667,11 @@
     const inv = getCurrentInvoice();
     const c = calculateRoom(readRoomForm(''), inv);
     document.getElementById('roomLivePts').textContent = `إجمالي الغرفة · ${fmt(c.totalPoints)} نقطة`;
-    document.getElementById('roomLiveTotal').textContent = `${fmt(c.totalCost)} ج.م`;
-    document.getElementById('profileHint').textContent = `بسعر المتر: ${fmt(inv.profileMeterPrice || 0)} ج.م`;
+    document.getElementById('roomLiveTotal').textContent = `${fmt(c.totalCost)} ${CUR}`;
+    document.getElementById('profileHint').textContent = `بسعر المتر: ${fmt(inv.profileMeterPrice || 0)} ${CUR}`;
     const noPlasterPrice = num('roomLedPlaster') > 0 && !(inv.plasterProfilePrice > 0);
     const ph = document.getElementById('plasterHint');
-    ph.textContent = noPlasterPrice ? '⚠️ حدد سعر متر بروفايل المحارة من صفحة «البيانات» أولاً' : `بسعر المتر: ${fmt(inv.plasterProfilePrice || 0)} ج.م`;
+    ph.textContent = noPlasterPrice ? '⚠️ حدد سعر متر بروفايل المحارة من صفحة «البيانات» أولاً' : `بسعر المتر: ${fmt(inv.plasterProfilePrice || 0)} ${CUR}`;
     ph.style.color = noPlasterPrice ? 'var(--danger)' : '';
   }
 
@@ -1694,8 +1750,8 @@
   function setItemUnit(u) { itemUnit = u; renderUnitChips('itemUnits', ITEM_UNITS, itemUnit, setItemUnit); updateItemLive(); }
   function updateItemLive() {
     const q = num('itemQty'), p = num('itemPrice');
-    document.getElementById('itemLiveQty').textContent = `${fmt(q || 0)} ${itemUnit} × ${fmt(p)} ج.م`;
-    document.getElementById('itemLiveTotal').textContent = `${fmt(q * p)} ج.م`;
+    document.getElementById('itemLiveQty').textContent = `${fmt(q || 0)} ${itemUnit} × ${fmt(p)} ${CUR}`;
+    document.getElementById('itemLiveTotal').textContent = `${fmt(q * p)} ${CUR}`;
   }
   function openItemSheet(index) {
     const inv = getCurrentInvoice();
@@ -1881,9 +1937,9 @@
     const notice = document.getElementById('systemRuleNotice');
     if (isOld) {
       const avg = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
-      notice.innerHTML = `<strong>النظام القديم</strong> (يظهر أعلى الفاتورة):<br>• البرايز والمفاتيح وخطوط اللوحة والصواعد بمتوسط السعرين = <strong>${fmt(avg)} ج.م</strong><br>• الإسبوتات وشريط الليد بالسعر الحالي = <strong>${fmt(inv.newPointPrice || 0)} ج.م</strong>`;
+      notice.innerHTML = `<strong>النظام القديم</strong> (يظهر أعلى الفاتورة):<br>• البرايز والمفاتيح وخطوط اللوحة والصواعد بمتوسط السعرين = <strong>${fmt(avg)} ${CUR}</strong><br>• الإسبوتات وشريط الليد بالسعر الحالي = <strong>${fmt(inv.newPointPrice || 0)} ${CUR}</strong>`;
     } else {
-      notice.innerHTML = `<strong>تسعيرة موحدة:</strong> كل النقاط تُحسب بسعر <strong>${fmt(inv.newPointPrice || 0)} ج.م</strong> للنقطة، ولا يُذكر اسم النظام في الفاتورة.`;
+      notice.innerHTML = `<strong>تسعيرة موحدة:</strong> كل النقاط تُحسب بسعر <strong>${fmt(inv.newPointPrice || 0)} ${CUR}</strong> للنقطة، ولا يُذكر اسم النظام في الفاتورة.`;
     }
   }
 
@@ -1919,10 +1975,10 @@
     const p = t.panel;
 
     document.getElementById('headerSub').textContent = `${inv.clientName || 'بدون اسم'} · ${inv.date || ''}`;
-    document.getElementById('mainPanelBadge').textContent = `${fmt(p.totalPanelPts)} نقطة · ${fmt(p.totalPanelCost)} ج.م`;
+    document.getElementById('mainPanelBadge').textContent = `${fmt(p.totalPanelPts)} نقطة · ${fmt(p.totalPanelCost)} ${CUR}`;
     document.getElementById('mainPanelLiveSummary').innerHTML =
-      `• خطوط الأتوماتيك: <strong>${fmt(p.linesCount)} (${fmt(p.linesPts)} ن)</strong> = ${fmt(p.linesCost)} ج.م<br>` +
-      `• الصواعد الرئيسية: <strong>${fmt(p.risersCount)} (${fmt(p.risersPts)} ن)</strong> = ${fmt(p.risersCost)} ج.م`;
+      `• خطوط الأتوماتيك: <strong>${fmt(p.linesCount)} (${fmt(p.linesPts)} ن)</strong> = ${fmt(p.linesCost)} ${CUR}<br>` +
+      `• الصواعد الرئيسية: <strong>${fmt(p.risersCount)} (${fmt(p.risersPts)} ن)</strong> = ${fmt(p.risersCost)} ${CUR}`;
     document.getElementById('linePtsHint').textContent = `الخط = ${fmt(p.linePtsEach)} نقطة`;
     document.getElementById('riserPtsHint').textContent = `الصاعد = ${fmt(p.riserPtsEach)} نقطة`;
 
@@ -1941,10 +1997,10 @@
       itemsBox.innerHTML = inv.items.map((it, idx) => `
         <div class="item-card" onclick="openItemSheet(${idx})">
           <span class="room-num">${idx + 1}</span>
-          <div class="i-info"><div class="i-name">${esc(it.name)}</div><div class="i-meta">${esc(itemQtyText(it))} × ${fmt(it.price)} ج.م${it.note ? ' · ' + esc(it.note) : ''}</div></div>
-          <div class="i-amt">${fmt((Number(it.qty) || 0) * (Number(it.price) || 0))}<small>ج.م</small></div>
+          <div class="i-info"><div class="i-name">${esc(it.name)}</div><div class="i-meta">${esc(itemQtyText(it))} × ${fmt(it.price)} ${CUR}${it.note ? ' · ' + esc(it.note) : ''}</div></div>
+          <div class="i-amt">${fmt((Number(it.qty) || 0) * (Number(it.price) || 0))}<small>${CUR}</small></div>
         </div>`).join('') +
-        `<div class="sum-total" style="margin-bottom:14px"><span>إجمالي البنود (${inv.items.length})</span><strong>${fmt(calculateItems(inv).total)} ج.م</strong></div>`;
+        `<div class="sum-total" style="margin-bottom:14px"><span>إجمالي البنود (${inv.items.length})</span><strong>${fmt(calculateItems(inv).total)} ${CUR}</strong></div>`;
     }
 
     const list = document.getElementById('roomsListContainer');
@@ -1957,12 +2013,12 @@
         if (r.sockets) chips.push(`<span class="r-chip">برايز ومفاتيح <b>${fmt(r.sockets)} (${fmt(c.socketsPts)} ن)</b></span>`);
         if (r.spots) chips.push(`<span class="r-chip">إسبوتات <b>${fmt(r.spots)} (${fmt(c.spotsPts)} ن)</b></span>`);
         if (r.ledStrip) chips.push(`<span class="r-chip">شريط ليد <b>${fmt(r.ledStrip)} م (${fmt(c.ledStripPts)} ن)</b></span>`);
-        if (r.ledProfile) chips.push(`<span class="r-chip">بروفايل ${fmt(r.ledProfile)} م <b>${fmt(c.profileCost)} ج.م</b></span>`);
-        if (r.ledProfilePlaster) chips.push(`<span class="r-chip">بروفايل محارة ${fmt(r.ledProfilePlaster)} م <b>${fmt(c.plasterCost)} ج.م</b></span>`);
-        (r.extras || []).forEach(ex => chips.push(`<span class="r-chip">${esc(ex.name)} (${fmt(ex.qty)}) <b>${fmt(ex.qty * ex.price)} ج.م</b></span>`));
+        if (r.ledProfile) chips.push(`<span class="r-chip">بروفايل ${fmt(r.ledProfile)} م <b>${fmt(c.profileCost)} ${CUR}</b></span>`);
+        if (r.ledProfilePlaster) chips.push(`<span class="r-chip">بروفايل محارة ${fmt(r.ledProfilePlaster)} م <b>${fmt(c.plasterCost)} ${CUR}</b></span>`);
+        (r.extras || []).forEach(ex => chips.push(`<span class="r-chip">${esc(ex.name)} (${fmt(ex.qty)}) <b>${fmt(ex.qty * ex.price)} ${CUR}</b></span>`));
         return `
           <div class="room-card">
-            <div class="room-top"><span class="room-num">${idx + 1}</span><span class="room-name">${esc(r.name)}</span><span class="room-total">${fmt(c.totalCost)} ج.م</span></div>
+            <div class="room-top"><span class="room-num">${idx + 1}</span><span class="room-name">${esc(r.name)}</span><span class="room-total">${fmt(c.totalCost)} ${CUR}</span></div>
             ${chips.length ? `<div class="room-chips">${chips.join('')}</div>` : ''}
             <div class="room-foot">
               <span>نقاط الغرفة: <b>${fmt(c.totalPoints)} نقطة</b></span>
@@ -1979,30 +2035,30 @@
     document.getElementById('heroL2').textContent = itemsMode ? 'إجمالي البنود' : 'حساب النقاط';
     document.getElementById('heroL3').textContent = itemsMode ? 'المدفوع' : 'بروفايل وإضافي';
     document.getElementById('topTotalPoints').textContent = itemsMode ? `${inv.items.length} بند` : `${fmt(t.allPointsCount)} نقطة`;
-    document.getElementById('topPointsCost').textContent = `${fmt(itemsMode ? t.itemsTotal : t.pointsCostTotal)} ج.م`;
-    document.getElementById('topExtrasCost').textContent = `${fmt(itemsMode ? (inv.paidAmount || 0) : t.profileAndExtrasTotal)} ج.م`;
+    document.getElementById('topPointsCost').textContent = `${fmt(itemsMode ? t.itemsTotal : t.pointsCostTotal)} ${CUR}`;
+    document.getElementById('topExtrasCost').textContent = `${fmt(itemsMode ? (inv.paidAmount || 0) : t.profileAndExtrasTotal)} ${CUR}`;
     document.getElementById('topNetRequired').textContent = fmt(t.netRemaining);
 
     document.getElementById('summaryTitle').textContent = `كشف الحساب: ${inv.clientName}`;
     const row = (label, value, cls = '') => `<div class="sum-row ${cls}"><span>${label}</span><strong>${value}</strong></div>`;
     let html = '<div class="sum-list">';
     if (itemsMode) {
-      if (!inv.items.length) html += row('لا توجد بنود بعد', '0 ج.م');
-      inv.items.forEach((it, i) => { html += row(`${esc(it.name)} (${esc(itemQtyText(it))} × ${fmt(it.price)} ج.م)`, `${fmt(t.itemRows[i])} ج.م`); });
+      if (!inv.items.length) html += row('لا توجد بنود بعد', `0 ${CUR}`);
+      inv.items.forEach((it, i) => { html += row(`${esc(it.name)} (${esc(itemQtyText(it))} × ${fmt(it.price)} ${CUR})`, `${fmt(t.itemRows[i])} ${CUR}`); });
     } else if (inv.systemType === 'old') {
-      html += row(`نقاط البرايز والخطوط والصواعد (${fmt(t.totalBasePtsAll)} ن × ${fmt(t.avgRate)} ج.م)`, `${fmt(t.totalBaseCostAll)} ج.م`);
-      html += row(`نقاط الإسبوتات وشريط الليد (${fmt(t.sumFinishPts)} ن × ${fmt(inv.newPointPrice || 0)} ج.م)`, `${fmt(t.sumFinishCost)} ج.م`);
+      html += row(`نقاط البرايز والخطوط والصواعد (${fmt(t.totalBasePtsAll)} ن × ${fmt(t.avgRate)} ${CUR})`, `${fmt(t.totalBaseCostAll)} ${CUR}`);
+      html += row(`نقاط الإسبوتات وشريط الليد (${fmt(t.sumFinishPts)} ن × ${fmt(inv.newPointPrice || 0)} ${CUR})`, `${fmt(t.sumFinishCost)} ${CUR}`);
     } else {
-      html += row(`إجمالي حساب النقاط (${fmt(t.allPointsCount)} ن × ${fmt(inv.newPointPrice || 0)} ج.م)`, `${fmt(t.pointsCostTotal)} ج.م`);
+      html += row(`إجمالي حساب النقاط (${fmt(t.allPointsCount)} ن × ${fmt(inv.newPointPrice || 0)} ${CUR})`, `${fmt(t.pointsCostTotal)} ${CUR}`);
     }
-    if (!itemsMode && t.sumProfileCost > 0) html += row(`إجمالي الليد بروفايل (${fmt(t.sumProfileMeters)} م)`, `${fmt(t.sumProfileCost)} ج.م`);
-    if (!itemsMode && t.sumPlasterCost > 0) html += row(`إجمالي ليد بروفايل على المحارة (${fmt(t.sumPlasterMeters)} م)`, `${fmt(t.sumPlasterCost)} ج.م`);
-    if (!itemsMode && t.sumExtrasCost > 0) html += row('إجمالي البنود الإضافية', `${fmt(t.sumExtrasCost)} ج.م`);
-    html += row('إجمالي قيمة الأعمال', `${fmt(t.grandTotal)} ج.م`, 'bold');
-    if (inv.discountAmount > 0) html += row('الخصم', `- ${fmt(inv.discountAmount)} ج.م`, 'minus');
-    if (inv.paidAmount > 0) html += row('المدفوع تحت الحساب', `- ${fmt(inv.paidAmount)} ج.م`, 'minus');
-    if (t.materialsDue > 0) html += row('خامات (مستحقة على العميل)', `+ ${fmt(t.materialsDue)} ج.م`, 'bold');
-    html += `</div><div class="sum-total"><span>الصافي المطلوب سداده</span><strong>${fmt(t.netRemaining)} ج.م</strong></div>`;
+    if (!itemsMode && t.sumProfileCost > 0) html += row(`إجمالي الليد بروفايل (${fmt(t.sumProfileMeters)} م)`, `${fmt(t.sumProfileCost)} ${CUR}`);
+    if (!itemsMode && t.sumPlasterCost > 0) html += row(`إجمالي ليد بروفايل على المحارة (${fmt(t.sumPlasterMeters)} م)`, `${fmt(t.sumPlasterCost)} ${CUR}`);
+    if (!itemsMode && t.sumExtrasCost > 0) html += row('إجمالي البنود الإضافية', `${fmt(t.sumExtrasCost)} ${CUR}`);
+    html += row('إجمالي قيمة الأعمال', `${fmt(t.grandTotal)} ${CUR}`, 'bold');
+    if (inv.discountAmount > 0) html += row('الخصم', `- ${fmt(inv.discountAmount)} ${CUR}`, 'minus');
+    if (inv.paidAmount > 0) html += row('المدفوع تحت الحساب', `- ${fmt(inv.paidAmount)} ${CUR}`, 'minus');
+    if (t.materialsDue > 0) html += row('خامات (مستحقة على العميل)', `+ ${fmt(t.materialsDue)} ${CUR}`, 'bold');
+    html += `</div><div class="sum-total"><span>الصافي المطلوب سداده</span><strong>${fmt(t.netRemaining)} ${CUR}</strong></div>`;
     document.getElementById('finalSummaryBox').innerHTML = html;
 
     renderLinkUI();
@@ -2028,7 +2084,7 @@
             <div class="n">${esc(inv.clientName)}${isCur ? '<span class="badge-now">مفتوحة</span>' : ''}</div>
             <div class="m">${esc(inv.date || '')}${inv.clientPhone ? ' · <span dir="ltr">' + esc(inv.clientPhone) + '</span>' : ''} · ${t.mode === 'items' ? `بنود منفصلة · ${inv.items.length} بند` : `${inv.rooms.length} غرف · ${fmt(t.allPointsCount)} نقطة`}</div>
           </div>
-          <div class="inv-amount">${fmt(t.netRemaining)}<small>ج.م صافي</small></div>
+          <div class="inv-amount">${fmt(t.netRemaining)}<small>${CUR} صافي</small></div>
         </div>`;
     }).join('');
     box.querySelectorAll('.inv-card').forEach(el => { el.onclick = () => openInvoice(el.dataset.id); });
@@ -2126,7 +2182,7 @@
   function buildItemsInvoiceHTML(inv) {
     autoFitTypographyForRoomCount(Math.round(inv.items.length * 0.8));
     const t = computeInvoice(inv);
-    const money = v => `${fmt(v)} ج.م`;
+    const money = v => `${fmt(v)} ${CUR}`;
     const rows = inv.items.map((it, i) => `
         <tr>
           <td class="idx" ${CE}>${i + 1}</td>
@@ -2192,15 +2248,15 @@
     const avgRate = t.avgRate;
     const isOld = inv.systemType === 'old';
     const ce = 'contenteditable="true"';
-    const money = v => `${fmt(v)} ج.م`;
+    const money = v => `${fmt(v)} ${CUR}`;
 
     let roomRowsHTML = '';
     inv.rooms.forEach((r, i) => {
       const c = t.rooms[i];
       const extraTexts = [];
-      if (r.ledProfile) extraTexts.push(`بروفايل ${fmt(r.ledProfile)} م = ${fmt(c.profileCost)} ج`);
-      if (r.ledProfilePlaster) extraTexts.push(`بروفايل محارة ${fmt(r.ledProfilePlaster)} م = ${fmt(c.plasterCost)} ج`);
-      (r.extras || []).forEach(ex => extraTexts.push(`${esc(ex.name)} ${fmt(ex.qty)}×${fmt(ex.price)} = ${fmt(ex.qty * ex.price)} ج`));
+      if (r.ledProfile) extraTexts.push(`بروفايل ${fmt(r.ledProfile)} م = ${fmt(c.profileCost)} ${CUR_SHORT}`);
+      if (r.ledProfilePlaster) extraTexts.push(`بروفايل محارة ${fmt(r.ledProfilePlaster)} م = ${fmt(c.plasterCost)} ${CUR_SHORT}`);
+      (r.extras || []).forEach(ex => extraTexts.push(`${esc(ex.name)} ${fmt(ex.qty)}×${fmt(ex.price)} = ${fmt(ex.qty * ex.price)} ${CUR_SHORT}`));
       roomRowsHTML += `
         <tr>
           <td class="idx" ${ce}>${i + 1}</td>
@@ -2372,7 +2428,7 @@
      النوتة: حسابات العملاء (المبالغ المستلمة والخامات)
      ========================================================= */
   function uid(prefix) { return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-  function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+  function round2(n) { const f = Math.pow(10, Math.max(2, CUR_DEC)); return Math.round((Number(n) || 0) * f) / f; }
   function todayISO() { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
   function fmtDate(iso) {
     if (!iso) return '';
@@ -2485,8 +2541,8 @@
     const stats = customers.map(c => { const st = customerStats(c); totalDue += Math.max(0, st.remaining); received += st.received; matRem += Math.max(0, st.matRemaining); return st; });
     document.getElementById('ledgerTotalDue').textContent = fmt(totalDue);
     document.getElementById('ledgerCount').textContent = customers.length;
-    document.getElementById('ledgerReceived').textContent = `${fmt(received)} ج.م`;
-    document.getElementById('ledgerMaterials').textContent = `${fmt(matRem)} ج.م`;
+    document.getElementById('ledgerReceived').textContent = `${fmt(received)} ${CUR}`;
+    document.getElementById('ledgerMaterials').textContent = `${fmt(matRem)} ${CUR}`;
 
     const q = (document.getElementById('customerSearch').value || '').trim();
     const box = document.getElementById('customerList');
@@ -2498,9 +2554,9 @@
     } else {
       box.innerHTML = items.map(({ c, st }) => {
         let amt;
-        if (st.remaining > 0) amt = `<div class="cust-amt due">${fmt(st.remaining)}<small>ج.م متبقي عليه</small></div>`;
+        if (st.remaining > 0) amt = `<div class="cust-amt due">${fmt(st.remaining)}<small>${CUR} متبقي عليه</small></div>`;
         else if (st.invs.length && round2(st.remaining) === 0) amt = `<div class="cust-amt ok">خالص ✓<small>لا يوجد متبقي</small></div>`;
-        else if (st.remaining < 0) amt = `<div class="cust-amt ok">${fmt(-st.remaining)}<small>ج.م ${st.invs.length ? 'زيادة له' : 'وصلك مقدماً'}</small></div>`;
+        else if (st.remaining < 0) amt = `<div class="cust-amt ok">${fmt(-st.remaining)}<small>${CUR} ${st.invs.length ? 'زيادة له' : 'وصلك مقدماً'}</small></div>`;
         else amt = `<div class="cust-amt">0<small>لا توجد حركة</small></div>`;
         const meta = [c.phone ? `<span dir="ltr">${esc(c.phone)}</span>` : '', `${c.entries.length} حركة`, st.invs.length ? `${st.invs.length} فاتورة` : 'بدون فاتورة'].filter(Boolean).join(' · ');
         return `
@@ -2589,7 +2645,7 @@
     document.getElementById('custPageName').textContent = c.name;
     document.getElementById('custPageSub').textContent = [c.phone, c.address].filter(Boolean).join(' · ') || 'صفحة العميل في النوتة';
     const row = (label, value, cls = '') => `<div class="sum-row ${cls}"><span>${label}</span><strong>${value}</strong></div>`;
-    const money = v => `${fmt(v)} ج.م`;
+    const money = v => `${fmt(v)} ${CUR}`;
     const hasMat = st.matTotal > 0 || st.matPaid > 0;
     const byNewest = (a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt - a.createdAt);
     const workEntries = c.entries.filter(e => e.kind === 'payment').sort(byNewest);
@@ -2603,7 +2659,7 @@
     let html = `
       <section class="hero">
         <div class="hero-label">${heroLabel}</div>
-        <div class="hero-value"><span id="custHeroValue">${fmt(heroValue)}</span><small>ج.م</small></div>
+        <div class="hero-value"><span id="custHeroValue">${fmt(heroValue)}</span><small>${CUR}</small></div>
         <div class="hero-stats">
           <div class="hero-stat"><span>دفعات الشغل</span><strong>${money(st.paid)}</strong></div>
           <div class="hero-stat"><span>متبقي الخامات</span><strong>${money(Math.max(0, st.matRemaining))}</strong></div>
@@ -2692,12 +2748,12 @@
 
   /* ---------- تسجيل دفعة / خامات / سداد خامات (كل نوع في نافذة مستقلة) ---------- */
   const TXN_UI = {
-    payment: { add: 'تسجيل دفعة تحت الحساب', edit: 'تعديل دفعة تحت الحساب', amount: 'المبلغ المستلم (ج.م)',
+    payment: { add: 'تسجيل دفعة تحت الحساب', edit: 'تعديل دفعة تحت الحساب', get amount() { return `المبلغ المستلم (${CUR})`; },
       hint: () => 'مبلغ وصلك من العميل من <strong>حساب الشغل</strong> نفسه (المصنعية).' },
-    material: { add: 'إضافة خامات اشتريتها', edit: 'تعديل الخامات', amount: 'إجمالي ثمن الخامات (ج.م)',
+    material: { add: 'إضافة خامات اشتريتها', edit: 'تعديل الخامات', get amount() { return `إجمالي ثمن الخامات (${CUR})`; },
       hint: () => 'اكتب <strong>إجمالي ثمن الخامات</strong> التي اشتريتها للعميل على حسابك.' },
-    matpay: { add: 'تسجيل سداد خامات', edit: 'تعديل سداد الخامات', amount: 'المبلغ المسدد من الخامات (ج.م)',
-      hint: rem => `مبلغ وصلك من العميل <strong>مقابل الخامات</strong>. المتبقي من الخامات حالياً: <strong>${fmt(rem)} ج.م</strong>` }
+    matpay: { add: 'تسجيل سداد خامات', edit: 'تعديل سداد الخامات', get amount() { return `المبلغ المسدد من الخامات (${CUR})`; },
+      hint: rem => `مبلغ وصلك من العميل <strong>مقابل الخامات</strong>. المتبقي من الخامات حالياً: <strong>${fmt(rem)} ${CUR}</strong>` }
   };
   function setTxnKind(kind, isEdit = false, matRemaining = 0) {
     txnKind = kind;
@@ -2710,7 +2766,7 @@
     const showFill = kind === 'matpay' && !isEdit && matRemaining > 0;
     fillBtn.classList.toggle('hidden', !showFill);
     if (showFill) {
-      fillBtn.textContent = `سداد كل المتبقي (${fmt(matRemaining)} ج.م)`;
+      fillBtn.textContent = `سداد كل المتبقي (${fmt(matRemaining)} ${CUR})`;
       fillBtn.onclick = () => { document.getElementById('txnAmount').value = round2(matRemaining); };
     }
   }
@@ -2744,7 +2800,7 @@
     else c.entries.push(Object.assign({ id: uid('e_'), createdAt: Date.now() }, data));
     afterLedgerChange();
     closeOverlay();
-    showAppToast(existing ? '✔️ تم تعديل السجل' : `✔️ تم تسجيل ${fmt(data.amount)} ج.م (${KIND_LABEL[data.kind]})`);
+    showAppToast(existing ? '✔️ تم تعديل السجل' : `✔️ تم تسجيل ${fmt(data.amount)} ${CUR} (${KIND_LABEL[data.kind]})`);
   }
   function deleteTxn() {
     const c = getCustomer(currentCustomerId);
@@ -2768,8 +2824,8 @@
     hideClientSuggestions();
     const m = customerMoney(c);
     showAppToast(m.materialsDue > 0
-      ? `✔️ تم الربط بنوتة "${c.name}" — خامات مستحقة: ${fmt(m.materialsDue)} ج.م`
-      : `✔️ تم الربط بنوتة "${c.name}" — المدفوع: ${fmt(inv.paidAmount || 0)} ج.م`);
+      ? `✔️ تم الربط بنوتة "${c.name}" — خامات مستحقة: ${fmt(m.materialsDue)} ${CUR}`
+      : `✔️ تم الربط بنوتة "${c.name}" — المدفوع: ${fmt(inv.paidAmount || 0)} ${CUR}`);
   }
   function linkInvoiceToCustomer(invId, customerId, fillFields) {
     const inv = appData.invoices.find(i => i.id === invId);
@@ -2777,7 +2833,7 @@
     if (!inv || !c) return;
     const m = customerMoney(c);
     if ((inv.paidAmount || 0) > 0 && round2(inv.paidAmount) !== round2(m.netPaid)) {
-      showAppConfirm(`الفاتورة مسجل بها مدفوع ${fmt(inv.paidAmount)} ج.م. بعد الربط سيُحسب المدفوع من نوتة العميل (${fmt(m.netPaid)} ج.م). متابعة؟`, () => doLinkInvoice(inv, c, fillFields));
+      showAppConfirm(`الفاتورة مسجل بها مدفوع ${fmt(inv.paidAmount)} ${CUR}. بعد الربط سيُحسب المدفوع من نوتة العميل (${fmt(m.netPaid)} ${CUR}). متابعة؟`, () => doLinkInvoice(inv, c, fillFields));
     } else doLinkInvoice(inv, c, fillFields);
   }
   function unlinkInvoice(invId) {
@@ -2821,7 +2877,7 @@
     const matches = customers.filter(c => !q || c.name.includes(q) || c.phone.includes(q)).slice(0, 5);
     let html = matches.map(c => {
       const m = customerMoney(c);
-      const info = m.materialsDue > 0 ? `خامات مستحقة ${fmt(m.materialsDue)} ج.م` : `صافي المدفوع ${fmt(m.netPaid)} ج.م`;
+      const info = m.materialsDue > 0 ? `خامات مستحقة ${fmt(m.materialsDue)} ${CUR}` : `صافي المدفوع ${fmt(m.netPaid)} ${CUR}`;
       return `<button type="button" data-id="${esc(c.id)}"><span class="s-av">${customerInitial(c.name)}</span><span>${esc(c.name)}<small>${c.phone ? esc(c.phone) + ' · ' : ''}${info}</small></span></button>`;
     }).join('');
     if (q && !customers.some(c => c.name.trim() === q)) html += `<button type="button" data-new="1"><span class="s-av add">${icon('plus')}</span><span>حفظ «${esc(q)}» كعميل جديد في النوتة<small>لتسجيل دفعاته وربطها بهذه الفاتورة</small></span></button>`;
@@ -2840,7 +2896,7 @@
     if (c) {
       if (document.activeElement !== paidInput) paidInput.value = inv.paidAmount || '';
       const m = customerMoney(c);
-      const info = m.materialsDue > 0 ? `خامات مستحقة: ${fmt(m.materialsDue)} ج.م` : `صافي المدفوع: ${fmt(inv.paidAmount || 0)} ج.م`;
+      const info = m.materialsDue > 0 ? `خامات مستحقة: ${fmt(m.materialsDue)} ${CUR}` : `صافي المدفوع: ${fmt(inv.paidAmount || 0)} ${CUR}`;
       const box = extra => `
         <div class="link-box">
           <span class="l-ic">${icon('link')}</span>
@@ -2863,7 +2919,7 @@
   /* ---------- كشف حساب العميل ---------- */
   function buildCustomerStatement(c) {
     const st = customerStats(c);
-    const money = v => `${fmt(v)} ج.م`;
+    const money = v => `${fmt(v)} ${CUR}`;
     const line = '--------------------------------\n';
     let text = `*📒 كشف حساب العميل: ${c.name}*\n`;
     if (appData.techName) text += `*${appData.techName}*\n`;
@@ -2990,7 +3046,7 @@
     box.innerHTML = items.map(l => {
       const st = matListStats(l);
       const buyer = l.buyer ? BUYER_LABEL[l.buyer] : 'لم يحدد مين هيشتري';
-      const amt = l.buyer === 'me' ? `<div class="inv-amount">${fmt(st.total)}<small>ج.م على حسابك</small></div>` : `<div class="inv-amount" style="color:var(--muted)">${st.count}<small>صنف</small></div>`;
+      const amt = l.buyer === 'me' ? `<div class="inv-amount">${fmt(st.total)}<small>${CUR} على حسابك</small></div>` : `<div class="inv-amount" style="color:var(--muted)">${st.count}<small>صنف</small></div>`;
       return `
         <div class="inv-card" data-id="${esc(l.id)}">
           <div class="inv-avatar" style="background:linear-gradient(135deg,var(--orange-400),var(--orange-600))">${icon('box')}</div>
@@ -3122,7 +3178,7 @@
           <div class="mat-row">
             <div class="m-info" onclick="openMatItem('${esc(it.id)}')"><div class="m-name">${i + 1}. ${esc(it.name)}</div>${meta ? `<div class="m-meta">${meta}</div>` : ''}</div>
             <span class="m-qty">${esc(matQtyText(it))}</span>
-            ${me ? `<div class="m-price"><input type="number" inputmode="decimal" min="0" step="any" placeholder="السعر" aria-label="سعر ${esc(it.name)}" data-price-id="${esc(it.id)}" value="${it.price || ''}" oninput="onMatPriceInput('${esc(it.id)}', this.value)"><small id="mlRowTot-${esc(it.id)}">= ${fmt(matItemTotal(it))} ج.م</small></div>` : ''}
+            ${me ? `<div class="m-price"><input type="number" inputmode="decimal" min="0" step="any" placeholder="السعر" aria-label="سعر ${esc(it.name)}" data-price-id="${esc(it.id)}" value="${it.price || ''}" oninput="onMatPriceInput('${esc(it.id)}', this.value)"><small id="mlRowTot-${esc(it.id)}">= ${fmt(matItemTotal(it))} ${CUR}</small></div>` : ''}
           </div>`;
       }).join('');
     }
@@ -3141,11 +3197,11 @@
     const st = matListStats(l);
     const c = l.customerId ? getCustomer(l.customerId) : null;
     let html = `<div class="card"><div class="card-title"><div class="t-ic orange">${icon('calc')}</div><h2>ثمن الخامات</h2></div>
-      <div class="sum-total" style="margin-top:0"><span>إجمالي ثمن الخامات (${st.count} صنف)</span><strong id="mlTotalVal">${fmt(st.total)} ج.م</strong></div>`;
+      <div class="sum-total" style="margin-top:0"><span>إجمالي ثمن الخامات (${st.count} صنف)</span><strong id="mlTotalVal">${fmt(st.total)} ${CUR}</strong></div>`;
     if (st.unpriced) html += `<div class="warn-box"><b>${st.unpriced} صنف</b> لسه من غير سعر — مش هيتسجل في النوتة غير لما تكتب سعره.</div>`;
     if (c) {
       const n = l.items.filter(it => matItemTotal(it) > 0).length;
-      html += `<div class="ok-box">✓ متسجلة في نوتة <b>${esc(c.name)}</b> في «حساب الخامات» كبنود منفصلة: <b>${n} بند</b> بإجمالي <b>${fmt(st.total)} ج.م</b>. أي تعديل هنا بيتحدث في النوتة تلقائياً، والسداد بتسجله من صفحة العميل («سداد خامات»).</div>`;
+      html += `<div class="ok-box">✓ متسجلة في نوتة <b>${esc(c.name)}</b> في «حساب الخامات» كبنود منفصلة: <b>${n} بند</b> بإجمالي <b>${fmt(st.total)} ${CUR}</b>. أي تعديل هنا بيتحدث في النوتة تلقائياً، والسداد بتسجله من صفحة العميل («سداد خامات»).</div>`;
     } else {
       html += `<div class="warn-box">علشان الخامات تتسجل في النوتة تلقائياً لازم تربط الكشف بعميل.<button type="button" class="btn btn-accent btn-sm" style="width:100%;margin-top:8px" onclick="openPickCustomer()">${icon('book')} ربط الكشف بعميل من النوتة</button></div>`;
     }
@@ -3182,7 +3238,7 @@
     };
     const led = matListLedgerAmount(l);
     if (b !== 'me' && led.sum > 0 && led.holder) {
-      showAppConfirm(`الخامات دي متسجلة في نوتة "${led.holder.name}" بمبلغ ${fmt(led.sum)} ج.م. لو اخترت إن الزبون هيشتريها هتتشال من النوتة. متابعة؟`, apply);
+      showAppConfirm(`الخامات دي متسجلة في نوتة "${led.holder.name}" بمبلغ ${fmt(led.sum)} ${CUR}. لو اخترت إن الزبون هيشتريها هتتشال من النوتة. متابعة؟`, apply);
     } else apply();
   }
 
@@ -3220,9 +3276,9 @@
     if (!it) return;
     it.price = Math.max(0, parseFloat(value) || 0);
     const tot = document.getElementById('mlRowTot-' + itemId);
-    if (tot) tot.textContent = `= ${fmt(matItemTotal(it))} ج.م`;
+    if (tot) tot.textContent = `= ${fmt(matItemTotal(it))} ${CUR}`;
     const tv = document.getElementById('mlTotalVal');
-    if (tv) tv.textContent = `${fmt(matListStats(l).total)} ج.م`;
+    if (tv) tv.textContent = `${fmt(matListStats(l).total)} ${CUR}`;
     touchMatList(l, true);
   }
 
@@ -3272,14 +3328,14 @@
     if (!l) return;
     const led = matListLedgerAmount(l);
     const apply = () => { l.customerId = null; touchMatList(l, false); applyMatLedgerSync(); renderMatPage(); showAppToast('تم فك ربط الكشف بالنوتة'); };
-    if (led.sum > 0 && led.holder) showAppConfirm(`فك الربط هيشيل خامات الكشف (${fmt(led.sum)} ج.م) من نوتة "${led.holder.name}". متابعة؟`, apply);
+    if (led.sum > 0 && led.holder) showAppConfirm(`فك الربط هيشيل خامات الكشف (${fmt(led.sum)} ${CUR}) من نوتة "${led.holder.name}". متابعة؟`, apply);
     else apply();
   }
   function deleteMatList() {
     const l = curMatList();
     if (!l) return;
     const led = matListLedgerAmount(l);
-    const extra = led.sum > 0 && led.holder ? ` وهتتشال خاماته (${fmt(led.sum)} ج.م) من نوتة "${led.holder.name}"` : '';
+    const extra = led.sum > 0 && led.holder ? ` وهتتشال خاماته (${fmt(led.sum)} ${CUR}) من نوتة "${led.holder.name}"` : '';
     showAppConfirm(`حذف كشف خامات "${matListName(l)}" نهائياً${extra}؟`, () => {
       l.buyer = null;
       syncMatListToLedger(l);
@@ -3321,8 +3377,8 @@
   }
   function updateMatItemLive() {
     const q = num('miQty'), p = num('miPrice');
-    document.getElementById('miLiveQty').textContent = `${fmt(q || 0)} ${matItemUnit} × ${fmt(p)} ج.م`;
-    document.getElementById('miLiveTotal').textContent = `${fmt(q * p)} ج.م`;
+    document.getElementById('miLiveQty').textContent = `${fmt(q || 0)} ${matItemUnit} × ${fmt(p)} ${CUR}`;
+    document.getElementById('miLiveTotal').textContent = `${fmt(q * p)} ${CUR}`;
   }
   function openMatItem(id) {
     const l = curMatList();
@@ -3380,7 +3436,7 @@
     autoFitTypographyForRoomCount(Math.round(l.items.length * 0.75));
     const me = l.buyer === 'me';
     const st = matListStats(l);
-    const money = v => `${fmt(v)} ج.م`;
+    const money = v => `${fmt(v)} ${CUR}`;
     const cols = me ? 7 : 5;
     const rows = l.items.map((it, i) => `
         <tr>
@@ -3464,12 +3520,12 @@
     l.items.forEach((it, i) => {
       const details = [matSpecText(it) ? (isWireName(it.name) ? 'قطر ' : '') + matSpecText(it) : '', it.brand ? 'ماركة ' + it.brand : ''].filter(Boolean).join(' - ');
       text += `${i + 1}) *${it.name}*${details ? ' (' + details + ')' : ''} — *${matQtyText(it)}*`;
-      if (me && it.price) text += ` × ${fmt(it.price)} = ${fmt(matItemTotal(it))} ج.م`;
+      if (me && it.price) text += ` × ${fmt(it.price)} = ${fmt(matItemTotal(it))} ${CUR}`;
       text += '\n';
       if (it.note) text += `   _${it.note}_\n`;
     });
     text += line + `*عدد الأصناف:* ${st.count}\n`;
-    if (me) text += `*إجمالي ثمن الخامات:* *${fmt(st.total)} ج.م*\n`;
+    if (me) text += `*إجمالي ثمن الخامات:* *${fmt(st.total)} ${CUR}*\n`;
     else if (l.buyer === 'customer') text += `*الخامات يشتريها العميل* — يرجى الالتزام بالمقاسات والماركات المذكورة.\n`;
     return text.trim();
   }
@@ -3499,33 +3555,33 @@
     if (isItemsMode(inv)) {
       text += `--------------------------------\n`;
       inv.items.forEach((it, i) => {
-        text += `*${i + 1}. ${it.name}:* ${itemQtyText(it)} × ${fmt(it.price)} = *${fmt(t.itemRows[i])} ج.م*\n`;
+        text += `*${i + 1}. ${it.name}:* ${itemQtyText(it)} × ${fmt(it.price)} = *${fmt(t.itemRows[i])} ${CUR}*\n`;
         if (it.note) text += `   _${it.note}_\n`;
       });
-      text += `--------------------------------\n*إجمالي البنود:* ${fmt(t.itemsTotal)} ج.م\n`;
-      if (inv.discountAmount > 0) text += `*الخصم:* ${fmt(inv.discountAmount)} ج.م\n`;
-      if (inv.paidAmount > 0) text += `*المدفوع:* ${fmt(inv.paidAmount)} ج.م\n`;
-      if (t.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${fmt(t.materialsDue)} ج.م\n`;
-      text += `*الصافي المتبقي:* *${fmt(t.netRemaining)} ج.م*`;
+      text += `--------------------------------\n*إجمالي البنود:* ${fmt(t.itemsTotal)} ${CUR}\n`;
+      if (inv.discountAmount > 0) text += `*الخصم:* ${fmt(inv.discountAmount)} ${CUR}\n`;
+      if (inv.paidAmount > 0) text += `*المدفوع:* ${fmt(inv.paidAmount)} ${CUR}\n`;
+      if (t.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${fmt(t.materialsDue)} ${CUR}\n`;
+      text += `*الصافي المتبقي:* *${fmt(t.netRemaining)} ${CUR}*`;
       return text;
     }
-    if (inv.systemType === 'old') text += `*نظام الحساب:* النظام القديم (متوسط النقطة ${fmt(t.avgRate)} ج.م / الحالي ${fmt(inv.newPointPrice)} ج.م)\n`;
-    else text += `*سعر النقطة:* ${fmt(inv.newPointPrice)} ج.م\n`;
+    if (inv.systemType === 'old') text += `*نظام الحساب:* النظام القديم (متوسط النقطة ${fmt(t.avgRate)} ${CUR} / الحالي ${fmt(inv.newPointPrice)} ${CUR})\n`;
+    else text += `*سعر النقطة:* ${fmt(inv.newPointPrice)} ${CUR}\n`;
     text += `--------------------------------\n`;
     inv.rooms.forEach((r, i) => {
       const c = t.rooms[i];
-      text += `*${i + 1}. ${r.name}:* (${fmt(c.totalPoints)} ن) = *${fmt(c.totalCost)} ج.م*\n`;
+      text += `*${i + 1}. ${r.name}:* (${fmt(c.totalPoints)} ن) = *${fmt(c.totalCost)} ${CUR}*\n`;
     });
     if (p.totalPanelPts > 0) {
       text += `--------------------------------\n*⚡ اللوحة الرئيسية والصواعد:*\n`;
-      if (p.linesCount) text += `- خطوط اللوحة: ${fmt(p.linesCount)} (${fmt(p.linesPts)} ن) = ${fmt(p.linesCost)} ج.م\n`;
-      if (p.risersCount) text += `- الصواعد: ${fmt(p.risersCount)} (${fmt(p.risersPts)} ن) = ${fmt(p.risersCost)} ج.م\n`;
+      if (p.linesCount) text += `- خطوط اللوحة: ${fmt(p.linesCount)} (${fmt(p.linesPts)} ن) = ${fmt(p.linesCost)} ${CUR}\n`;
+      if (p.risersCount) text += `- الصواعد: ${fmt(p.risersCount)} (${fmt(p.risersPts)} ن) = ${fmt(p.risersCost)} ${CUR}\n`;
     }
-    text += `--------------------------------\n*إجمالي عدد النقاط الكلي:* ${fmt(t.allPointsCount)} نقطة\n*إجمالي الحساب الكلي:* ${fmt(t.grandTotal)} ج.م\n`;
-    if (inv.discountAmount > 0) text += `*الخصم:* ${fmt(inv.discountAmount)} ج.م\n`;
-    if (inv.paidAmount > 0) text += `*المدفوع:* ${fmt(inv.paidAmount)} ج.م\n`;
-    if (t.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${fmt(t.materialsDue)} ج.م\n`;
-    text += `*الصافي المتبقي:* *${fmt(t.netRemaining)} ج.م*`;
+    text += `--------------------------------\n*إجمالي عدد النقاط الكلي:* ${fmt(t.allPointsCount)} نقطة\n*إجمالي الحساب الكلي:* ${fmt(t.grandTotal)} ${CUR}\n`;
+    if (inv.discountAmount > 0) text += `*الخصم:* ${fmt(inv.discountAmount)} ${CUR}\n`;
+    if (inv.paidAmount > 0) text += `*المدفوع:* ${fmt(inv.paidAmount)} ${CUR}\n`;
+    if (t.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${fmt(t.materialsDue)} ${CUR}\n`;
+    text += `*الصافي المتبقي:* *${fmt(t.netRemaining)} ${CUR}*`;
     return text;
   }
 
