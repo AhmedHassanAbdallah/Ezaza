@@ -1,0 +1,156 @@
+# بناء تطبيق أندرويد (APK) تلقائياً ونشره كرابط تحميل مباشر
+# © 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة.
+name: Android APK
+
+on:
+  push:
+    branches: [main, "claude/**"]
+    paths:
+      - "index.html"
+      - "version.json"
+      - "icons/**"
+      - "android/**"
+      - "tools/android-*.sh"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      signed: ${{ steps.key.outputs.signed }}
+      version: ${{ steps.ver.outputs.version }}
+    env:
+      HESABATY_KEY_PASSWORD: ${{ secrets.HESABATY_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Version
+        id: ver
+        run: echo "version=$(python3 -c "import json;print(json.load(open('version.json'))['version'])")" >> "$GITHUB_OUTPUT"
+
+      - name: App files
+        run: bash tools/android-assets.sh
+
+      - name: Signing key
+        id: key
+        run: |
+          if [ -z "${HESABATY_KEY_PASSWORD}" ]; then
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::كلمة سر التوقيع HESABATY_KEY_PASSWORD مش متضافة — هيتعمل APK للاختبار فقط ومش هيتنشر"
+            exit 0
+          fi
+          KS="$RUNNER_TEMP/hesabaty.jks"
+          if [ -f android/keystore.enc ]; then
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in android/keystore.enc -out "$KS" -pass env:HESABATY_KEY_PASSWORD
+          else
+            keytool -genkeypair -keystore "$KS" -storetype PKCS12 -alias hesabaty -keyalg RSA -keysize 4096 -validity 36500 \
+              -storepass "$HESABATY_KEY_PASSWORD" -keypass "$HESABATY_KEY_PASSWORD" \
+              -dname "CN=Ahmed Hassan Abdallah, O=Hesabaty, C=EG"
+            openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -in "$KS" -out android/keystore.enc -pass env:HESABATY_KEY_PASSWORD
+            echo "new_key=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "HESABATY_KEYSTORE=$KS" >> "$GITHUB_ENV"
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build APK
+        working-directory: android
+        run: gradle --no-daemon assembleRelease
+
+      - name: Collect APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/release/*.apk out/hesabaty.apk
+          ls -la out
+          "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs out/hesabaty.apk | head -5 || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hesabaty-apk
+          path: out/hesabaty.apk
+
+      - name: Save encrypted signing key
+        if: steps.key.outputs.new_key == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/keystore.enc
+          git commit -m "Add encrypted APK signing key [skip ci]"
+          git push
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [29, 34]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: hesabaty-apk
+          path: apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run on Android emulator (API ${{ matrix.api-level }})
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash tools/android-smoke.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: emulator-${{ matrix.api-level }}
+          path: |
+            screen.png
+            logcat.txt
+
+  release:
+    needs: [build, test]
+    if: needs.build.outputs.signed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: hesabaty-apk
+          path: out
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER: ${{ needs.build.outputs.version }}
+        run: |
+          python3 -c "import json;d=json.load(open('version.json'));print('\n'.join('- '+n for n in d['notes']))" > notes.md
+          printf '\n\nحمّل الملف hesabaty.apk وثبّته على موبايلك الأندرويد.\n' >> notes.md
+          if gh release view "v$VER" >/dev/null 2>&1; then
+            gh release upload "v$VER" out/hesabaty.apk --clobber
+            gh release edit "v$VER" --notes-file notes.md --latest
+          else
+            gh release create "v$VER" out/hesabaty.apk --title "حساباتي $VER" --notes-file notes.md --latest
+          fi

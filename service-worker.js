@@ -13,7 +13,7 @@
  * عند إصدار تحديث جديد: غيّر SW_VERSION هنا + APP_VERSION في index.html + version.json
  * (أو شغّل: node tools/bump-version.js 2.1.0 "ملاحظة 1" "ملاحظة 2").
  */
-const SW_VERSION = "2.2.0";
+const SW_VERSION = "2.3.0";
 
 const APP_PREFIX = "hesabaty-app-";
 const META_CACHE = "hesabaty-meta";
@@ -154,7 +154,8 @@ async function serveApp(request) {
   const version = await resolveActiveVersion();
   const cache = await caches.open(APP_PREFIX + version);
   const url = new URL(request.url);
-  const isIndex = request.mode === "navigate" && url.pathname.endsWith("/");
+  // الصفحة الرئيسية فقط (وليس أي مسار فرعي مثل /beta/)
+  const isIndex = request.mode === "navigate" && (url.pathname === SCOPE_PATH || url.pathname === SCOPE_PATH + "index.html");
   const hit = await cache.match(isIndex ? INDEX_URL : request, { ignoreSearch: true });
   if (hit) return hit;
   try {
