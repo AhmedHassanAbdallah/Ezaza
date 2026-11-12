@@ -116,6 +116,7 @@
       width: 100%;
       max-width: 100vw;
       overflow-x: hidden;
+      overflow-x: clip; /* يمنع السكرول العرضي من غير ما يبوّظ الرأس الثابت */
     }
     button, input, select, textarea { font-family: inherit; color: inherit; }
     button { cursor: pointer; }
@@ -306,12 +307,12 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
       background: var(--surface); border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
       height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: var(--safe-b);
       box-shadow: 0 -6px 20px rgba(11,27,51,.07);
     }
-    .nav-item { border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: .68rem; padding: 0; min-width: 0; font-weight: 700; position: relative; }
-    .nav-item .pill { width: 40px; height: 30px; border-radius: 99px; display: grid; place-items: center; transition: background .2s, color .2s; }
+    .nav-item { border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: .74rem; padding: 0; min-width: 0; font-weight: 700; position: relative; }
+    .nav-item .pill { width: 48px; height: 30px; border-radius: 99px; display: grid; place-items: center; transition: background .2s, color .2s; }
     .nav-item.active { color: var(--text); font-weight: 800; }
     .nav-item.active .pill { background: var(--accent-soft); color: var(--accent); }
     .nav-badge { position: absolute; top: 6px; left: calc(50% - 22px); white-space: nowrap; background: var(--accent); color: #fff; font-size: .62rem; min-width: 18px; height: 18px; border-radius: 99px; display: grid; place-items: center; padding: 0 4px; font-weight: 800; }
@@ -368,6 +369,83 @@
     }
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+
+    /* ============ الواجهة الجديدة (2.4.0) ============ */
+    body.in-editor .tab-only { display: none !important; }
+    body:not(.in-editor) .editor-only { display: none !important; }
+    .ed-head { position: sticky; top: 0; z-index: 50; background: linear-gradient(135deg, var(--navy-950), var(--navy-700)); box-shadow: 0 4px 18px rgba(7,18,38,.25); }
+    .ed-head .app-header { position: static; box-shadow: none; background: transparent; }
+    .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 16px 12px; max-width: 720px; margin: 0 auto; }
+    .step { border: 0; background: none; color: #9fb3d1; display: flex; flex-direction: column; gap: 6px; font-weight: 800; font-size: .8rem; text-align: right; padding: 0; }
+    .step .bar { display: block; height: 5px; border-radius: 99px; background: rgba(255,255,255,.18); }
+    .step.done .bar, .step.on .bar { background: var(--orange-500); }
+    .step.on { color: #fff; font-weight: 900; }
+    .step-badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin-inline-start: 5px; border-radius: 99px; background: var(--orange-500); color: #fff; font-size: .66rem; vertical-align: middle; }
+    .editor-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--surface); border-top: 1px solid var(--border); box-shadow: 0 -6px 20px rgba(11,27,51,.08);
+      padding: 10px 16px calc(10px + var(--safe-b)); display: flex; align-items: center; gap: 12px; }
+    .editor-bar .eb-info { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+    .editor-bar .eb-info span { font-size: .74rem; color: var(--muted); font-weight: 700; }
+    .editor-bar .eb-info strong { font-size: 1.3rem; font-weight: 900; color: var(--primary); white-space: nowrap; }
+    .editor-bar .eb-info small { font-size: .7rem; color: var(--muted); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .editor-bar .eb-next { width: auto; padding: 0 18px; flex-shrink: 0; }
+    body.in-editor .fab { bottom: calc(80px + var(--safe-b) + 12px); }
+    body.in-editor .upd-bubble, body.in-editor .toast { bottom: calc(80px + var(--safe-b) + 14px); }
+    .tab-only .titles .sub { font-size: .76rem; }
+
+    /* شريط التنقل: 4 أقسام + زرار إنشاء في النص */
+    .nav-center { display: grid; place-items: center; }
+    .nav-plus { width: 60px; height: 60px; margin-top: -28px; border-radius: 50%; border: 5px solid var(--bg); background: linear-gradient(135deg, var(--orange-400), var(--orange-600)); color: #fff; display: grid; place-items: center; box-shadow: 0 8px 20px rgba(249,115,22,.45); }
+    .nav-plus svg { width: 26px; height: 26px; stroke-width: 2.6; }
+    .nav-plus:active { transform: scale(.94); }
+
+    /* الرئيسية */
+    .home-sum { background: radial-gradient(120% 140% at 100% 0%, var(--navy-600) 0%, var(--navy-800) 45%, var(--navy-950) 100%); color: #fff; border-radius: 22px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+    .home-sum::after { content: ""; position: absolute; left: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(249,115,22,.35), transparent 70%); }
+    .hs-label { font-size: .82rem; color: #b9c8e0; }
+    .hs-value { font-size: 2rem; font-weight: 900; line-height: 1.25; margin: 2px 0 12px; }
+    .hs-value small { font-size: 1rem; color: var(--amber-400); }
+    .hs-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; position: relative; z-index: 1; }
+    .hs-stats button { text-align: right; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.09); color: #fff; border-radius: 12px; padding: 7px 9px; min-width: 0; }
+    .hs-stats button.mat { background: rgba(249,115,22,.18); border-color: rgba(249,115,22,.35); }
+    .hs-stats span { display: block; font-size: .7rem; color: #c8d5ea; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hs-stats strong { display: block; font-size: 1rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .home-h { font-size: 1rem; font-weight: 900; margin: 0 2px 10px; }
+    .home-row { display: flex; align-items: center; justify-content: space-between; margin: 18px 2px 10px; }
+    .link-btn { border: 0; background: none; color: var(--primary); font-weight: 800; font-size: .85rem; padding: 6px 2px; }
+    .quick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .q-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: right; min-height: 112px; padding: 14px; border-radius: 18px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+    .q-tile:active { transform: scale(.98); }
+    .q-tile.dark { background: linear-gradient(135deg, var(--navy-700), var(--navy-900)); border-color: transparent; color: #fff; }
+    .q-tile b { font-size: .98rem; font-weight: 900; }
+    .q-tile small { font-size: .72rem; color: var(--muted); font-weight: 700; }
+    .q-tile.dark small { color: #c8d5ea; }
+    .q-ic { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary); flex-shrink: 0; }
+    .q-ic.orange { background: linear-gradient(135deg, var(--orange-400), var(--orange-600)); color: #fff; }
+    .q-ic.orange-soft { background: var(--accent-soft); color: var(--accent); }
+    .q-ic.green { background: var(--success-soft); color: var(--success); }
+    .mode-badge { display: inline-block; font-size: .64rem; font-weight: 800; padding: 0 8px; border-radius: 99px; margin-inline-start: 6px; vertical-align: middle; background: var(--primary-soft); color: var(--primary); }
+    .mode-badge.items { background: var(--accent-soft); color: var(--orange-600); }
+    .home-empty { text-align: center; color: var(--muted); font-size: .86rem; padding: 18px; background: var(--surface); border: 1px dashed var(--border); border-radius: 16px; }
+
+    /* الفواتير والكشوفات */
+    .docs-seg { margin-bottom: 12px; }
+    .seg-count { display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 6px; border-radius: 99px; background: rgba(127,167,230,.18); font-size: .72rem; margin-inline-start: 4px; }
+    .segmented button.on .seg-count { background: rgba(255,255,255,.2); }
+    .filter-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
+    .filter-chips::-webkit-scrollbar { display: none; }
+    .filter-chips .chip.on { background: linear-gradient(135deg, var(--navy-700), var(--navy-900)); color: #fff; border-color: transparent; }
+    .q-pay { flex-shrink: 0; }
+    .more-h { font-size: .82rem; font-weight: 800; color: var(--muted); margin: 6px 4px 8px; }
+
+    /* زرار (+) */
+    .create-list { display: grid; gap: 10px; }
+    .create-opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px; border-radius: 16px; border: 1.5px solid var(--border); background: var(--surface-2); color: var(--text); text-align: right; }
+    .create-opt b { display: block; font-size: 1rem; font-weight: 900; }
+    .create-opt small { display: block; font-size: .76rem; color: var(--muted); font-weight: 700; }
+    .create-opt.dark { background: linear-gradient(135deg, var(--navy-700), var(--navy-900)); color: #fff; border-color: transparent; }
+    .create-opt.dark small { color: #c8d5ea; }
+    .create-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .create-row .create-opt { padding: 11px; }
 
     /* ============ فقاعة تحديث تطبيق أندرويد ============ */
     .upd-bubble { position: fixed; right: 14px; bottom: calc(var(--nav-h) + var(--safe-b) + 16px); z-index: 70; display: flex; align-items: center; gap: 9px; height: 54px; padding: 0 18px 0 8px; border: 0; border-radius: 99px;
@@ -573,14 +651,17 @@
     .inv-foot { margin-top: 10px; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 11px; color: #5b6b82 !important; border-top: 1.5px solid #dbe4f0; }
     .inv-foot b { color: #10284a !important; }
 
-    @page { size: A4 portrait; margin: 9mm; }
+    /* الهوامش البيضاء جزء من الورقة نفسها (9 مم) عشان تطلع زي المعاينة بالظبط
+       حتى لو الطابعة أو أندرويد فرضوا هوامش صفر وتجاهلوا هوامش الصفحة */
+    @page { size: A4 portrait; margin: 0; }
     @media print {
       html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; overflow: visible !important; height: auto !important; }
       .page-overlay, .beta-bar { display: none !important; }
       #editorApp, .preview-toolbar, .page-label, .bottom-nav, .fab, .sheet, .backdrop, .dialog-wrap, .toast { display: none !important; }
       #printPreviewModal { display: block !important; position: static !important; background: transparent !important; padding: 0 !important; overflow: visible !important; }
       #printViewport { height: auto !important; width: auto !important; overflow: visible !important; }
-      #printSheet { position: static !important; transform: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: auto !important; min-height: 0 !important; }
+      #printSheet { position: static !important; transform: none !important; box-shadow: none !important; margin: 0 !important; padding: 9mm !important; width: auto !important; min-height: 0 !important;
+        -webkit-box-decoration-break: clone; box-decoration-break: clone; }
       #printSheet [contenteditable="true"] { outline: none !important; background: transparent !important; }
       .p-table tr { break-inside: avoid; page-break-inside: avoid; }
       .p-table thead { display: table-row-group; }
@@ -591,21 +672,38 @@
 <body>
 
 <div id="editorApp">
-  <div class="beta-bar hidden" id="betaBar">نسخة تجريبية للتحديث 2.3.0 — شغالة على نسخة من بياناتك، وتطبيقك الأصلي لن يتأثر</div>
-  <header class="app-header">
+  <div class="beta-bar hidden" id="betaBar">نسخة تجريبية للواجهة الجديدة 2.4.0 — شغالة على نسخة من بياناتك، وتطبيقك الأصلي لن يتأثر</div>
+  <!-- رأس الأقسام الرئيسية -->
+  <header class="app-header tab-only" id="tabHeader">
     <img class="brand-ic" src="./icons/icon-192.png" alt="">
     <div class="titles">
-      <h1 id="headerTitle">بيانات الفاتورة</h1>
-      <div class="sub" id="headerSub">—</div>
+      <div class="sub" id="greetLine">أهلاً بيك</div>
+      <h1 id="tabTitle">حساباتي</h1>
     </div>
     <button type="button" class="icon-btn" id="themeBtn" onclick="toggleTheme()" aria-label="تبديل الوضع الليلي والفاتح"><i data-icon="moon"></i></button>
-    <button type="button" class="icon-btn accent" onclick="openActions()" aria-label="الفاتورة والمشاركة"><i data-icon="share"></i></button>
   </header>
+
+  <!-- رأس صفحة عمل الفاتورة (3 خطوات) -->
+  <div class="ed-head editor-only" id="editorHeader">
+    <header class="app-header">
+      <button type="button" class="icon-btn" onclick="exitEditor()" aria-label="رجوع"><i data-icon="back"></i></button>
+      <div class="titles">
+        <h1 id="headerTitle">بيانات الفاتورة</h1>
+        <div class="sub" id="headerSub">—</div>
+      </div>
+      <button type="button" class="icon-btn accent" onclick="openActions()" aria-label="الفاتورة والمشاركة"><i data-icon="share"></i></button>
+    </header>
+    <nav class="steps" aria-label="خطوات الفاتورة">
+      <button type="button" class="step" id="stepBtn-pricing" onclick="switchView('pricing')"><i class="bar"></i><span>1. العميل</span></button>
+      <button type="button" class="step" id="stepBtn-rooms" onclick="switchView('rooms')"><i class="bar"></i><span>2. <span id="navRoomsLabel">الغرف</span><span class="step-badge hidden" id="drawerRoomCount">0</span></span></button>
+      <button type="button" class="step" id="stepBtn-summary" onclick="switchView('summary')"><i class="bar"></i><span>3. الحساب</span></button>
+    </nav>
+  </div>
 
   <main class="container">
 
     <!-- ملخص سريع -->
-    <section class="hero" id="heroCard">
+    <section class="hero hidden" id="heroCard" aria-hidden="true">
       <div class="hero-label">الصافي المطلوب</div>
       <div class="hero-value"><span id="topNetRequired">0</span><small><span class="cur">ج.م</span></small></div>
       <div class="hero-stats">
@@ -615,8 +713,35 @@
       </div>
     </section>
 
+    <!-- الرئيسية -->
+    <section class="view active" id="view-home">
+      <section class="home-sum">
+        <div class="hs-label">المتبقي لك عند العملاء</div>
+        <div class="hs-value"><span id="homeDue">0</span> <small class="cur">ج.م</small></div>
+        <div class="hs-stats">
+          <button type="button" onclick="switchView('docs')"><span>فواتير الشهر</span><strong id="homeMonth">0</strong></button>
+          <button type="button" onclick="switchView('ledger')"><span>العملاء</span><strong id="homeCust">0</strong></button>
+          <button type="button" class="mat" onclick="openDocs('mat')"><span>خامات متبقية</span><strong id="homeMat">0</strong></button>
+        </div>
+      </section>
+
+      <h2 class="home-h">ابدأ بسرعة</h2>
+      <div class="quick">
+        <button type="button" class="q-tile dark" id="qPoints" onclick="quickNewInvoice('points')"><span class="q-ic orange"><i data-icon="bolt"></i></span><b>فاتورة بالنقاط</b><small>غرف + لوحة وصواعد</small></button>
+        <button type="button" class="q-tile" id="qItems" onclick="quickNewInvoice('items')"><span class="q-ic"><i data-icon="list"></i></span><b>فاتورة بنود</b><small>كل شغلانة بسعرها</small></button>
+        <button type="button" class="q-tile" id="qMat" onclick="createMatList(null)"><span class="q-ic orange-soft"><i data-icon="box"></i></span><b>كشف خامات</b><small>للطباعة أو على حسابك</small></button>
+        <button type="button" class="q-tile" id="qPay" onclick="quickPayment()"><span class="q-ic green"><i data-icon="cash"></i></span><b>تسجيل دفعة</b><small>من عميل في النوتة</small></button>
+      </div>
+
+      <div class="home-row">
+        <h2 class="home-h" style="margin:0">آخر الفواتير</h2>
+        <button type="button" class="link-btn" onclick="switchView('docs')">عرض الكل</button>
+      </div>
+      <div id="homeRecent"></div>
+    </section>
+
     <!-- 1) البيانات والتسعير -->
-    <section class="view active" id="view-pricing">
+    <section class="view" id="view-pricing">
       <div class="card">
         <div class="card-title"><div class="t-ic orange"><i data-icon="layers"></i></div><h2>طريقة الحساب في الفاتورة دي</h2></div>
         <div class="segmented" style="margin-bottom:8px">
@@ -657,7 +782,6 @@
         <div class="note" id="systemRuleNotice"></div>
       </div>
 
-      <button type="button" class="btn btn-primary" onclick="switchView('rooms')"><span id="nextRoomsText">التالي: الغرف واللوحة</span> <i data-icon="arrow"></i></button>
     </section>
 
     <!-- 2) الغرف واللوحة -->
@@ -729,15 +853,38 @@
       </div>
     </section>
 
-    <!-- 4) الفواتير المحفوظة -->
-    <section class="view" id="view-saved">
-      <div class="btn-row" style="margin-bottom:12px">
-        <button type="button" class="btn btn-accent" onclick="startNewInvoice()"><i data-icon="plus"></i> فاتورة جديدة</button>
-        <button type="button" class="btn btn-ghost" onclick="manualSaveToast()"><i data-icon="check"></i> حفظ الحالية</button>
+    <!-- الفواتير وكشوفات الخامات -->
+    <section class="view" id="view-docs">
+      <div class="segmented docs-seg" role="tablist">
+        <button type="button" role="tab" id="docsTabInv" class="on" onclick="setDocsTab('inv')">الفواتير <span class="seg-count" id="docsInvCount">0</span></button>
+        <button type="button" role="tab" id="docsTabMat" onclick="setDocsTab('mat')">كشوفات الخامات <span class="seg-count" id="docsMatCount">0</span></button>
       </div>
-      <div class="field"><input type="search" id="invoiceSearch" placeholder="ابحث باسم العميل أو رقمه أو عنوانه..." oninput="renderInvoiceList()"></div>
-      <div id="invoiceList"></div>
-      <button type="button" class="btn btn-danger" style="margin-top:4px" onclick="deleteCurrentInvoice()"><i data-icon="trash"></i> حذف الفاتورة المفتوحة حالياً</button>
+      <div id="docsInv">
+        <div class="field" style="margin-bottom:10px"><input type="search" id="invoiceSearch" placeholder="ابحث باسم العميل أو رقمه أو عنوانه..." oninput="renderInvoiceList()"></div>
+        <div class="filter-chips" id="invFilter">
+          <button type="button" class="chip on" data-f="all">الكل</button>
+          <button type="button" class="chip" data-f="points">نقاط</button>
+          <button type="button" class="chip" data-f="items">بنود</button>
+          <button type="button" class="chip" data-f="due">عليها متبقي</button>
+        </div>
+        <div id="invoiceList"></div>
+        <button type="button" class="btn btn-accent" style="margin-top:4px" onclick="startNewInvoice()"><i data-icon="plus"></i> فاتورة جديدة</button>
+      </div>
+      <div id="docsMat" class="hidden">
+
+      <section class="hero">
+        <div class="hero-label">خامات على حسابك عند العملاء</div>
+        <div class="hero-value"><span id="matHeroTotal">0</span><small><span class="cur">ج.م</span></small></div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span>عدد الكشوفات</span><strong id="matHeroCount">0</strong></div>
+          <div class="hero-stat"><span>أنا هجيبها</span><strong id="matHeroMine">0</strong></div>
+          <div class="hero-stat"><span>الزبون هيشتريها</span><strong id="matHeroCust">0</strong></div>
+        </div>
+      </section>
+      <button type="button" class="btn btn-accent" id="btnNewMatList" style="margin-bottom:12px" onclick="createMatList(null)"><i data-icon="plus"></i> كشف خامات جديد</button>
+      <div class="field"><input type="search" id="matSearch" placeholder="ابحث باسم العميل..." oninput="renderMatLists()"></div>
+      <div id="matListBox"></div>
+      </div>
     </section>
 
     <!-- 5) النوتة: حسابات العملاء -->
@@ -761,31 +908,11 @@
       <div class="backup-line" id="backupLine"></div>
     </section>
 
-    <!-- 6) كشف الخامات -->
-    <section class="view" id="view-materials">
-      <section class="hero">
-        <div class="hero-label">خامات على حسابك عند العملاء</div>
-        <div class="hero-value"><span id="matHeroTotal">0</span><small><span class="cur">ج.م</span></small></div>
-        <div class="hero-stats">
-          <div class="hero-stat"><span>عدد الكشوفات</span><strong id="matHeroCount">0</strong></div>
-          <div class="hero-stat"><span>أنا هجيبها</span><strong id="matHeroMine">0</strong></div>
-          <div class="hero-stat"><span>الزبون هيشتريها</span><strong id="matHeroCust">0</strong></div>
-        </div>
-      </section>
-      <button type="button" class="btn btn-accent" id="btnNewMatList" style="margin-bottom:12px" onclick="createMatList(null)"><i data-icon="plus"></i> كشف خامات جديد</button>
-      <div class="field"><input type="search" id="matSearch" placeholder="ابحث باسم العميل..." oninput="renderMatLists()"></div>
-      <div id="matListBox"></div>
-    </section>
-
     <!-- 7) المزيد: الإعدادات والتحديثات وعن التطبيق -->
     <section class="view" id="view-more">
+      <h3 class="more-h">بياناتك على الفاتورة</h3>
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="briefcase"></i></div><h2>بياناتك على الفاتورة</h2></div>
-        <div class="field">
-          <label for="currencySelect">عملة بلدك</label>
-          <select id="currencySelect" onchange="setCurrency(this.value)"></select>
-          <div class="hint">تتحدد مرة واحدة وتتطبق على كل الأسعار في التطبيق والفواتير وكشوفات الخامات والنوتة. (بتغيّر رمز العملة بس، مش بتحوّل المبالغ)</div>
-        </div>
         <div class="field"><label for="invoiceTitle">عنوان الفاتورة</label><input type="text" id="invoiceTitle" placeholder="كشف حساب ومستخلص أعمال كهرباء" oninput="saveInvoiceMeta()"></div>
         <div class="row-2 stack-sm">
           <div class="field"><label for="techName">اسمك / لقبك المهني</label><input type="text" id="techName" placeholder="م/ أحمد حسن" oninput="saveInvoiceMeta()"></div>
@@ -805,8 +932,14 @@
         <label class="switch"><span>إظهار اللوجو أعلى الفاتورة</span><input type="checkbox" id="showLogoCheck" onchange="saveInvoiceMeta()"></label>
       </div>
 
+      <h3 class="more-h">الإعدادات</h3>
       <div class="card">
-        <div class="card-title"><div class="t-ic"><i data-icon="moon"></i></div><h2>المظهر</h2><span class="tag" id="themeTag">تلقائي</span></div>
+        <div class="field">
+          <label for="currencySelect">عملة بلدك</label>
+          <select id="currencySelect" onchange="setCurrency(this.value)"></select>
+          <div class="hint">تتحدد مرة واحدة وتتطبق على كل الأسعار. (بتغيّر رمز العملة بس، مش بتحوّل المبالغ)</div>
+        </div>
+        <div class="card-title" style="margin:14px 0 10px"><div class="t-ic"><i data-icon="moon"></i></div><h2>المظهر</h2><span class="tag" id="themeTag">تلقائي</span></div>
         <div class="segmented" style="grid-template-columns:repeat(3,1fr);margin-bottom:8px" role="radiogroup" aria-label="المظهر">
           <button type="button" id="themeAuto" role="radio" onclick="setTheme('auto')">تلقائي</button>
           <button type="button" id="themeLight" role="radio" onclick="setTheme('light')">فاتح</button>
@@ -815,6 +948,7 @@
         <div class="hint" style="margin:0">«تلقائي» يمشي مع إعداد الموبايل. تقدر كمان تبدّل بسرعة من زرار القمر/الشمس فوق.</div>
       </div>
 
+      <h3 class="more-h">التطبيق وبياناتك</h3>
       <div class="card">
         <div class="card-title"><div class="t-ic orange"><i data-icon="refresh"></i></div><h2>تحديثات التطبيق</h2></div>
         <div class="ver-box">
@@ -871,15 +1005,19 @@
 
   <button type="button" class="fab hidden" id="addRoomFab" onclick="fabAdd()"><i data-icon="plus"></i> <span id="fabText">غرفة</span></button>
 
-  <nav class="bottom-nav" aria-label="أقسام التطبيق">
-    <button type="button" class="nav-item active" id="navBtn-pricing" onclick="switchView('pricing')"><span class="pill"><i data-icon="file"></i></span>البيانات</button>
-    <button type="button" class="nav-item" id="navBtn-rooms" onclick="switchView('rooms')"><span class="pill" id="navRoomsIc"><i data-icon="home"></i></span><span id="navRoomsLabel">الغرف</span><span class="nav-badge hidden" id="drawerRoomCount">0</span></button>
-    <button type="button" class="nav-item" id="navBtn-summary" onclick="switchView('summary')"><span class="pill"><i data-icon="calc"></i></span>الحساب</button>
-    <button type="button" class="nav-item" id="navBtn-saved" onclick="switchView('saved')"><span class="pill"><i data-icon="folder"></i></span>الفواتير</button>
-    <button type="button" class="nav-item" id="navBtn-ledger" onclick="switchView('ledger')"><span class="pill"><i data-icon="book"></i></span>النوتة</button>
-    <button type="button" class="nav-item" id="navBtn-materials" onclick="switchView('materials')"><span class="pill"><i data-icon="box"></i></span>الخامات</button>
+  <nav class="bottom-nav tab-only" aria-label="أقسام التطبيق">
+    <button type="button" class="nav-item active" id="navBtn-home" onclick="switchView('home')"><span class="pill"><i data-icon="home"></i></span>الرئيسية</button>
+    <button type="button" class="nav-item" id="navBtn-docs" onclick="switchView('docs')"><span class="pill"><i data-icon="file"></i></span>الفواتير</button>
+    <div class="nav-center"><button type="button" class="nav-plus" id="navPlus" onclick="openCreate()" aria-label="إنشاء جديد"><i data-icon="plus"></i></button></div>
+    <button type="button" class="nav-item" id="navBtn-ledger" onclick="switchView('ledger')"><span class="pill"><i data-icon="users"></i></span>العملاء</button>
     <button type="button" class="nav-item" id="navBtn-more" onclick="switchView('more')"><span class="pill"><i data-icon="grid"></i></span>المزيد</button>
   </nav>
+
+  <!-- شريط الفاتورة السفلي: الإجمالي + الخطوة التالية -->
+  <div class="editor-bar editor-only" id="editorBar">
+    <div class="eb-info"><span id="ebLabel">الصافي المطلوب</span><strong id="ebValue">0</strong><small id="ebSub"></small></div>
+    <button type="button" class="btn btn-primary eb-next" id="ebNext" onclick="editorNext()"><span id="ebNextText">التالي</span> <i data-icon="arrow"></i></button>
+  </div>
 </div>
 
 <!-- نافذة إضافة / تعديل غرفة -->
@@ -930,6 +1068,22 @@
   <div class="btn-row">
     <button type="button" id="saveRoomBtn" class="btn btn-primary" onclick="saveRoom()">حفظ الغرفة</button>
     <button type="button" id="cancelEditBtn" class="btn btn-ghost" onclick="closeOverlay()">إلغاء</button>
+  </div>
+</div>
+
+<!-- زرار (+): إنشاء جديد -->
+<div class="backdrop" id="createBackdrop" onclick="closeOverlay()"></div>
+<div class="sheet" id="createSheet" role="dialog" aria-modal="true" aria-labelledby="createTitle">
+  <div class="grab"></div>
+  <div class="sheet-head"><h3 id="createTitle">عايز تعمل إيه؟</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
+  <div class="create-list">
+    <button type="button" class="create-opt dark" id="cPoints" onclick="createAction('points')"><span class="q-ic orange"><i data-icon="bolt"></i></span><span><b>فاتورة بالنقاط</b><small>غرف + لوحة وصواعد (الحساب المعتاد)</small></span></button>
+    <button type="button" class="create-opt" id="cItems" onclick="createAction('items')"><span class="q-ic"><i data-icon="list"></i></span><span><b>فاتورة بنود منفصلة</b><small>كل شغلانة بسعرها، مثلاً تقفيل لوحة</small></span></button>
+    <button type="button" class="create-opt" id="cMat" onclick="createAction('mat')"><span class="q-ic orange-soft"><i data-icon="box"></i></span><span><b>كشف خامات</b><small>الخامات المطلوبة للطباعة أو على حسابك</small></span></button>
+    <div class="create-row">
+      <button type="button" class="create-opt" id="cPay" onclick="createAction('pay')"><span class="q-ic green"><i data-icon="cash"></i></span><span><b>تسجيل دفعة</b></span></button>
+      <button type="button" class="create-opt" id="cCust" onclick="createAction('cust')"><span class="q-ic"><i data-icon="user"></i></span><span><b>عميل جديد</b></span></button>
+    </div>
   </div>
 </div>
 
@@ -1026,7 +1180,7 @@
 <div class="backdrop" id="pickBackdrop" onclick="closeOverlay()"></div>
 <div class="sheet" id="pickSheet" role="dialog" aria-modal="true">
   <div class="grab"></div>
-  <div class="sheet-head"><h3>اختيار عميل من النوتة</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
+  <div class="sheet-head"><h3 id="pickTitle">اختيار عميل من النوتة</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
   <div class="field"><input type="search" id="pickSearch" placeholder="ابحث باسم العميل أو رقمه..." oninput="renderPickList()"></div>
   <div class="pick-list suggest" id="pickList" style="margin-top:0"></div>
 </div>
@@ -1093,6 +1247,7 @@
     <button type="button" class="action-item" onclick="runAction(copyInvoiceForWhatsApp)"><span class="a-ic"><i data-icon="copy"></i></span><span>نسخ الفاتورة كنص</span></button>
     <button type="button" class="action-item" onclick="runAction(manualSaveToast)"><span class="a-ic green"><i data-icon="check"></i></span><span>حفظ الفاتورة الحالية</span></button>
     <button type="button" class="action-item" onclick="runAction(startNewInvoice)"><span class="a-ic orange"><i data-icon="plus"></i></span><span>فاتورة عميل جديدة</span></button>
+    <button type="button" class="action-item" id="actDelete" onclick="runAction(deleteCurrentInvoice)"><span class="a-ic" style="background:var(--danger-soft);color:var(--danger)"><i data-icon="trash"></i></span><span>حذف هذه الفاتورة</span></button>
   </div>
 </div>
 
@@ -1176,7 +1331,7 @@
      تصميم وتطوير: أحمد حسن عبدالله  |  واتساب: +201015421255
      © 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة.
      ========================================================= */
-  const APP_VERSION = '2.3.0';
+  const APP_VERSION = '2.4.0';
   // النسخة التجريبية (/beta/) تعمل على نسخة مستقلة من البيانات ولا تلمس بيانات التطبيق الأصلي
   const IS_BETA = /\/beta\//.test(location.pathname);
   const KEY_PREFIX = IS_BETA ? 'beta_' : '';
@@ -1198,7 +1353,8 @@
   const DEFAULT_TITLE = 'كشف حساب ومستخلص أعمال كهرباء';
   const DEFAULT_TECH = 'م/ أحمد حسن - للأعمال والتشطيبات الكهربائية';
   const ROOM_PRESETS = ['الريسبشن', 'الصالة', 'غرفة النوم الرئيسية', 'غرفة الأطفال', 'غرفة المعيشة', 'المطبخ', 'الحمام', 'الطرقة والمدخل', 'البلكونة'];
-  const VIEW_TITLES = { pricing: 'بيانات الفاتورة', rooms: 'الغرف واللوحة', summary: 'الحساب النهائي', saved: 'الفواتير المحفوظة', ledger: 'نوتة العملاء', materials: 'كشف الخامات', more: 'المزيد' };
+  const VIEW_TITLES = { home: 'حساباتي', pricing: 'بيانات الفاتورة', rooms: 'الغرف واللوحة', summary: 'الحساب النهائي', docs: 'الفواتير والكشوفات', ledger: 'العملاء (النوتة)', more: 'المزيد' };
+  const EDITOR_VIEWS = ['pricing', 'rooms', 'summary'];
   // نظام البنود المنفصلة
   const WORK_PRESETS = ['تقفيل لوحة', 'تركيب لوحة', 'سحب خط', 'تأسيس نقطة', 'تركيب نجفة', 'تركيب إسبوتات', 'تركيب سخان', 'تركيب شفاط', 'تغيير بريزة / مفتاح', 'صيانة وكشف أعطال'];
   const ITEM_UNITS = ['عدد', 'متر', 'خط', 'نقطة', 'مقطوعية'];
@@ -1298,7 +1454,10 @@
   let editingMatItemId = null;
   let matItemUnit = 'عدد';
   let pickTarget = null;
-  let currentView = 'pricing';
+  let currentView = 'home';
+  let lastTab = 'home';
+  let docsTab = 'inv';
+  let invFilter = 'all';
   let currentPrintFontSize = 13;
   let currentCellPadV = 5;
 
@@ -1344,6 +1503,7 @@
     box: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
     cash: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 10v4M18 10v4"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+    users: '<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8"/><path d="M22 21a7 7 0 0 0-4-6.3"/>',
     layers: '<path d="M12 2l10 5-10 5L2 7z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
     list: '<path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
     moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
@@ -1389,23 +1549,30 @@
     custEdit: { open: () => toggleSheet('custEdit', true), close: () => toggleSheet('custEdit', false) },
     txn: { open: () => toggleSheet('txn', true), close: () => toggleSheet('txn', false) },
     mode: { open: () => toggleSheet('mode', true), close: () => toggleSheet('mode', false) },
+    create: { open: () => toggleSheet('create', true), close: () => toggleSheet('create', false) },
+    // صفحة عمل الفاتورة (الخطوات 1-2-3): زر الرجوع في أندرويد يرجّع للقسم اللي كنت فيه
+    editor: {
+      open: () => { document.body.classList.add('in-editor'); },
+      close: () => { document.body.classList.remove('in-editor'); showView(lastTab); }
+    },
     appUpd: { open: () => toggleSheet('appUpd', true), close: () => toggleSheet('appUpd', false) },
     item: { open: () => toggleSheet('item', true), close: () => { toggleSheet('item', false); editingItemIndex = null; } },
     matItem: { open: () => toggleSheet('matItem', true), close: () => { toggleSheet('matItem', false); editingMatItemId = null; } },
-    pick: { open: () => toggleSheet('pick', true), close: () => toggleSheet('pick', false) },
+    pick: { open: () => toggleSheet('pick', true), close: () => { toggleSheet('pick', false); pickTarget = null; } },
     matlist: {
       open: () => { const pg = document.getElementById('matPage'); pg.classList.add('open'); pg.scrollTop = 0; },
       close: () => {
         document.getElementById('matPage').classList.remove('open');
         flushMatLedgerSync();
         currentMatListId = null;
-        if (currentView === 'materials') renderMatLists();
+        if (currentView === 'docs') renderMatLists();
+        if (currentView === 'home') renderHome();
         if (currentCustomerId) renderCustomerPage();
       }
     },
     customer: {
       open: () => { const pg = document.getElementById('customerPage'); pg.classList.add('open'); pg.scrollTop = 0; },
-      close: () => { document.getElementById('customerPage').classList.remove('open'); currentCustomerId = null; if (currentView === 'ledger') renderLedger(); }
+      close: () => { document.getElementById('customerPage').classList.remove('open'); currentCustomerId = null; if (currentView === 'ledger') renderLedger(); if (currentView === 'home') renderHome(); }
     },
     preview: { open: () => { document.getElementById('printPreviewModal').style.display = 'block'; }, close: () => { document.getElementById('printPreviewModal').style.display = 'none'; } }
   };
@@ -1413,7 +1580,8 @@
     document.getElementById(name + 'Sheet').classList.toggle('open', open);
     document.getElementById(name + 'Backdrop').classList.toggle('open', open);
   }
-  function lockBodyScroll() { document.body.style.overflow = overlayStack.length ? 'hidden' : ''; }
+  // صفحة الفاتورة صفحة عادية بتتسكرول؛ القفل للنوافذ المنبثقة بس
+  function lockBodyScroll() { document.body.style.overflow = overlayStack.some(n => n !== 'editor') ? 'hidden' : ''; }
   function openOverlay(name) {
     if (overlayStack[overlayStack.length - 1] === name) return;
     OVERLAYS[name].open();
@@ -1437,13 +1605,25 @@
     while (overlayStack.length > depth) popOverlay();
   });
   // يغلق كل النوافذ المفتوحة ثم ينفذ الإجراء بعد اكتمال الرجوع
+  function inEditor() { return overlayStack.includes('editor'); }
+  // يقفل النوافذ المفتوحة فوق صفحة الفاتورة (ويسيب الصفحة نفسها)، ثم ينفذ الإجراء
   function closeAllThen(fn) {
+    const ed = overlayStack.lastIndexOf('editor');
+    const n = overlayStack.length - (ed + 1);
+    if (!n) { fn(); return; }
+    const handler = () => { window.removeEventListener('popstate', handler); setTimeout(fn, 30); };
+    window.addEventListener('popstate', handler);
+    try { history.go(-n); } catch (e) { window.removeEventListener('popstate', handler); while (overlayStack.length) popOverlay(); fn(); }
+  }
+  // يقفل كل حاجة بما فيها صفحة الفاتورة
+  function closeEverythingThen(fn) {
     const n = overlayStack.length;
     if (!n) { fn(); return; }
     const handler = () => { window.removeEventListener('popstate', handler); setTimeout(fn, 30); };
     window.addEventListener('popstate', handler);
     try { history.go(-n); } catch (e) { window.removeEventListener('popstate', handler); while (overlayStack.length) popOverlay(); fn(); }
   }
+  function exitEditor() { if (inEditor()) closeEverythingThen(() => {}); }
   function closeTopThen(fn) {
     if (!overlayStack.length) { fn(); return; }
     const handler = () => { window.removeEventListener('popstate', handler); setTimeout(fn, 30); };
@@ -1455,16 +1635,32 @@
   function closePrintMenu() {}  // للتوافق مع الإصدارات السابقة
 
   /* ---------------- التنقل بين الأقسام ---------------- */
+  // الأقسام: الرئيسية / الفواتير / العملاء / المزيد — وصفحة الفاتورة بخطواتها الثلاث
   function switchView(key) {
+    if (key === 'saved' || key === 'materials') { docsTab = key === 'materials' ? 'mat' : 'inv'; key = 'docs'; }
+    if (EDITOR_VIEWS.includes(key)) { openEditor(key); return; }
+    lastTab = key;
+    if (inEditor()) { exitEditor(); return; }
+    showView(key);
+  }
+  function openEditor(step) {
+    if (!inEditor()) openOverlay('editor');
+    showView(step || 'pricing');
+  }
+  function showView(key) {
     currentView = key;
+    const isEd = EDITOR_VIEWS.includes(key);
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + key));
     document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.id === 'navBtn-' + key));
+    const order = EDITOR_VIEWS.indexOf(key);
+    EDITOR_VIEWS.forEach((v, i) => { const b = document.getElementById('stepBtn-' + v); b.classList.toggle('on', i === order); b.classList.toggle('done', order > i); });
     document.getElementById('headerTitle').textContent = (key === 'rooms' && isItemsMode(getCurrentInvoice())) ? 'بنود الفاتورة' : VIEW_TITLES[key];
-    document.getElementById('heroCard').classList.toggle('hidden', key === 'saved' || key === 'more' || key === 'ledger' || key === 'materials');
+    document.getElementById('tabTitle').textContent = VIEW_TITLES[key] || 'حساباتي';
     document.getElementById('addRoomFab').classList.toggle('hidden', key !== 'rooms');
-    if (key === 'saved') renderInvoiceList();
+    if (isEd) renderEditorBar();
+    if (key === 'home') renderHome();
+    if (key === 'docs') { setDocsTab(docsTab); }
     if (key === 'ledger') renderLedger();
-    if (key === 'materials') renderMatLists();
     if (key === 'more') renderUpdateUI();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1614,8 +1810,12 @@
     document.getElementById('verCurrent').textContent = IN_APP ? appVersion() : APP_VERSION;
     document.getElementById('copyYear').textContent = Math.max(2026, new Date().getFullYear());
 
+    document.getElementById('invFilter').addEventListener('click', e => {
+      const b = e.target.closest('.chip');
+      if (b) { invFilter = b.dataset.f; renderInvoiceList(); }
+    });
     renderAll();
-    switchView('pricing');
+    showView('home');
   }
 
   function saveToStorage() {
@@ -1656,7 +1856,7 @@
     editingRoomIndex = null;
     saveToStorage();
     renderAll();
-    if (goPricing) { switchView('pricing'); showAppToast('✔️ تم إنشاء فاتورة جديدة'); }
+    if (goPricing) { openEditor('pricing'); showAppToast('✔️ تم إنشاء فاتورة جديدة'); }
   }
 
   function deleteCurrentInvoice() {
@@ -1672,6 +1872,8 @@
       saveToStorage();
       renderAll();
       renderInvoiceList();
+      showAppToast('تم حذف الفاتورة');
+      exitEditor();
     });
   }
 
@@ -1683,9 +1885,9 @@
     renderAll();
   }
 
-  function openInvoice(id) {
+  function openInvoice(id, step) {
     switchInvoice(id);
-    switchView('pricing');
+    openEditor(step || 'summary');
   }
 
   // فاتورة جديدة: يسأل المستخدم الأول هيحاسب بنظام إيه
@@ -2053,9 +2255,7 @@
     document.getElementById('pointsPricingCard').classList.toggle('hidden', items);
     document.getElementById('itemsModeBox').classList.toggle('hidden', !items);
     document.getElementById('pointsModeBox').classList.toggle('hidden', items);
-    document.getElementById('nextRoomsText').textContent = items ? 'التالي: بنود الفاتورة' : 'التالي: الغرف واللوحة';
     document.getElementById('navRoomsLabel').textContent = items ? 'البنود' : 'الغرف';
-    document.getElementById('navRoomsIc').innerHTML = icon(items ? 'list' : 'home');
     document.getElementById('fabText').textContent = items ? 'بند' : 'غرفة';
     if (currentView === 'rooms') document.getElementById('headerTitle').textContent = items ? 'بنود الفاتورة' : VIEW_TITLES.rooms;
   }
@@ -2196,32 +2396,127 @@
     document.getElementById('finalSummaryBox').innerHTML = html;
 
     renderLinkUI();
-    if (currentView === 'saved') renderInvoiceList();
+    renderEditorBar();
+    if (currentView === 'docs') renderInvoiceList();
+    if (currentView === 'home') renderHome();
   }
+
+  function invoiceMeta(inv, t) {
+    return t.mode === 'items' ? `${inv.items.length} بند` : `${inv.rooms.length} غرف · ${fmt(t.allPointsCount)} نقطة`;
+  }
+  function invoiceCardHTML(inv) {
+    const t = computeInvoice(inv);
+    const initial = esc((inv.clientName || '؟').replace(/^(أ\.|م\/|د\.)\s*/, '').trim().charAt(0) || '؟');
+    const badge = t.mode === 'items' ? '<span class="mode-badge items">بنود</span>' : '<span class="mode-badge">نقاط</span>';
+    const settled = round2(t.netRemaining) <= 0 && t.grandTotal > 0;
+    const amt = settled ? `<div class="inv-amount" style="color:var(--success)">خالص<small>${t.netRemaining < 0 ? fmt(-t.netRemaining) + ' زيادة' : 'مدفوعة'}</small></div>`
+                        : `<div class="inv-amount">${fmt(t.netRemaining)}<small>${CUR} متبقي</small></div>`;
+    return `
+        <div class="inv-card" data-id="${esc(inv.id)}">
+          <div class="inv-avatar"${t.mode === 'items' ? ' style="background:linear-gradient(135deg,var(--orange-400),var(--orange-600))"' : ''}>${initial}</div>
+          <div class="inv-info">
+            <div class="n">${esc(inv.clientName)}${badge}</div>
+            <div class="m">${esc(inv.date || '')}${inv.clientPhone ? ' · <span dir="ltr">' + esc(inv.clientPhone) + '</span>' : ''} · ${invoiceMeta(inv, t)}</div>
+          </div>
+          ${amt}
+        </div>`;
+  }
+  function bindInvoiceCards(box) { box.querySelectorAll('.inv-card').forEach(el => { el.onclick = () => openInvoice(el.dataset.id); }); }
 
   function renderInvoiceList() {
     const q = (document.getElementById('invoiceSearch').value || '').trim();
     const box = document.getElementById('invoiceList');
-    const items = appData.invoices.filter(inv => !q || (inv.clientName || '').includes(q) || (inv.clientPhone || '').includes(q) || (inv.clientAddress || '').includes(q));
+    document.querySelectorAll('#invFilter .chip').forEach(b => b.classList.toggle('on', b.dataset.f === invFilter));
+    document.getElementById('docsInvCount').textContent = appData.invoices.length;
+    document.getElementById('docsMatCount').textContent = matLists.length;
+    const items = appData.invoices.filter(inv => {
+      if (q && !((inv.clientName || '').includes(q) || (inv.clientPhone || '').includes(q) || (inv.clientAddress || '').includes(q))) return false;
+      if (invFilter === 'points') return !isItemsMode(inv);
+      if (invFilter === 'items') return isItemsMode(inv);
+      if (invFilter === 'due') return round2(computeInvoice(inv).netRemaining) > 0;
+      return true;
+    });
     if (!items.length) {
-      box.innerHTML = `<div class="card empty"><div class="big">${icon('folder')}</div><p>لا توجد فواتير مطابقة للبحث.</p></div>`;
+      box.innerHTML = `<div class="card empty"><div class="big">${icon('folder')}</div><p>${q || invFilter !== 'all' ? 'لا توجد فواتير مطابقة.' : 'لا توجد فواتير بعد.'}</p></div>`;
       return;
     }
-    box.innerHTML = items.map(inv => {
-      const t = computeInvoice(inv);
-      const isCur = inv.id === appData.currentId;
-      const initial = esc((inv.clientName || '؟').replace(/^(أ\.|م\/|د\.)\s*/, '').trim().charAt(0) || '؟');
-      return `
-        <div class="inv-card ${isCur ? 'current' : ''}" data-id="${esc(inv.id)}">
-          <div class="inv-avatar">${initial}</div>
-          <div class="inv-info">
-            <div class="n">${esc(inv.clientName)}${isCur ? '<span class="badge-now">مفتوحة</span>' : ''}</div>
-            <div class="m">${esc(inv.date || '')}${inv.clientPhone ? ' · <span dir="ltr">' + esc(inv.clientPhone) + '</span>' : ''} · ${t.mode === 'items' ? `بنود منفصلة · ${inv.items.length} بند` : `${inv.rooms.length} غرف · ${fmt(t.allPointsCount)} نقطة`}</div>
-          </div>
-          <div class="inv-amount">${fmt(t.netRemaining)}<small>${CUR} صافي</small></div>
-        </div>`;
-    }).join('');
-    box.querySelectorAll('.inv-card').forEach(el => { el.onclick = () => openInvoice(el.dataset.id); });
+    box.innerHTML = items.map(invoiceCardHTML).join('');
+    bindInvoiceCards(box);
+  }
+
+  /* ---------------- الفواتير وكشوفات الخامات ---------------- */
+  function setDocsTab(tab) {
+    docsTab = tab === 'mat' ? 'mat' : 'inv';
+    document.getElementById('docsTabInv').classList.toggle('on', docsTab === 'inv');
+    document.getElementById('docsTabMat').classList.toggle('on', docsTab === 'mat');
+    document.getElementById('docsInv').classList.toggle('hidden', docsTab !== 'inv');
+    document.getElementById('docsMat').classList.toggle('hidden', docsTab !== 'mat');
+    renderInvoiceList();
+    if (docsTab === 'mat') renderMatLists();
+  }
+  function openDocs(tab) { docsTab = tab; switchView('docs'); }
+
+  /* ---------------- الرئيسية ---------------- */
+  function ledgerTotals() {
+    let due = 0, mat = 0;
+    customers.forEach(c => { const st = customerStats(c); due += Math.max(0, st.remaining); mat += Math.max(0, st.matRemaining); });
+    return { due, mat };
+  }
+  function invoiceTime(inv) { const n = parseInt(String(inv.id || '').replace(/\D/g, ''), 10); return isFinite(n) ? n : 0; }
+  function renderHome() {
+    const tot = ledgerTotals();
+    const now = new Date();
+    const month = appData.invoices.filter(inv => { const d = new Date(invoiceTime(inv)); return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); }).length;
+    document.getElementById('homeDue').textContent = fmt(tot.due);
+    document.getElementById('homeMonth').textContent = month;
+    document.getElementById('homeCust').textContent = customers.length;
+    document.getElementById('homeMat').textContent = fmt(tot.mat);
+    const name = String(appData.techName || '').split(' - ')[0].trim();
+    document.getElementById('greetLine').textContent = name ? `أهلاً، ${name}` : 'أهلاً بيك';
+    const box = document.getElementById('homeRecent');
+    const recent = appData.invoices.slice(0, 4);
+    if (!recent.length) { box.innerHTML = `<div class="home-empty">لسه مفيش فواتير. ابدأ بزرار <b>(+)</b> اللي تحت.</div>`; return; }
+    box.innerHTML = recent.map(invoiceCardHTML).join('');
+    bindInvoiceCards(box);
+  }
+
+  /* ---------------- شريط الفاتورة السفلي ---------------- */
+  function renderEditorBar() {
+    if (!EDITOR_VIEWS.includes(currentView)) return;
+    const inv = getCurrentInvoice();
+    const t = computeInvoice(inv);
+    const lbl = document.getElementById('ebLabel'), val = document.getElementById('ebValue'), sub = document.getElementById('ebSub'), next = document.getElementById('ebNextText');
+    if (currentView === 'summary') { lbl.textContent = 'الصافي المطلوب سداده'; val.textContent = `${fmt(t.netRemaining)} ${CUR}`; }
+    else { lbl.textContent = 'إجمالي الشغل'; val.textContent = `${fmt(t.grandTotal)} ${CUR}`; }
+    sub.textContent = invoiceMeta(inv, t);
+    next.textContent = currentView === 'pricing' ? (isItemsMode(inv) ? 'التالي: البنود' : 'التالي: الشغل')
+                     : currentView === 'rooms' ? 'التالي: الحساب' : 'تم ✓ حفظ';
+  }
+  function editorNext() {
+    if (currentView === 'pricing') showView('rooms');
+    else if (currentView === 'rooms') showView('summary');
+    else { saveToStorage(); exitEditor(); showAppToast('✔️ تم حفظ الفاتورة'); }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ---------------- زرار (+) والإجراءات السريعة ---------------- */
+  function openCreate() { openOverlay('create'); }
+  function createAction(kind) {
+    closeAllThen(() => {
+      if (kind === 'points' || kind === 'items') quickNewInvoice(kind);
+      else if (kind === 'mat') createMatList(null);
+      else if (kind === 'pay') quickPayment();
+      else if (kind === 'cust') openCustomerEdit(null);
+    });
+  }
+  function quickNewInvoice(mode) {
+    settings.lastMode = mode; saveSettings();
+    createNewInvoice(true, mode);
+    if (mode === 'items') showAppToast('✔️ فاتورة جديدة بنظام البنود المنفصلة');
+  }
+  function quickPayment() {
+    if (!customers.length) { showAppToast('ضيف العميل الأول في النوتة'); openCustomerEdit(null); return; }
+    openPickCustomer('payment');
   }
 
   /* ---------------- الفاتورة المطبوعة ---------------- */
@@ -2699,9 +2994,11 @@
             <div class="inv-avatar">${customerInitial(c.name)}</div>
             <div class="inv-info"><div class="n">${esc(c.name)}</div><div class="m">${meta}</div></div>
             ${amt}
+            <button type="button" class="btn btn-soft btn-icon q-pay" data-pay="${esc(c.id)}" aria-label="تسجيل دفعة من ${esc(c.name)}" style="background:var(--success-soft);color:var(--success)">${icon('cash')}</button>
           </div>`;
       }).join('');
       box.querySelectorAll('.cust-card').forEach(el => { el.onclick = () => openCustomer(el.dataset.id); });
+      box.querySelectorAll('.q-pay').forEach(b => { b.onclick = e => { e.stopPropagation(); openCustomer(b.dataset.pay); setTimeout(() => openTxn('payment'), 60); }; });
     }
     renderBackupLine();
   }
@@ -3274,13 +3571,13 @@
         <div class="link-box">
           <span class="l-ic">${icon('link')}</span>
           <div class="l-txt"><b>مرتبط بنوتة: ${esc(c.name)}</b><span>${l.buyer === 'me' ? 'الخامات اللي بسعر بتتسجل في حسابه تلقائياً' : 'لو اخترت «أنا هجيبها» هتتسجل في حسابه'}</span></div>
-          <button type="button" class="btn btn-soft btn-sm" onclick="openPickCustomer()">تغيير</button>
+          <button type="button" class="btn btn-soft btn-sm" onclick="openPickCustomer('matlist')">تغيير</button>
           <button type="button" class="btn btn-ghost btn-sm" onclick="unlinkMatList()">فك</button>
         </div>`;
       return;
     }
     const exact = customers.find(x => x.name.trim() === l.clientName.trim() && l.clientName.trim());
-    let html = `<button type="button" class="btn btn-soft btn-sm" id="btnPickCustomer" style="margin-top:10px;width:100%" onclick="${exact ? `pickCustomer('${esc(exact.id)}')` : 'openPickCustomer()'}">${icon('book')} ${exact ? `ربط الكشف بنوتة «${esc(exact.name)}»` : 'ربط الكشف بعميل من النوتة'}</button>`;
+    let html = `<button type="button" class="btn btn-soft btn-sm" id="btnPickCustomer" style="margin-top:10px;width:100%" onclick="${exact ? `pickCustomer('${esc(exact.id)}')` : 'openPickCustomer(\'matlist\')'}">${icon('book')} ${exact ? `ربط الكشف بنوتة «${esc(exact.name)}»` : 'ربط الكشف بعميل من النوتة'}</button>`;
     const inv = getCurrentInvoice();
     const invName = (inv && inv.clientName || '').trim();
     if (!l.clientName && invName && invName !== 'بدون اسم' && !DEFAULT_CLIENT_RE.test(invName)) {
@@ -3338,7 +3635,7 @@
       const n = l.items.filter(it => matItemTotal(it) > 0).length;
       html += `<div class="ok-box">✓ متسجلة في نوتة <b>${esc(c.name)}</b> في «حساب الخامات» كبنود منفصلة: <b>${n} بند</b> بإجمالي <b>${fmt(st.total)} ${CUR}</b>. أي تعديل هنا بيتحدث في النوتة تلقائياً، والسداد بتسجله من صفحة العميل («سداد خامات»).</div>`;
     } else {
-      html += `<div class="warn-box">علشان الخامات تتسجل في النوتة تلقائياً لازم تربط الكشف بعميل.<button type="button" class="btn btn-accent btn-sm" style="width:100%;margin-top:8px" onclick="openPickCustomer()">${icon('book')} ربط الكشف بعميل من النوتة</button></div>`;
+      html += `<div class="warn-box">علشان الخامات تتسجل في النوتة تلقائياً لازم تربط الكشف بعميل.<button type="button" class="btn btn-accent btn-sm" style="width:100%;margin-top:8px" onclick="openPickCustomer('matlist')">${icon('book')} ربط الكشف بعميل من النوتة</button></div>`;
     }
     box.innerHTML = html + '</div>';
   }
@@ -3418,13 +3715,15 @@
   }
 
   /* ---------- ربط الكشف بعميل ---------- */
-  function openPickCustomer() {
+  function openPickCustomer(target) {
+    pickTarget = target === 'payment' ? 'payment' : 'matlist';
+    document.getElementById('pickTitle').textContent = pickTarget === 'payment' ? 'تسجيل دفعة: اختار العميل' : 'اختيار عميل من النوتة';
     document.getElementById('pickSearch').value = '';
     renderPickList();
     openOverlay('pick');
   }
   function renderPickList() {
-    const l = curMatList();
+    const l = pickTarget === 'payment' ? null : curMatList();
     const q = (document.getElementById('pickSearch').value || '').trim();
     const list = customers.filter(c => !q || c.name.includes(q) || c.phone.includes(q));
     const newName = q || (l ? l.clientName.trim() : '');
@@ -3441,6 +3740,12 @@
     };
   }
   function pickCustomer(id) {
+    if (pickTarget === 'payment') {
+      pickTarget = null;
+      const done = () => { openCustomer(id); setTimeout(() => openTxn('payment'), 60); };
+      if (overlayStack[overlayStack.length - 1] === 'pick') closeTopThen(done); else done();
+      return;
+    }
     const l = curMatList(), c = getCustomer(id);
     if (!l || !c) return;
     l.customerId = c.id;
@@ -3452,7 +3757,7 @@
     if (overlayStack[overlayStack.length - 1] === 'pick') closeTopThen(finish); else finish();
   }
   function pickNewCustomer(name) {
-    const l = curMatList();
+    const l = pickTarget === 'payment' ? null : curMatList();
     const c = { id: uid('c_'), name, phone: l ? l.clientPhone : '', address: l ? l.clientAddress : '', note: '', createdAt: Date.now(), entries: [] };
     customers.unshift(c);
     saveCustomers();
@@ -4017,7 +4322,11 @@
       const version = String(rel.tag_name || '').replace(/^v/i, '');
       const assets = Array.isArray(rel.assets) ? rel.assets : [];
       const apk = assets.find(a => a.name === 'hesabaty.apk') || assets.find(a => /\.apk$/i.test(a.name || ''));
-      if (!apk || !version || cmpVer(version, appVersion()) <= 0) {
+      const cur = appVersion();
+      const base = cur.replace(/-test.*$/, '');
+      // نسخة الاختبار (مثلاً 2.4.0-test) تعتبر أقدم من الإصدار الرسمي 2.4.0
+      const newer = cmpVer(version, base) > 0 || (base !== cur && cmpVer(version, base) === 0);
+      if (!apk || !version || !newer) {
         appUpdate = null;
         renderAppUpdate();
         if (fromUser) showAppToast('✔️ أنت تستخدم أحدث إصدار');
