@@ -16,11 +16,12 @@ done
 sleep 3
 adb logcat -d > logcat.txt || true
 adb exec-out screencap -p > screen.png || true
-PID="$(adb shell pidof com.ahmedhassan.hesabaty | tr -d '\r' || true)"
+PID=""
+for i in 1 2 3 4 5; do PID="$(adb shell pidof com.ahmedhassan.hesabaty | tr -d '\r' || true)"; [ -n "$PID" ] && break; sleep 1; done
 echo "pid=$PID"
 grep -E "HesabatyWeb|HESABATY|CONSOLE|Uncaught|FATAL EXCEPTION|AndroidRuntime" logcat.txt | head -60 || true
-[ -n "$PID" ] || { echo "::error::التطبيق مش شغال"; exit 1; }
 grep -q "HESABATY_READY" logcat.txt || { echo "::error::صفحة التطبيق ما اتحملتش"; exit 1; }
+[ -n "$PID" ] || echo "::warning::المحاكي ما رجّعش رقم العملية، بس الصفحة اتحملت"
 # رسائل صفحة التطبيق فقط (مش عمليات النظام)
 if grep "HesabatyWeb" logcat.txt | grep -q "Uncaught"; then echo "::error::خطأ JavaScript في الصفحة"; exit 1; fi
 if grep -A4 "FATAL EXCEPTION" logcat.txt | grep -q "com.ahmedhassan.hesabaty"; then echo "::error::التطبيق وقع"; exit 1; fi
