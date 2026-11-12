@@ -10,6 +10,7 @@ on:
       - "version.json"
       - "icons/**"
       - "android/**"
+      - "beta/**"
       - "tools/android-*.sh"
       - ".github/workflows/android.yml"
   workflow_dispatch:
@@ -28,6 +29,8 @@ jobs:
     outputs:
       signed: ${{ steps.key.outputs.signed }}
       version: ${{ steps.ver.outputs.version }}
+      channel: ${{ steps.ver.outputs.channel }}
+      test_version: ${{ steps.ver.outputs.test_version }}
     env:
       HESABATY_KEY_PASSWORD: ${{ secrets.HESABATY_KEY_PASSWORD }}
     steps:
@@ -44,7 +47,21 @@ jobs:
 
       - name: Version
         id: ver
-        run: echo "version=$(python3 -c "import json;print(json.load(open('version.json'))['version'])")" >> "$GITHUB_OUTPUT"
+        run: |
+          V="$(python3 -c "import json;print(json.load(open('version.json'))['version'])")"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          # الفروع غير main: نسخة اختبار من الواجهة التجريبية (beta) بس للتجربة
+          if [ "$GITHUB_REF" != "refs/heads/main" ] && [ -f beta/index.html ]; then
+            BV="$(grep -o "const APP_VERSION = '[^']*'" beta/index.html | cut -d"'" -f2)"
+            CODE="$(python3 -c "a=[int(x) for x in '$BV'.split('.')];print(a[0]*10000+a[1]*100+a[2]-1)")"
+            echo "HESABATY_VERSION_NAME=$BV-test" >> "$GITHUB_ENV"
+            echo "HESABATY_VERSION_CODE=$CODE" >> "$GITHUB_ENV"
+            echo "INDEX_FROM_BETA=1" >> "$GITHUB_ENV"
+            echo "channel=test" >> "$GITHUB_OUTPUT"
+            echo "test_version=$BV" >> "$GITHUB_OUTPUT"
+          else
+            echo "channel=release" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: App files
         run: bash tools/android-assets.sh
@@ -153,4 +170,29 @@ jobs:
             gh release edit "v$VER" --notes-file notes.md --latest
           else
             gh release create "v$VER" out/hesabaty.apk --title "حساباتي $VER" --notes-file notes.md --latest
+          fi
+
+  # نسخة اختبار (مش بتظهر في فقاعة التحديث ولا في رابط التحميل الرسمي)
+  test-release:
+    needs: [build, test]
+    if: needs.build.outputs.signed == 'true' && needs.build.outputs.channel == 'test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: hesabaty-apk
+          path: out
+      - name: Publish test build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BV: ${{ needs.build.outputs.test_version }}
+        run: |
+          cp out/hesabaty.apk out/hesabaty-test.apk
+          printf 'نسخة تجريبية %s للتجربة قبل النشر — مش بتوصل للمستخدمين.\nلما الإصدار الرسمي ينزل هيتثبت فوقها عادي.\n' "$BV" > notes.md
+          if gh release view test >/dev/null 2>&1; then
+            gh release upload test out/hesabaty-test.apk --clobber
+            gh release edit test --title "نسخة تجريبية $BV" --notes-file notes.md --prerelease
+          else
+            gh release create test out/hesabaty-test.apk --prerelease --title "نسخة تجريبية $BV" --notes-file notes.md --target "$GITHUB_SHA"
           fi

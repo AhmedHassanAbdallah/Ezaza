@@ -7,6 +7,10 @@ A="$ROOT/android/app/src/main/assets"
 rm -rf "$A"
 mkdir -p "$A/www/icons" "$A/fonts"
 cp "$ROOT/index.html" "$ROOT/manifest.json" "$ROOT/privacy.html" "$ROOT/version.json" "$A/www/"
+if [ "${INDEX_FROM_BETA:-}" = "1" ] && [ -f "$ROOT/beta/index.html" ]; then
+  node "$ROOT/tools/promote-beta.js" "$A/www"
+  echo "نسخة اختبار: الواجهة من beta/index.html"
+fi
 cp "$ROOT"/icons/*.png "$ROOT"/icons/*.jpg "$A/www/icons/"
 UA="Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36"
 if curl -fsSL -A "$UA" "https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" -o "$A/fonts/cairo.css"; then

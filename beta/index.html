@@ -651,14 +651,17 @@
     .inv-foot { margin-top: 10px; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 11px; color: #5b6b82 !important; border-top: 1.5px solid #dbe4f0; }
     .inv-foot b { color: #10284a !important; }
 
-    @page { size: A4 portrait; margin: 9mm; }
+    /* الهوامش البيضاء جزء من الورقة نفسها (9 مم) عشان تطلع زي المعاينة بالظبط
+       حتى لو الطابعة أو أندرويد فرضوا هوامش صفر وتجاهلوا هوامش الصفحة */
+    @page { size: A4 portrait; margin: 0; }
     @media print {
       html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; width: 100% !important; overflow: visible !important; height: auto !important; }
       .page-overlay, .beta-bar { display: none !important; }
       #editorApp, .preview-toolbar, .page-label, .bottom-nav, .fab, .sheet, .backdrop, .dialog-wrap, .toast { display: none !important; }
       #printPreviewModal { display: block !important; position: static !important; background: transparent !important; padding: 0 !important; overflow: visible !important; }
       #printViewport { height: auto !important; width: auto !important; overflow: visible !important; }
-      #printSheet { position: static !important; transform: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: auto !important; min-height: 0 !important; }
+      #printSheet { position: static !important; transform: none !important; box-shadow: none !important; margin: 0 !important; padding: 9mm !important; width: auto !important; min-height: 0 !important;
+        -webkit-box-decoration-break: clone; box-decoration-break: clone; }
       #printSheet [contenteditable="true"] { outline: none !important; background: transparent !important; }
       .p-table tr { break-inside: avoid; page-break-inside: avoid; }
       .p-table thead { display: table-row-group; }
@@ -4319,7 +4322,11 @@
       const version = String(rel.tag_name || '').replace(/^v/i, '');
       const assets = Array.isArray(rel.assets) ? rel.assets : [];
       const apk = assets.find(a => a.name === 'hesabaty.apk') || assets.find(a => /\.apk$/i.test(a.name || ''));
-      if (!apk || !version || cmpVer(version, appVersion()) <= 0) {
+      const cur = appVersion();
+      const base = cur.replace(/-test.*$/, '');
+      // نسخة الاختبار (مثلاً 2.4.0-test) تعتبر أقدم من الإصدار الرسمي 2.4.0
+      const newer = cmpVer(version, base) > 0 || (base !== cur && cmpVer(version, base) === 0);
+      if (!apk || !version || !newer) {
         appUpdate = null;
         renderAppUpdate();
         if (fromUser) showAppToast('✔️ أنت تستخدم أحدث إصدار');

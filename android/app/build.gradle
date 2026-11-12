@@ -9,6 +9,9 @@ def versionJson = new groovy.json.JsonSlurper().parse(file("../../version.json")
 def appVersionName = versionJson.version as String
 def parts = appVersionName.tokenize(".").collect { it as int }
 def appVersionCode = parts[0] * 10000 + parts[1] * 100 + parts[2]
+// نسخ الاختبار: رقم أقل بواحد من الإصدار الرسمي علشان الرسمي يتثبت فوقها عادي
+if (System.getenv("HESABATY_VERSION_NAME")) appVersionName = System.getenv("HESABATY_VERSION_NAME")
+if (System.getenv("HESABATY_VERSION_CODE")) appVersionCode = System.getenv("HESABATY_VERSION_CODE") as int
 
 android {
     namespace "com.ahmedhassan.hesabaty"
