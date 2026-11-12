@@ -1,0 +1,53 @@
+// حساباتي - تطبيق أندرويد
+// © 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة.
+plugins {
+    id "com.android.application"
+}
+
+// رقم الإصدار يُقرأ من version.json (نفس رقم إصدار تطبيق الويب)
+def versionJson = new groovy.json.JsonSlurper().parse(file("../../version.json"))
+def appVersionName = versionJson.version as String
+def parts = appVersionName.tokenize(".").collect { it as int }
+def appVersionCode = parts[0] * 10000 + parts[1] * 100 + parts[2]
+
+android {
+    namespace "com.ahmedhassan.hesabaty"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.ahmedhassan.hesabaty"
+        minSdk 21
+        targetSdk 34
+        versionCode appVersionCode
+        versionName appVersionName
+    }
+
+    signingConfigs {
+        release {
+            def ks = System.getenv("HESABATY_KEYSTORE")
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv("HESABATY_KEY_PASSWORD")
+                keyAlias "hesabaty"
+                keyPassword System.getenv("HESABATY_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig System.getenv("HESABATY_KEYSTORE") ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}

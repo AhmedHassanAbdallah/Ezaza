@@ -14,6 +14,14 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <script>
+    // تطبيق المظهر المحفوظ قبل ظهور الصفحة (بدون وميض)
+    try {
+      var _k = (/\/beta\//.test(location.pathname) ? 'beta_' : '') + 'hesabaty_settings_v1';
+      var _t = (JSON.parse(localStorage.getItem(_k) || '{}') || {}).theme;
+      if (_t === 'dark' || _t === 'light') document.documentElement.setAttribute('data-theme', _t);
+    } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -61,8 +69,9 @@
       --p-cell-pad-h: 6px;
       --p-logo-height: 58px;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
+    :root[data-theme="light"] { color-scheme: light; }
+    /* الوضع الليلي: تلقائي حسب الموبايل، أو يختاره المستخدم من «المزيد» */
+    :root[data-theme="dark"] {
         --bg: #071226;
         --surface: #0f1f38;
         --surface-2: #142847;
@@ -76,6 +85,24 @@
         --danger-soft: #3d1a1d;
         --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
         --shadow-md: 0 6px 20px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #071226;
+        --surface: #0f1f38;
+        --surface-2: #142847;
+        --border: #223a5e;
+        --text: #e9eff8;
+        --muted: #9db0cb;
+        --primary: #7fa7e6;
+        --primary-soft: #18315a;
+        --accent-soft: #3a2413;
+        --success-soft: #0f3529;
+        --danger-soft: #3d1a1d;
+        --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
+        --shadow-md: 0 6px 20px rgba(0,0,0,.35);
+        color-scheme: dark;
       }
     }
 
@@ -145,7 +172,8 @@
     .card-title .t-ic.orange { background: var(--accent-soft); color: var(--accent); }
     .card-title h2 { font-size: 1rem; font-weight: 800; flex: 1; }
     .card-title .tag { font-size: .75rem; font-weight: 700; background: var(--accent-soft); color: var(--orange-600); padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
-    @media (prefers-color-scheme: dark) { .card-title .tag { color: var(--orange-400); } }
+    :root[data-theme="dark"] .card-title .tag { color: var(--orange-400); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .card-title .tag { color: var(--orange-400); } }
 
     .field { margin-bottom: 12px; min-width: 0; }
     .field label { display: block; font-size: .8rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
@@ -170,7 +198,8 @@
     .note strong { color: var(--primary); font-weight: 800; }
     .note.orange { background: var(--accent-soft); }
     .note.orange strong { color: var(--orange-600); }
-    @media (prefers-color-scheme: dark) { .note.orange strong { color: var(--orange-400); } }
+    :root[data-theme="dark"] .note.orange strong { color: var(--orange-400); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .note.orange strong { color: var(--orange-400); } }
 
     /* عدّاد + / - */
     .stepper { display: flex; align-items: stretch; height: 48px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); overflow: hidden; }
@@ -277,15 +306,15 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
       background: var(--surface); border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: repeat(6, 1fr);
+      display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
       height: calc(var(--nav-h) + var(--safe-b)); padding-bottom: var(--safe-b);
       box-shadow: 0 -6px 20px rgba(11,27,51,.07);
     }
     .nav-item { border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: .68rem; padding: 0; min-width: 0; font-weight: 700; position: relative; }
-    .nav-item .pill { width: 44px; height: 30px; border-radius: 99px; display: grid; place-items: center; transition: background .2s, color .2s; }
+    .nav-item .pill { width: 40px; height: 30px; border-radius: 99px; display: grid; place-items: center; transition: background .2s, color .2s; }
     .nav-item.active { color: var(--text); font-weight: 800; }
     .nav-item.active .pill { background: var(--accent-soft); color: var(--accent); }
-    .nav-badge { position: absolute; top: 6px; left: calc(50% - 22px); background: var(--accent); color: #fff; font-size: .62rem; min-width: 18px; height: 18px; border-radius: 99px; display: grid; place-items: center; padding: 0 4px; font-weight: 800; }
+    .nav-badge { position: absolute; top: 6px; left: calc(50% - 22px); white-space: nowrap; background: var(--accent); color: #fff; font-size: .62rem; min-width: 18px; height: 18px; border-radius: 99px; display: grid; place-items: center; padding: 0 4px; font-weight: 800; }
 
     /* النوافذ المنبثقة من الأسفل */
     .backdrop { position: fixed; inset: 0; background: rgba(7,18,38,.55); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .22s; }
@@ -308,7 +337,8 @@
     .live-total { display: flex; justify-content: space-between; align-items: center; background: var(--accent-soft); border-radius: 14px; padding: 12px 14px; margin: 4px 0 12px; }
     .live-total span { font-size: .82rem; color: var(--muted); }
     .live-total strong { font-size: 1.15rem; font-weight: 900; color: var(--orange-600); }
-    @media (prefers-color-scheme: dark) { .live-total strong { color: var(--orange-400); } }
+    :root[data-theme="dark"] .live-total strong { color: var(--orange-400); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .live-total strong { color: var(--orange-400); } }
     .extra-row { display: grid; grid-template-columns: 1.6fr .8fr .9fr 40px; gap: 6px; margin-bottom: 8px; align-items: center; }
     .extra-row input { height: 44px; padding: 0 10px; font-size: .9rem; }
     .action-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 12px; border: 0; background: var(--surface-2); border-radius: 14px; font-weight: 800; font-size: .95rem; text-align: right; color: var(--text); }
@@ -339,10 +369,32 @@
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 
+    /* ============ فقاعة تحديث تطبيق أندرويد ============ */
+    .upd-bubble { position: fixed; right: 14px; bottom: calc(var(--nav-h) + var(--safe-b) + 16px); z-index: 70; display: flex; align-items: center; gap: 9px; height: 54px; padding: 0 18px 0 8px; border: 0; border-radius: 99px;
+      background: linear-gradient(135deg, #22c55e, #0f9f6e); color: #fff; font-weight: 900; font-size: .95rem; box-shadow: 0 12px 28px rgba(15,159,110,.45); animation: bubbleIn .5s cubic-bezier(.2,1.4,.4,1); }
+    .upd-bubble .b-ic { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.22); display: grid; place-items: center; position: relative; }
+    .upd-bubble .b-ic::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(255,255,255,.7); animation: bubblePulse 1.8s ease-out infinite; }
+    .upd-bubble small { display: block; font-size: .7rem; font-weight: 700; opacity: .9; line-height: 1.2; }
+    .upd-bubble span.t { line-height: 1.25; text-align: right; }
+    @keyframes bubbleIn { from { transform: translateY(30px) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes bubblePulse { from { transform: scale(.9); opacity: 1; } to { transform: scale(1.45); opacity: 0; } }
+    .upd-head { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, var(--navy-800), var(--navy-950)); color: #fff; border-radius: 18px; padding: 14px; margin-bottom: 12px; }
+    .upd-head .u-ic { width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, #22c55e, #0f9f6e); display: grid; place-items: center; flex-shrink: 0; }
+    .upd-head .u-ic svg { width: 28px; height: 28px; }
+    .upd-head b { display: block; font-size: 1.1rem; font-weight: 900; }
+    .upd-head span { display: block; font-size: .8rem; color: #c8d5ea; }
+    .upd-notes { list-style: none; display: grid; gap: 8px; margin-bottom: 12px; }
+    .upd-notes li { display: flex; gap: 10px; align-items: flex-start; background: var(--surface-2); border: 1px solid var(--border); border-radius: 13px; padding: 10px 12px; font-size: .9rem; font-weight: 700; line-height: 1.6; }
+    .upd-notes li::before { content: "✓"; flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--success); color: #fff; display: grid; place-items: center; font-size: .75rem; font-weight: 900; margin-top: 2px; }
+    .upd-progress { height: 10px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; margin-bottom: 6px; }
+    .upd-progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #22c55e, #0f9f6e); transition: width .3s; }
+
     /* ============ النسخة التجريبية ============ */
     .beta-bar { background: repeating-linear-gradient(135deg, #7c2d12, #7c2d12 12px, #9a3412 12px, #9a3412 24px); color: #fff; font-size: .76rem; font-weight: 800; text-align: center; padding: 6px 12px; }
 
     /* ============ اقتراحات العملاء وربط الفاتورة ============ */
+    select { width: 100%; min-width: 0; height: 48px; padding: 0 14px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); font-size: .95rem; font-weight: 700; color: var(--text); }
+    select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(249,115,22,.14); }
     input[type="date"] { width: 100%; min-width: 0; height: 48px; padding: 0 14px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); font-size: 1rem; font-weight: 700; color: var(--text); }
     .suggest { border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface); margin-top: 6px; overflow: hidden; box-shadow: var(--shadow-md); }
     .suggest button { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; border-bottom: 1px solid var(--border); background: none; padding: 10px 12px; text-align: right; font-weight: 800; font-size: .9rem; color: var(--text); }
@@ -362,6 +414,7 @@
     .page-overlay { display: none; position: fixed; inset: 0; z-index: 150; background: var(--bg); overflow-y: auto; }
     .page-overlay.open { display: block; animation: fadeUp .2s ease; }
     .page-overlay .container { padding-bottom: 40px; }
+    #matPage { z-index: 155; }
     .cust-card { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); cursor: pointer; }
     .cust-amt { text-align: left; white-space: nowrap; font-weight: 900; font-size: .92rem; }
     .cust-amt small { display: block; font-size: .68rem; color: var(--muted); font-weight: 700; }
@@ -386,6 +439,46 @@
     textarea { width: 100%; min-height: 76px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); font-size: .95rem; font-weight: 700; color: var(--text); resize: vertical; }
     textarea:focus { outline: none; border-color: var(--accent); background: var(--surface); }
     .field.wide { grid-column: 1 / -1; }
+
+    /* ============ اختيار نظام الحساب ============ */
+    .mode-opts { display: grid; gap: 10px; margin-bottom: 6px; }
+    .mode-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: right; border: 2px solid var(--border); background: var(--surface-2); border-radius: 16px; padding: 14px; color: var(--text); transition: border-color .15s, background .15s; }
+    .mode-opt.on { border-color: var(--accent); background: var(--accent-soft); }
+    .mode-opt .m-ic { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, var(--navy-600), var(--navy-900)); color: #fff; flex-shrink: 0; }
+    .mode-opt .m-ic.orange { background: linear-gradient(135deg, var(--orange-400), var(--orange-600)); }
+    .mode-opt .m-ic svg { width: 24px; height: 24px; }
+    .mode-opt b { display: block; font-size: 1rem; font-weight: 900; }
+    .mode-opt small { display: block; font-size: .78rem; color: var(--muted); font-weight: 600; line-height: 1.6; }
+    .mode-opt .m-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: grid; place-items: center; color: #fff; }
+    .mode-opt.on .m-check { background: var(--accent); border-color: var(--accent); }
+    .mode-opt .m-check svg { width: 14px; height: 14px; stroke-width: 3; }
+
+    /* ============ البنود المنفصلة وكشف الخامات ============ */
+    .item-card { display: flex; align-items: center; gap: 11px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); cursor: pointer; }
+    .item-card .room-num { width: 32px; height: 32px; }
+    .item-card .i-info { flex: 1; min-width: 0; }
+    .item-card .i-name { font-weight: 800; font-size: .96rem; overflow-wrap: anywhere; }
+    .item-card .i-meta { font-size: .76rem; color: var(--muted); overflow-wrap: anywhere; }
+    .item-card .i-amt { font-weight: 900; color: var(--primary); white-space: nowrap; text-align: left; }
+    .item-card .i-amt small { display: block; font-size: .66rem; color: var(--muted); font-weight: 700; }
+    .unit-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .unit-chips .chip { padding: 5px 11px; }
+    .mat-row { display: flex; align-items: center; gap: 10px; padding: 11px 2px; border-bottom: 1px solid var(--border); }
+    .mat-row:last-child { border-bottom: 0; }
+    .mat-row .m-info { flex: 1; min-width: 0; cursor: pointer; }
+    .mat-row .m-name { font-weight: 800; font-size: .92rem; overflow-wrap: anywhere; }
+    .mat-row .m-meta { font-size: .74rem; color: var(--muted); overflow-wrap: anywhere; }
+    .mat-row .m-qty { background: var(--primary-soft); color: var(--primary); font-weight: 900; font-size: .8rem; border-radius: 10px; padding: 4px 9px; white-space: nowrap; }
+    .mat-row .m-price { width: 92px; flex-shrink: 0; }
+    .mat-row .m-price input { height: 40px; padding: 0 8px; font-size: .9rem; text-align: center; }
+    .mat-row .m-price small { display: block; text-align: center; font-size: .66rem; color: var(--muted); margin-top: 2px; white-space: nowrap; }
+    .src-badge { display: inline-block; font-size: .64rem; background: var(--primary-soft); color: var(--primary); border-radius: 99px; padding: 0 7px; margin-inline-start: 4px; font-weight: 800; vertical-align: middle; }
+    .warn-box { background: var(--accent-soft); border: 1.5px solid rgba(249,115,22,.35); border-radius: 13px; padding: 10px 12px; font-size: .82rem; line-height: 1.7; margin-top: 10px; }
+    .warn-box b { color: var(--orange-600); }
+    .ok-box { background: var(--success-soft); border: 1.5px solid rgba(15,159,110,.35); border-radius: 13px; padding: 10px 12px; font-size: .82rem; line-height: 1.7; margin-top: 10px; }
+    .ok-box b { color: var(--success); }
+    .pick-list { max-height: 46vh; overflow-y: auto; margin-bottom: 10px; }
+    .p-table td .sub-note { display: block; font-size: calc(var(--p-font-size) - 2px); color: #5b6b82 !important; font-weight: 700; margin-top: 1px; }
 
     /* =====================================================
        المعاينة: ورقة A4 حقيقية بنفس مقاس الطباعة، مصغّرة لتناسب الشاشة
@@ -498,13 +591,14 @@
 <body>
 
 <div id="editorApp">
-  <div class="beta-bar hidden" id="betaBar">نسخة تجريبية للتحديث 2.2.0 — بيانات تطبيقك الأصلي لن تتأثر</div>
+  <div class="beta-bar hidden" id="betaBar">نسخة تجريبية للتحديث 2.3.0 — شغالة على نسخة من بياناتك، وتطبيقك الأصلي لن يتأثر</div>
   <header class="app-header">
     <img class="brand-ic" src="./icons/icon-192.png" alt="">
     <div class="titles">
       <h1 id="headerTitle">بيانات الفاتورة</h1>
       <div class="sub" id="headerSub">—</div>
     </div>
+    <button type="button" class="icon-btn" id="themeBtn" onclick="toggleTheme()" aria-label="تبديل الوضع الليلي والفاتح"><i data-icon="moon"></i></button>
     <button type="button" class="icon-btn accent" onclick="openActions()" aria-label="الفاتورة والمشاركة"><i data-icon="share"></i></button>
   </header>
 
@@ -513,16 +607,25 @@
     <!-- ملخص سريع -->
     <section class="hero" id="heroCard">
       <div class="hero-label">الصافي المطلوب</div>
-      <div class="hero-value"><span id="topNetRequired">0</span><small>ج.م</small></div>
+      <div class="hero-value"><span id="topNetRequired">0</span><small><span class="cur">ج.م</span></small></div>
       <div class="hero-stats">
-        <div class="hero-stat"><span>إجمالي النقاط</span><strong id="topTotalPoints">0 نقطة</strong></div>
-        <div class="hero-stat"><span>حساب النقاط</span><strong id="topPointsCost">0 ج.م</strong></div>
-        <div class="hero-stat"><span>بروفايل وإضافي</span><strong id="topExtrasCost">0 ج.م</strong></div>
+        <div class="hero-stat"><span id="heroL1">إجمالي النقاط</span><strong id="topTotalPoints">0 نقطة</strong></div>
+        <div class="hero-stat"><span id="heroL2">حساب النقاط</span><strong id="topPointsCost">0 <span class="cur">ج.م</span></strong></div>
+        <div class="hero-stat"><span id="heroL3">بروفايل وإضافي</span><strong id="topExtrasCost">0 <span class="cur">ج.م</span></strong></div>
       </div>
     </section>
 
     <!-- 1) البيانات والتسعير -->
     <section class="view active" id="view-pricing">
+      <div class="card">
+        <div class="card-title"><div class="t-ic orange"><i data-icon="layers"></i></div><h2>طريقة الحساب في الفاتورة دي</h2></div>
+        <div class="segmented" style="margin-bottom:8px">
+          <button type="button" id="modePoints" class="on" onclick="setBillingMode('points')">بالنقاط</button>
+          <button type="button" id="modeItems" onclick="setBillingMode('items')">بنود منفصلة</button>
+        </div>
+        <div class="hint" id="modeHint" style="margin:0"></div>
+      </div>
+
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="user"></i></div><h2>بيانات العميل</h2></div>
         <div class="field"><label for="clientName">اسم العميل</label><input type="text" id="clientName" autocomplete="off" placeholder="اكتب الاسم وسيقترح التطبيق من النوتة" oninput="saveInvoiceMeta(); renderClientSuggestions()" onfocus="renderClientSuggestions()" onblur="setTimeout(hideClientSuggestions, 250)">
@@ -536,7 +639,7 @@
         <div id="clientLinkBox"></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="pointsPricingCard">
         <div class="card-title"><div class="t-ic orange"><i data-icon="bolt"></i></div><h2>نظام التسعير</h2><span class="tag" id="activeSystemBadge">تسعيرة موحدة</span></div>
         <div class="segmented" role="tablist">
           <button type="button" id="cardModern" class="on" onclick="setSystemType('modern')">تسعيرة موحدة</button>
@@ -554,11 +657,20 @@
         <div class="note" id="systemRuleNotice"></div>
       </div>
 
-      <button type="button" class="btn btn-primary" onclick="switchView('rooms')">التالي: الغرف واللوحة <i data-icon="arrow"></i></button>
+      <button type="button" class="btn btn-primary" onclick="switchView('rooms')"><span id="nextRoomsText">التالي: الغرف واللوحة</span> <i data-icon="arrow"></i></button>
     </section>
 
     <!-- 2) الغرف واللوحة -->
     <section class="view" id="view-rooms">
+      <div id="itemsModeBox" class="hidden">
+        <div class="note orange" style="margin-bottom:12px"><strong>بنود منفصلة:</strong> كل شغلانة ببندها وسعرها، مثلاً «تقفيل لوحة» أو «سحب خط» — من غير نقاط.</div>
+        <div class="section-head">
+          <h3>بنود الفاتورة<span class="count" id="itemsCountBadge">0</span></h3>
+          <button type="button" class="btn btn-soft btn-sm" onclick="openItemSheet(null)"><i data-icon="plus"></i> إضافة بند</button>
+        </div>
+        <div id="itemsListContainer"></div>
+      </div>
+      <div id="pointsModeBox">
       <div class="card">
         <div class="card-title"><div class="t-ic orange"><i data-icon="panel"></i></div><h2>اللوحة الرئيسية والصواعد</h2><span class="tag" id="mainPanelBadge">0 نقطة</span></div>
         <div class="row-2">
@@ -589,6 +701,7 @@
         <button type="button" class="btn btn-soft btn-sm" onclick="openRoomSheet()"><i data-icon="plus"></i> إضافة غرفة</button>
       </div>
       <div id="roomsListContainer"></div>
+      </div>
     </section>
 
     <!-- 3) الحساب النهائي -->
@@ -619,7 +732,7 @@
     <!-- 4) الفواتير المحفوظة -->
     <section class="view" id="view-saved">
       <div class="btn-row" style="margin-bottom:12px">
-        <button type="button" class="btn btn-accent" onclick="createNewInvoice()"><i data-icon="plus"></i> فاتورة جديدة</button>
+        <button type="button" class="btn btn-accent" onclick="startNewInvoice()"><i data-icon="plus"></i> فاتورة جديدة</button>
         <button type="button" class="btn btn-ghost" onclick="manualSaveToast()"><i data-icon="check"></i> حفظ الحالية</button>
       </div>
       <div class="field"><input type="search" id="invoiceSearch" placeholder="ابحث باسم العميل أو رقمه أو عنوانه..." oninput="renderInvoiceList()"></div>
@@ -631,11 +744,11 @@
     <section class="view" id="view-ledger">
       <section class="hero">
         <div class="hero-label">إجمالي المتبقي لك عند العملاء</div>
-        <div class="hero-value"><span id="ledgerTotalDue">0</span><small>ج.م</small></div>
+        <div class="hero-value"><span id="ledgerTotalDue">0</span><small><span class="cur">ج.م</span></small></div>
         <div class="hero-stats">
           <div class="hero-stat"><span>عدد العملاء</span><strong id="ledgerCount">0</strong></div>
-          <div class="hero-stat"><span>إجمالي ما وصلك</span><strong id="ledgerReceived">0 ج.م</strong></div>
-          <div class="hero-stat"><span>خامات متبقية</span><strong id="ledgerMaterials">0 ج.م</strong></div>
+          <div class="hero-stat"><span>إجمالي ما وصلك</span><strong id="ledgerReceived">0 <span class="cur">ج.م</span></strong></div>
+          <div class="hero-stat"><span>خامات متبقية</span><strong id="ledgerMaterials">0 <span class="cur">ج.م</span></strong></div>
         </div>
       </section>
       <div class="btn-row" style="margin-bottom:12px">
@@ -648,10 +761,31 @@
       <div class="backup-line" id="backupLine"></div>
     </section>
 
-    <!-- 6) المزيد: الإعدادات والتحديثات وعن التطبيق -->
+    <!-- 6) كشف الخامات -->
+    <section class="view" id="view-materials">
+      <section class="hero">
+        <div class="hero-label">خامات على حسابك عند العملاء</div>
+        <div class="hero-value"><span id="matHeroTotal">0</span><small><span class="cur">ج.م</span></small></div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span>عدد الكشوفات</span><strong id="matHeroCount">0</strong></div>
+          <div class="hero-stat"><span>أنا هجيبها</span><strong id="matHeroMine">0</strong></div>
+          <div class="hero-stat"><span>الزبون هيشتريها</span><strong id="matHeroCust">0</strong></div>
+        </div>
+      </section>
+      <button type="button" class="btn btn-accent" id="btnNewMatList" style="margin-bottom:12px" onclick="createMatList(null)"><i data-icon="plus"></i> كشف خامات جديد</button>
+      <div class="field"><input type="search" id="matSearch" placeholder="ابحث باسم العميل..." oninput="renderMatLists()"></div>
+      <div id="matListBox"></div>
+    </section>
+
+    <!-- 7) المزيد: الإعدادات والتحديثات وعن التطبيق -->
     <section class="view" id="view-more">
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="briefcase"></i></div><h2>بياناتك على الفاتورة</h2></div>
+        <div class="field">
+          <label for="currencySelect">عملة بلدك</label>
+          <select id="currencySelect" onchange="setCurrency(this.value)"></select>
+          <div class="hint">تتحدد مرة واحدة وتتطبق على كل الأسعار في التطبيق والفواتير وكشوفات الخامات والنوتة. (بتغيّر رمز العملة بس، مش بتحوّل المبالغ)</div>
+        </div>
         <div class="field"><label for="invoiceTitle">عنوان الفاتورة</label><input type="text" id="invoiceTitle" placeholder="كشف حساب ومستخلص أعمال كهرباء" oninput="saveInvoiceMeta()"></div>
         <div class="row-2 stack-sm">
           <div class="field"><label for="techName">اسمك / لقبك المهني</label><input type="text" id="techName" placeholder="م/ أحمد حسن" oninput="saveInvoiceMeta()"></div>
@@ -672,6 +806,16 @@
       </div>
 
       <div class="card">
+        <div class="card-title"><div class="t-ic"><i data-icon="moon"></i></div><h2>المظهر</h2><span class="tag" id="themeTag">تلقائي</span></div>
+        <div class="segmented" style="grid-template-columns:repeat(3,1fr);margin-bottom:8px" role="radiogroup" aria-label="المظهر">
+          <button type="button" id="themeAuto" role="radio" onclick="setTheme('auto')">تلقائي</button>
+          <button type="button" id="themeLight" role="radio" onclick="setTheme('light')">فاتح</button>
+          <button type="button" id="themeDark" role="radio" onclick="setTheme('dark')">ليلي</button>
+        </div>
+        <div class="hint" style="margin:0">«تلقائي» يمشي مع إعداد الموبايل. تقدر كمان تبدّل بسرعة من زرار القمر/الشمس فوق.</div>
+      </div>
+
+      <div class="card">
         <div class="card-title"><div class="t-ic orange"><i data-icon="refresh"></i></div><h2>تحديثات التطبيق</h2></div>
         <div class="ver-box">
           <span class="dot" id="verDot"></span>
@@ -688,9 +832,15 @@
         </div>
       </div>
 
+      <div class="card hidden" id="apkCard">
+        <div class="card-title"><div class="t-ic orange"><i data-icon="download"></i></div><h2>تطبيق أندرويد</h2><span class="tag">APK</span></div>
+        <p class="hint" style="margin:-6px 0 12px">نزّل التطبيق كملف APK وثبّته على أي موبايل أندرويد، وابعته لأي حد. بياناتك هنا مش بتتنقل لوحدها: خد «نسخة كاملة» من تحت واعمل لها «استعادة» جوه التطبيق.</p>
+        <a class="btn btn-accent" id="apkLink" href="https://github.com/AhmedHassanAbdallah/Ezaza/releases/latest/download/hesabaty.apk" rel="noopener"><i data-icon="download"></i> تحميل تطبيق أندرويد</a>
+      </div>
+
       <div class="card">
         <div class="card-title"><div class="t-ic"><i data-icon="save"></i></div><h2>النسخ الاحتياطي</h2></div>
-        <p class="hint" style="margin:-6px 0 12px">النسخة الكاملة تحفظ كل الفواتير ونوتة العملاء في ملف واحد، وتسترجعها في أي وقت أو على هاتف آخر.</p>
+        <p class="hint" style="margin:-6px 0 12px">النسخة الكاملة تحفظ كل الفواتير ونوتة العملاء وكشوفات الخامات في ملف واحد، وتسترجعها في أي وقت أو على هاتف آخر.</p>
         <div class="btn-row">
           <button type="button" class="btn btn-ghost" onclick="exportBackupJSON()"><i data-icon="download"></i> نسخة كاملة</button>
           <button type="button" class="btn btn-ghost" onclick="document.getElementById('importFile').click()"><i data-icon="upload"></i> استعادة</button>
@@ -719,14 +869,15 @@
     </section>
   </main>
 
-  <button type="button" class="fab hidden" id="addRoomFab" onclick="openRoomSheet()"><i data-icon="plus"></i> غرفة</button>
+  <button type="button" class="fab hidden" id="addRoomFab" onclick="fabAdd()"><i data-icon="plus"></i> <span id="fabText">غرفة</span></button>
 
   <nav class="bottom-nav" aria-label="أقسام التطبيق">
     <button type="button" class="nav-item active" id="navBtn-pricing" onclick="switchView('pricing')"><span class="pill"><i data-icon="file"></i></span>البيانات</button>
-    <button type="button" class="nav-item" id="navBtn-rooms" onclick="switchView('rooms')"><span class="pill"><i data-icon="home"></i></span>الغرف<span class="nav-badge hidden" id="drawerRoomCount">0</span></button>
+    <button type="button" class="nav-item" id="navBtn-rooms" onclick="switchView('rooms')"><span class="pill" id="navRoomsIc"><i data-icon="home"></i></span><span id="navRoomsLabel">الغرف</span><span class="nav-badge hidden" id="drawerRoomCount">0</span></button>
     <button type="button" class="nav-item" id="navBtn-summary" onclick="switchView('summary')"><span class="pill"><i data-icon="calc"></i></span>الحساب</button>
     <button type="button" class="nav-item" id="navBtn-saved" onclick="switchView('saved')"><span class="pill"><i data-icon="folder"></i></span>الفواتير</button>
     <button type="button" class="nav-item" id="navBtn-ledger" onclick="switchView('ledger')"><span class="pill"><i data-icon="book"></i></span>النوتة</button>
+    <button type="button" class="nav-item" id="navBtn-materials" onclick="switchView('materials')"><span class="pill"><i data-icon="box"></i></span>الخامات</button>
     <button type="button" class="nav-item" id="navBtn-more" onclick="switchView('more')"><span class="pill"><i data-icon="grid"></i></span>المزيد</button>
   </nav>
 </div>
@@ -775,11 +926,109 @@
   </div>
   <div id="extraItemsContainer"></div>
 
-  <div class="live-total"><span id="roomLivePts">0 نقطة</span><strong id="roomLiveTotal">0 ج.م</strong></div>
+  <div class="live-total"><span id="roomLivePts">0 نقطة</span><strong id="roomLiveTotal">0 <span class="cur">ج.م</span></strong></div>
   <div class="btn-row">
     <button type="button" id="saveRoomBtn" class="btn btn-primary" onclick="saveRoom()">حفظ الغرفة</button>
     <button type="button" id="cancelEditBtn" class="btn btn-ghost" onclick="closeOverlay()">إلغاء</button>
   </div>
+</div>
+
+<!-- اختيار نظام الحساب للفاتورة الجديدة -->
+<div class="backdrop" id="modeBackdrop" onclick="closeOverlay()"></div>
+<div class="sheet" id="modeSheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div class="sheet-head"><h3>فاتورة جديدة: هتحاسب بنظام إيه؟</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
+  <div class="mode-opts">
+    <button type="button" class="mode-opt" id="pickModePoints" onclick="chooseNewInvoiceMode('points')">
+      <span class="m-ic"><i data-icon="bolt"></i></span>
+      <span style="flex:1;min-width:0"><b>نظام النقاط</b><small>الغرف بالبرايز والإسبوتات وشريط الليد + خطوط اللوحة والصواعد (نفس الحساب المعتاد)</small></span>
+    </button>
+    <button type="button" class="mode-opt" id="pickModeItems" onclick="chooseNewInvoiceMode('items')">
+      <span class="m-ic orange"><i data-icon="list"></i></span>
+      <span style="flex:1;min-width:0"><b>بنود منفصلة</b><small>كل شغلانة ببندها وسعرها، مثلاً «تقفيل لوحة» فقط، وتقدر تضيف أكتر من بند في نفس الفاتورة</small></span>
+    </button>
+  </div>
+  <p class="hint" style="text-align:center;margin-top:8px">تقدر تغيّر النظام بعدين من صفحة «البيانات»</p>
+</div>
+
+<!-- إضافة / تعديل بند (نظام البنود المنفصلة) -->
+<div class="backdrop" id="itemBackdrop" onclick="closeOverlay()"></div>
+<div class="sheet" id="itemSheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div class="sheet-head"><h3 id="itemFormTitle">إضافة بند</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
+  <div class="chips" id="itemChips"></div>
+  <div class="field"><label for="itemName">اسم البند / الشغلانة</label><input type="text" id="itemName" placeholder="مثال: تقفيل لوحة"></div>
+  <div class="row-2">
+    <div class="field">
+      <label for="itemQty">الكمية</label>
+      <div class="stepper"><button type="button" data-step="1">+</button><input type="number" inputmode="decimal" id="itemQty" min="0" step="any" placeholder="1"><button type="button" data-step="-1">−</button></div>
+    </div>
+    <div class="field"><label for="itemPrice" id="itemPriceLabel">سعر الوحدة (<span class="cur">ج.م</span>)</label><input type="number" inputmode="decimal" id="itemPrice" min="0" step="any" placeholder="0"></div>
+  </div>
+  <div class="field" style="margin-top:-4px"><label>الوحدة</label><div class="unit-chips" id="itemUnits"></div></div>
+  <div class="field"><label for="itemNote">ملاحظة تظهر تحت البند <span class="hint">(اختياري)</span></label><input type="text" id="itemNote" placeholder="مثال: لوحة 12 خط شاملة الترقيم"></div>
+  <div class="live-total"><span id="itemLiveQty">الكمية × السعر</span><strong id="itemLiveTotal">0 <span class="cur">ج.م</span></strong></div>
+  <div class="stack">
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" id="saveItemBtn" onclick="saveItem()">حفظ البند</button>
+      <button type="button" class="btn btn-ghost" onclick="closeOverlay()">إلغاء</button>
+    </div>
+    <button type="button" class="btn btn-danger hidden" id="deleteItemBtn" onclick="deleteItem()"><i data-icon="trash"></i> حذف البند</button>
+  </div>
+</div>
+
+<!-- صفحة كشف الخامات -->
+<div class="page-overlay" id="matPage">
+  <header class="app-header">
+    <button type="button" class="icon-btn" onclick="closeOverlay()" aria-label="رجوع"><i data-icon="back"></i></button>
+    <div class="titles">
+      <h1 id="matPageName">كشف خامات</h1>
+      <div class="sub" id="matPageSub"></div>
+    </div>
+    <button type="button" class="icon-btn accent" onclick="openMatPreview(false)" aria-label="معاينة وطباعة الكشف"><i data-icon="printer"></i></button>
+  </header>
+  <div class="container" id="matBody"></div>
+</div>
+
+<!-- إضافة / تعديل خامة -->
+<div class="backdrop" id="matItemBackdrop" onclick="closeOverlay()"></div>
+<div class="sheet" id="matItemSheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div class="sheet-head"><h3 id="matItemTitle">إضافة خامة</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
+  <div class="chips" id="matChips"></div>
+  <div class="field"><label for="miName">اسم الخامة</label><input type="text" id="miName" placeholder="مثال: سلك" oninput="updateMatItemForm()"></div>
+  <div class="row-2">
+    <div class="field">
+      <label for="miQty">العدد / الكمية</label>
+      <div class="stepper"><button type="button" data-step="1">+</button><input type="number" inputmode="decimal" id="miQty" min="0" step="any" placeholder="1"><button type="button" data-step="-1">−</button></div>
+    </div>
+    <div class="field"><label for="miBrand">الماركة</label><input type="text" id="miBrand" placeholder="اختياري"></div>
+  </div>
+  <div class="field" style="margin-top:-4px"><label>الوحدة</label><div class="unit-chips" id="miUnits"></div></div>
+  <div class="field">
+    <label for="miSpec" id="miSpecLabel">المقاس / المواصفات <span class="hint">(اختياري)</span></label>
+    <input type="text" id="miSpec" placeholder="مثال: 16 أمبير">
+    <div class="unit-chips hidden" id="miWireChips"></div>
+  </div>
+  <div class="field"><label for="miNote">ملاحظة <span class="hint">(اختياري)</span></label><input type="text" id="miNote" placeholder="مثال: لون أحمر وأسود"></div>
+  <div class="field hidden" id="miPriceField"><label for="miPrice">سعر الوحدة (<span class="cur">ج.م</span>) — لأنك هتجيبها على حسابك</label><input type="number" inputmode="decimal" id="miPrice" min="0" step="any" placeholder="0"></div>
+  <div class="live-total hidden" id="miLive"><span id="miLiveQty">الكمية × السعر</span><strong id="miLiveTotal">0 <span class="cur">ج.م</span></strong></div>
+  <div class="stack">
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" id="saveMatItemBtn" onclick="saveMatItem()">حفظ الخامة</button>
+      <button type="button" class="btn btn-ghost" onclick="closeOverlay()">إلغاء</button>
+    </div>
+    <button type="button" class="btn btn-danger hidden" id="deleteMatItemBtn" onclick="deleteMatItem()"><i data-icon="trash"></i> حذف الخامة</button>
+  </div>
+</div>
+
+<!-- اختيار عميل من النوتة -->
+<div class="backdrop" id="pickBackdrop" onclick="closeOverlay()"></div>
+<div class="sheet" id="pickSheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <div class="sheet-head"><h3>اختيار عميل من النوتة</h3><button type="button" class="close-x" onclick="closeOverlay()" aria-label="إغلاق"><i data-icon="x"></i></button></div>
+  <div class="field"><input type="search" id="pickSearch" placeholder="ابحث باسم العميل أو رقمه..." oninput="renderPickList()"></div>
+  <div class="pick-list suggest" id="pickList" style="margin-top:0"></div>
 </div>
 
 <!-- صفحة العميل في النوتة -->
@@ -818,7 +1067,7 @@
   <div class="note" id="txnKindHint" style="margin-bottom:12px"></div>
   <div class="field hidden" id="txnTitleField"><label for="txnDesc">بيان الخامات</label><input type="text" id="txnDesc" placeholder="مثال: سلك ومواسير وعلب"></div>
   <div class="row-2">
-    <div class="field"><label for="txnAmount" id="txnAmountLabel">المبلغ (ج.م)</label><input type="number" inputmode="decimal" id="txnAmount" min="0" step="any" placeholder="0"></div>
+    <div class="field"><label for="txnAmount" id="txnAmountLabel">المبلغ (<span class="cur">ج.م</span>)</label><input type="number" inputmode="decimal" id="txnAmount" min="0" step="any" placeholder="0"></div>
     <div class="field"><label for="txnDate">التاريخ</label><input type="date" id="txnDate"></div>
   </div>
   <button type="button" class="chip hidden" id="txnFillRemaining" style="margin:-4px 0 12px"></button>
@@ -843,7 +1092,7 @@
     <button type="button" class="action-item" onclick="runAction(sendInvoiceWhatsApp)"><span class="a-ic green"><i data-icon="send"></i></span><span>إرسال الفاتورة عبر واتساب</span></button>
     <button type="button" class="action-item" onclick="runAction(copyInvoiceForWhatsApp)"><span class="a-ic"><i data-icon="copy"></i></span><span>نسخ الفاتورة كنص</span></button>
     <button type="button" class="action-item" onclick="runAction(manualSaveToast)"><span class="a-ic green"><i data-icon="check"></i></span><span>حفظ الفاتورة الحالية</span></button>
-    <button type="button" class="action-item" onclick="runAction(createNewInvoice)"><span class="a-ic orange"><i data-icon="plus"></i></span><span>فاتورة عميل جديدة</span></button>
+    <button type="button" class="action-item" onclick="runAction(startNewInvoice)"><span class="a-ic orange"><i data-icon="plus"></i></span><span>فاتورة عميل جديدة</span></button>
   </div>
 </div>
 
@@ -894,6 +1143,31 @@
   </div>
 </div>
 
+<!-- فقاعة تحديث تطبيق أندرويد -->
+<button type="button" class="upd-bubble hidden" id="updBubble" onclick="openAppUpdateSheet()" aria-label="تحديث جديد متاح">
+  <span class="b-ic"><i data-icon="gift"></i></span>
+  <span class="t">تحديث جديد<small id="updBubbleVer"></small></span>
+</button>
+<div class="backdrop" id="appUpdBackdrop" onclick="closeOverlay()"></div>
+<div class="sheet" id="appUpdSheet" role="dialog" aria-modal="true" aria-labelledby="appUpdTitle">
+  <div class="grab"></div>
+  <div class="upd-head">
+    <span class="u-ic"><i data-icon="gift"></i></span>
+    <div style="flex:1;min-width:0"><b id="appUpdTitle">تحديث جديد متاح</b><span id="appUpdSub"></span></div>
+  </div>
+  <h4 style="font-size:.95rem;font-weight:900;margin:0 2px 8px">الجديد في التحديث ده:</h4>
+  <ul class="upd-notes" id="appUpdNotes"></ul>
+  <div class="ok-box" style="margin:0 0 12px"><b>✓ بياناتك محفوظة:</b> الفواتير والنوتة وكشوفات الخامات مش هتتأثر بالتحديث.</div>
+  <div id="appUpdProgressBox" class="hidden" style="margin-bottom:12px">
+    <div class="upd-progress"><i id="appUpdBar"></i></div>
+    <div class="hint" id="appUpdState" style="text-align:center"></div>
+  </div>
+  <div class="stack">
+    <button type="button" class="btn btn-accent" id="appUpdBtn" onclick="startAppUpdate()"><i data-icon="download"></i> تحميل وتثبيت التحديث</button>
+    <button type="button" class="btn btn-ghost" onclick="closeOverlay()">لاحقاً</button>
+  </div>
+</div>
+
 <div id="appToast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -902,19 +1176,111 @@
      تصميم وتطوير: أحمد حسن عبدالله  |  واتساب: +201015421255
      © 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة.
      ========================================================= */
-  const APP_VERSION = '2.2.0';
+  const APP_VERSION = '2.3.0';
   // النسخة التجريبية (/beta/) تعمل على نسخة مستقلة من البيانات ولا تلمس بيانات التطبيق الأصلي
   const IS_BETA = /\/beta\//.test(location.pathname);
   const KEY_PREFIX = IS_BETA ? 'beta_' : '';
+  // داخل تطبيق أندرويد (APK): الجسر الأصلي متاح باسم HesabatyApp
+  const IN_APP = !!(window.HesabatyApp && typeof window.HesabatyApp.versionName === 'function');
+  const RELEASES_API = 'https://api.github.com/repos/AhmedHassanAbdallah/Ezaza/releases/latest';
+  let printJobName = 'حساباتي';
+  if (IN_APP) {
+    // روابط واتساب وفيسبوك تفتح في تطبيقاتها، والطباعة عن طريق أندرويد (حفظ PDF أو طابعة)
+    window.open = function (u) { try { window.HesabatyApp.openExternal(String(u)); } catch (e) {} return null; };
+    window.print = function () { try { window.HesabatyApp.print(printJobName); } catch (e) {} };
+  }
   const MAIN_STORAGE_KEY = 'ahmed_elec_invoices_v7';
   const STORAGE_KEY = KEY_PREFIX + MAIN_STORAGE_KEY;
   const CUSTOMERS_KEY = KEY_PREFIX + 'hesabaty_customers_v1';
   const SETTINGS_KEY = KEY_PREFIX + 'hesabaty_settings_v1';
   const BACKUP_KEY = KEY_PREFIX + 'hesabaty_last_backup';
+  const MATLISTS_KEY = KEY_PREFIX + 'hesabaty_matlists_v1';
   const DEFAULT_TITLE = 'كشف حساب ومستخلص أعمال كهرباء';
   const DEFAULT_TECH = 'م/ أحمد حسن - للأعمال والتشطيبات الكهربائية';
   const ROOM_PRESETS = ['الريسبشن', 'الصالة', 'غرفة النوم الرئيسية', 'غرفة الأطفال', 'غرفة المعيشة', 'المطبخ', 'الحمام', 'الطرقة والمدخل', 'البلكونة'];
-  const VIEW_TITLES = { pricing: 'بيانات الفاتورة', rooms: 'الغرف واللوحة', summary: 'الحساب النهائي', saved: 'الفواتير المحفوظة', ledger: 'نوتة العملاء', more: 'المزيد' };
+  const VIEW_TITLES = { pricing: 'بيانات الفاتورة', rooms: 'الغرف واللوحة', summary: 'الحساب النهائي', saved: 'الفواتير المحفوظة', ledger: 'نوتة العملاء', materials: 'كشف الخامات', more: 'المزيد' };
+  // نظام البنود المنفصلة
+  const WORK_PRESETS = ['تقفيل لوحة', 'تركيب لوحة', 'سحب خط', 'تأسيس نقطة', 'تركيب نجفة', 'تركيب إسبوتات', 'تركيب سخان', 'تركيب شفاط', 'تغيير بريزة / مفتاح', 'صيانة وكشف أعطال'];
+  const ITEM_UNITS = ['عدد', 'متر', 'خط', 'نقطة', 'مقطوعية'];
+  // كشف الخامات
+  const MAT_PRESETS = ['سلك', 'كابل', 'خرطوم (مواسير)', 'علب', 'بريزة', 'مفتاح', 'قاطع أوتوماتيك', 'لوحة توزيع', 'إسبوت', 'شريط ليد', 'بروفايل ليد', 'دواية', 'شريط عازل', 'ترانس / درايفر'];
+  const MAT_UNITS = ['عدد', 'متر', 'لفة', 'علبة', 'كرتونة', 'قطعة'];
+  const WIRE_SIZES = ['1.5', '2', '3', '4', '6', '10', '16', '25'];
+  const isWireName = n => /سلك|كابل|كابلات|أسلاك/.test(n || '');
+
+  // العملة: تُختار مرة واحدة من «المزيد» وتُطبّق على كل الأسعار في التطبيق
+  const CURRENCIES = [
+    { code: 'EGP', country: 'مصر', name: 'جنيه مصري', sym: 'ج.م', short: 'ج', dec: 2 },
+    { code: 'SAR', country: 'السعودية', name: 'ريال سعودي', sym: 'ر.س', dec: 2 },
+    { code: 'AED', country: 'الإمارات', name: 'درهم إماراتي', sym: 'د.إ', dec: 2 },
+    { code: 'KWD', country: 'الكويت', name: 'دينار كويتي', sym: 'د.ك', dec: 3 },
+    { code: 'QAR', country: 'قطر', name: 'ريال قطري', sym: 'ر.ق', dec: 2 },
+    { code: 'BHD', country: 'البحرين', name: 'دينار بحريني', sym: 'د.ب', dec: 3 },
+    { code: 'OMR', country: 'عُمان', name: 'ريال عماني', sym: 'ر.ع', dec: 3 },
+    { code: 'JOD', country: 'الأردن', name: 'دينار أردني', sym: 'د.أ', dec: 3 },
+    { code: 'IQD', country: 'العراق', name: 'دينار عراقي', sym: 'د.ع', dec: 0 },
+    { code: 'SYP', country: 'سوريا', name: 'ليرة سورية', sym: 'ل.س', dec: 0 },
+    { code: 'LBP', country: 'لبنان', name: 'ليرة لبنانية', sym: 'ل.ل', dec: 0 },
+    { code: 'ILS', country: 'فلسطين', name: 'شيكل', sym: '₪', dec: 2 },
+    { code: 'YER', country: 'اليمن', name: 'ريال يمني', sym: 'ر.ي', dec: 0 },
+    { code: 'LYD', country: 'ليبيا', name: 'دينار ليبي', sym: 'د.ل', dec: 3 },
+    { code: 'TND', country: 'تونس', name: 'دينار تونسي', sym: 'د.ت', dec: 3 },
+    { code: 'DZD', country: 'الجزائر', name: 'دينار جزائري', sym: 'د.ج', dec: 2 },
+    { code: 'MAD', country: 'المغرب', name: 'درهم مغربي', sym: 'د.م', dec: 2 },
+    { code: 'SDG', country: 'السودان', name: 'جنيه سوداني', sym: 'ج.س', dec: 2 },
+    { code: 'MRU', country: 'موريتانيا', name: 'أوقية', sym: 'أ.م', dec: 2 },
+    { code: 'SOS', country: 'الصومال', name: 'شلن صومالي', sym: 'ش.ص', dec: 0 },
+    { code: 'DJF', country: 'جيبوتي', name: 'فرنك جيبوتي', sym: 'ف.ج', dec: 0 },
+    { code: 'KMF', country: 'جزر القمر', name: 'فرنك قمري', sym: 'ف.ق', dec: 0 },
+    { code: 'USD', country: 'دولار أمريكي', name: 'دولار', sym: '$', dec: 2 }
+  ];
+  let CUR = 'ج.م', CUR_SHORT = 'ج', CUR_DEC = 2;
+  function currentCurrency() { return CURRENCIES.find(c => c.code === settings.currency) || CURRENCIES[0]; }
+  function applyCurrency() {
+    const c = currentCurrency();
+    CUR = c.sym; CUR_SHORT = c.short || c.sym; CUR_DEC = c.dec;
+    document.querySelectorAll('.cur').forEach(el => { el.textContent = CUR; });
+    const sel = document.getElementById('currencySelect');
+    if (sel) sel.value = c.code;
+  }
+  // المظهر: تلقائي (حسب الموبايل) / فاتح / ليلي
+  const darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function themeMode() { return settings.theme === 'dark' || settings.theme === 'light' ? settings.theme : 'auto'; }
+  function isDarkNow() { const m = themeMode(); return m === 'dark' || (m === 'auto' && !!(darkQuery && darkQuery.matches)); }
+  function applyTheme() {
+    const m = themeMode();
+    if (m === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', m);
+    const dark = isDarkNow();
+    const btn = document.getElementById('themeBtn');
+    if (btn) { btn.innerHTML = icon(dark ? 'sun' : 'moon'); btn.setAttribute('aria-label', dark ? 'التبديل للوضع الفاتح' : 'التبديل للوضع الليلي'); }
+    [['auto', 'themeAuto'], ['light', 'themeLight'], ['dark', 'themeDark']].forEach(([k, id]) => {
+      const b = document.getElementById(id);
+      if (b) { b.classList.toggle('on', m === k); b.setAttribute('aria-checked', m === k ? 'true' : 'false'); }
+    });
+    const tag = document.getElementById('themeTag');
+    if (tag) tag.textContent = m === 'auto' ? `تلقائي (${dark ? 'ليلي' : 'فاتح'})` : (m === 'dark' ? 'ليلي' : 'فاتح');
+  }
+  function setTheme(mode) {
+    settings.theme = mode === 'dark' || mode === 'light' ? mode : 'auto';
+    saveSettings();
+    applyTheme();
+  }
+  function toggleTheme() {
+    setTheme(isDarkNow() ? 'light' : 'dark');
+    showAppToast(isDarkNow() ? '🌙 الوضع الليلي' : '☀️ الوضع الفاتح');
+  }
+  if (darkQuery) { try { darkQuery.addEventListener('change', applyTheme); } catch (e) { try { darkQuery.addListener(applyTheme); } catch (e2) {} } }
+
+  function setCurrency(code) {
+    if (!CURRENCIES.some(c => c.code === code)) return;
+    settings.currency = code;
+    saveSettings();
+    applyCurrency();
+    renderAll();
+    const c = currentCurrency();
+    showAppToast(`✔️ العملة: ${c.name} (${c.sym}) — اتطبقت على كل الأسعار`);
+  }
 
   let appData = { invoiceTitle: DEFAULT_TITLE, techName: DEFAULT_TECH, techPhone: '', logoData: '', showLogo: false, currentId: null, invoices: [] };
   let customers = [];
@@ -925,6 +1291,13 @@
   let txnKind = 'payment';
   let custTab = 'work';
   let editingRoomIndex = null;
+  let editingItemIndex = null;
+  let itemUnit = 'عدد';
+  let matLists = [];
+  let currentMatListId = null;
+  let editingMatItemId = null;
+  let matItemUnit = 'عدد';
+  let pickTarget = null;
   let currentView = 'pricing';
   let currentPrintFontSize = 13;
   let currentCellPadV = 5;
@@ -970,7 +1343,11 @@
     link: '<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
     box: '<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>',
     cash: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 10v4M18 10v4"/>',
-    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>'
+    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+    layers: '<path d="M12 2l10 5-10 5L2 7z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
+    list: '<path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
   };
   function icon(name) { return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`; }
   function hydrateIcons(root = document) {
@@ -982,8 +1359,9 @@
     return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
   function fmt(n) {
-    const v = Math.round((Number(n) || 0) * 100) / 100;
-    return v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const f = Math.pow(10, CUR_DEC);
+    const v = Math.round((Number(n) || 0) * f) / f;
+    return v.toLocaleString('en-US', { maximumFractionDigits: CUR_DEC });
   }
   function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
 
@@ -1010,6 +1388,21 @@
     actions: { open: () => toggleSheet('actions', true), close: () => toggleSheet('actions', false) },
     custEdit: { open: () => toggleSheet('custEdit', true), close: () => toggleSheet('custEdit', false) },
     txn: { open: () => toggleSheet('txn', true), close: () => toggleSheet('txn', false) },
+    mode: { open: () => toggleSheet('mode', true), close: () => toggleSheet('mode', false) },
+    appUpd: { open: () => toggleSheet('appUpd', true), close: () => toggleSheet('appUpd', false) },
+    item: { open: () => toggleSheet('item', true), close: () => { toggleSheet('item', false); editingItemIndex = null; } },
+    matItem: { open: () => toggleSheet('matItem', true), close: () => { toggleSheet('matItem', false); editingMatItemId = null; } },
+    pick: { open: () => toggleSheet('pick', true), close: () => toggleSheet('pick', false) },
+    matlist: {
+      open: () => { const pg = document.getElementById('matPage'); pg.classList.add('open'); pg.scrollTop = 0; },
+      close: () => {
+        document.getElementById('matPage').classList.remove('open');
+        flushMatLedgerSync();
+        currentMatListId = null;
+        if (currentView === 'materials') renderMatLists();
+        if (currentCustomerId) renderCustomerPage();
+      }
+    },
     customer: {
       open: () => { const pg = document.getElementById('customerPage'); pg.classList.add('open'); pg.scrollTop = 0; },
       close: () => { document.getElementById('customerPage').classList.remove('open'); currentCustomerId = null; if (currentView === 'ledger') renderLedger(); }
@@ -1066,11 +1459,12 @@
     currentView = key;
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + key));
     document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.id === 'navBtn-' + key));
-    document.getElementById('headerTitle').textContent = VIEW_TITLES[key];
-    document.getElementById('heroCard').classList.toggle('hidden', key === 'saved' || key === 'more' || key === 'ledger');
+    document.getElementById('headerTitle').textContent = (key === 'rooms' && isItemsMode(getCurrentInvoice())) ? 'بنود الفاتورة' : VIEW_TITLES[key];
+    document.getElementById('heroCard').classList.toggle('hidden', key === 'saved' || key === 'more' || key === 'ledger' || key === 'materials');
     document.getElementById('addRoomFab').classList.toggle('hidden', key !== 'rooms');
     if (key === 'saved') renderInvoiceList();
     if (key === 'ledger') renderLedger();
+    if (key === 'materials') renderMatLists();
     if (key === 'more') renderUpdateUI();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1131,6 +1525,8 @@
       if (typeof inv.clientPhone !== 'string') inv.clientPhone = '';
       if (typeof inv.clientAddress !== 'string') inv.clientAddress = '';
       if (typeof inv.materialsDue !== 'number') inv.materialsDue = 0;
+      if (inv.billingMode !== 'items') inv.billingMode = 'points';
+      if (!Array.isArray(inv.items)) inv.items = [];
       inv.rooms.forEach(r => {
         if (r.lines > 0) { inv.mainLines += r.lines; r.lines = 0; }
         if (r.risers > 0) { inv.mainRisers += r.risers; r.risers = 0; }
@@ -1154,23 +1550,34 @@
 
   function initApp() {
     hydrateIcons();
-    let saved = localStorage.getItem(STORAGE_KEY);
+    // بداية نظيفة لسجل الرجوع (لو التطبيق اتفتح من جديد وهو على نافذة مفتوحة)
+    try { history.replaceState({ ovDepth: 0 }, ''); } catch (e) {}
     if (IS_BETA) {
       document.getElementById('betaBar').classList.remove('hidden');
-      if (saved == null) {
-        // أول تشغيل للنسخة التجريبية: ننسخ بيانات التطبيق الأصلي مرة واحدة
-        saved = localStorage.getItem(MAIN_STORAGE_KEY);
-        const mainLedger = localStorage.getItem('hesabaty_customers_v1');
-        if (mainLedger && localStorage.getItem(CUSTOMERS_KEY) == null) localStorage.setItem(CUSTOMERS_KEY, mainLedger);
-      }
-    } else {
+      // أول تشغيل لهذه النسخة التجريبية: ننسخ بيانات التطبيق الأصلي مرة واحدة (نسخة، لا تعديل على الأصل)
+      const BETA_TAG = 'beta-' + APP_VERSION;
+      try {
+        if (localStorage.getItem('beta_data_tag') !== BETA_TAG) {
+          [MAIN_STORAGE_KEY, 'hesabaty_customers_v1', 'hesabaty_settings_v1', 'hesabaty_matlists_v1'].forEach(k => {
+            const v = localStorage.getItem(k);
+            if (v != null) localStorage.setItem('beta_' + k, v); else localStorage.removeItem('beta_' + k);
+          });
+          localStorage.setItem('beta_data_tag', BETA_TAG);
+        }
+      } catch (e) {}
+    }
+    let saved = localStorage.getItem(STORAGE_KEY);
+    if (!IS_BETA) {
       saved = saved
         || localStorage.getItem('ahmed_elec_invoices_v6')
         || localStorage.getItem('ahmed_elec_invoices_v5')
         || localStorage.getItem('ahmed_elec_invoices_v4');
     }
     loadSettings();
+    applyCurrency();
+    applyTheme();
     loadCustomers();
+    loadMatLists();
     if (saved) { try { loadFromParsed(JSON.parse(saved)); } catch (e) {} }
     if (!appData.invoices || appData.invoices.length === 0) createNewInvoice(false);
     else if (!appData.currentId || !appData.invoices.some(i => i.id === appData.currentId)) appData.currentId = appData.invoices[0].id;
@@ -1189,6 +1596,10 @@
       input.dispatchEvent(new Event('input', { bubbles: true }));
     });
     document.getElementById('roomSheet').addEventListener('input', updateRoomLivePreview);
+    initItemSheet();
+    document.getElementById('currencySelect').innerHTML = CURRENCIES.map(c => `<option value="${c.code}">${esc(c.country)} — ${esc(c.name)} (${esc(c.sym)})</option>`).join('');
+    applyCurrency();
+    initMatItemSheet();
     const suggestBox = document.getElementById('clientSuggest');
     suggestBox.addEventListener('pointerdown', e => e.preventDefault());
     suggestBox.addEventListener('click', e => {
@@ -1200,7 +1611,7 @@
     document.getElementById('clientName').addEventListener('focus', e => { if (DEFAULT_CLIENT_RE.test(e.target.value.trim())) e.target.select(); });
     document.getElementById('printSheet').addEventListener('input', () => requestAnimationFrame(fitPreview));
     document.getElementById('aboutVersion').textContent = APP_VERSION;
-    document.getElementById('verCurrent').textContent = APP_VERSION;
+    document.getElementById('verCurrent').textContent = IN_APP ? appVersion() : APP_VERSION;
     document.getElementById('copyYear').textContent = Math.max(2026, new Date().getFullYear());
 
     renderAll();
@@ -1217,8 +1628,10 @@
     return appData.invoices.find(inv => inv.id === appData.currentId) || appData.invoices[0];
   }
 
-  function createNewInvoice(goPricing = true) {
+  function createNewInvoice(goPricing = true, mode = 'points') {
     const newInv = {
+      billingMode: mode === 'items' ? 'items' : 'points',
+      items: [],
       id: 'inv_' + Date.now(),
       clientName: 'عميل جديد ' + (appData.invoices.length + 1),
       clientPhone: '',
@@ -1273,6 +1686,38 @@
   function openInvoice(id) {
     switchInvoice(id);
     switchView('pricing');
+  }
+
+  // فاتورة جديدة: يسأل المستخدم الأول هيحاسب بنظام إيه
+  let pendingNewInvoiceCustomer = null;
+  function startNewInvoice(customerId = null) {
+    pendingNewInvoiceCustomer = customerId || null;
+    const last = settings.lastMode === 'items' ? 'items' : 'points';
+    document.getElementById('pickModePoints').classList.toggle('on', last === 'points');
+    document.getElementById('pickModeItems').classList.toggle('on', last === 'items');
+    openOverlay('mode');
+  }
+  function chooseNewInvoiceMode(mode) {
+    const customerId = pendingNewInvoiceCustomer;
+    pendingNewInvoiceCustomer = null;
+    settings.lastMode = mode; saveSettings();
+    closeAllThen(() => {
+      createNewInvoice(true, mode);
+      const c = customerId ? getCustomer(customerId) : null;
+      if (c) doLinkInvoice(getCurrentInvoice(), c, true);
+      if (mode === 'items') showAppToast('✔️ فاتورة جديدة بنظام البنود المنفصلة');
+    });
+  }
+  function setBillingMode(mode) {
+    const inv = getCurrentInvoice();
+    if (inv.billingMode === mode) return;
+    inv.billingMode = mode;
+    settings.lastMode = mode; saveSettings();
+    saveToStorage();
+    renderAll();
+    const kept = mode === 'items' ? (inv.rooms.length || inv.mainLines || inv.mainRisers) : inv.items.length;
+    showAppToast(mode === 'items' ? '✔️ الفاتورة دي بقت بنظام البنود المنفصلة' + (kept ? ' — بيانات النقاط محفوظة لو رجعت لها' : '')
+                                  : '✔️ الفاتورة دي رجعت لنظام النقاط' + (kept ? ' — البنود محفوظة لو رجعت لها' : ''));
   }
 
   function setSystemType(type) {
@@ -1356,11 +1801,11 @@
     const inv = getCurrentInvoice();
     const c = calculateRoom(readRoomForm(''), inv);
     document.getElementById('roomLivePts').textContent = `إجمالي الغرفة · ${fmt(c.totalPoints)} نقطة`;
-    document.getElementById('roomLiveTotal').textContent = `${fmt(c.totalCost)} ج.م`;
-    document.getElementById('profileHint').textContent = `بسعر المتر: ${fmt(inv.profileMeterPrice || 0)} ج.م`;
+    document.getElementById('roomLiveTotal').textContent = `${fmt(c.totalCost)} ${CUR}`;
+    document.getElementById('profileHint').textContent = `بسعر المتر: ${fmt(inv.profileMeterPrice || 0)} ${CUR}`;
     const noPlasterPrice = num('roomLedPlaster') > 0 && !(inv.plasterProfilePrice > 0);
     const ph = document.getElementById('plasterHint');
-    ph.textContent = noPlasterPrice ? '⚠️ حدد سعر متر بروفايل المحارة من صفحة «البيانات» أولاً' : `بسعر المتر: ${fmt(inv.plasterProfilePrice || 0)} ج.م`;
+    ph.textContent = noPlasterPrice ? '⚠️ حدد سعر متر بروفايل المحارة من صفحة «البيانات» أولاً' : `بسعر المتر: ${fmt(inv.plasterProfilePrice || 0)} ${CUR}`;
     ph.style.color = noPlasterPrice ? 'var(--danger)' : '';
   }
 
@@ -1414,6 +1859,78 @@
     ['roomName', 'roomSockets', 'roomSpots', 'roomLedStrip', 'roomLedProfile', 'roomLedPlaster'].forEach(id => { document.getElementById(id).value = ''; });
     document.getElementById('extraItemsContainer').innerHTML = '';
   }
+
+  /* ---------------- البنود المنفصلة ---------------- */
+  function isItemsMode(inv) { return !!inv && inv.billingMode === 'items'; }
+  function fabAdd() { if (isItemsMode(getCurrentInvoice())) openItemSheet(null); else openRoomSheet(); }
+  function renderUnitChips(boxId, units, current, onPick) {
+    const box = document.getElementById(boxId);
+    box.innerHTML = units.map(u => `<button type="button" class="chip${u === current ? ' on' : ''}" data-u="${esc(u)}">${esc(u)}</button>`).join('');
+    box.onclick = e => { const b = e.target.closest('.chip'); if (b) onPick(b.dataset.u); };
+  }
+  function initItemSheet() {
+    const chips = document.getElementById('itemChips');
+    chips.innerHTML = WORK_PRESETS.map(n => `<button type="button" class="chip" data-name="${esc(n)}">${esc(n)}</button>`).join('');
+    chips.addEventListener('click', e => {
+      const b = e.target.closest('.chip');
+      if (!b) return;
+      document.getElementById('itemName').value = b.dataset.name;
+      if (!document.getElementById('itemQty').value) document.getElementById('itemQty').value = 1;
+      if (b.dataset.name === 'سحب خط') setItemUnit('خط');
+      updateItemLive();
+    });
+    document.getElementById('itemSheet').addEventListener('input', updateItemLive);
+  }
+  function setItemUnit(u) { itemUnit = u; renderUnitChips('itemUnits', ITEM_UNITS, itemUnit, setItemUnit); updateItemLive(); }
+  function updateItemLive() {
+    const q = num('itemQty'), p = num('itemPrice');
+    document.getElementById('itemLiveQty').textContent = `${fmt(q || 0)} ${itemUnit} × ${fmt(p)} ${CUR}`;
+    document.getElementById('itemLiveTotal').textContent = `${fmt(q * p)} ${CUR}`;
+  }
+  function openItemSheet(index) {
+    const inv = getCurrentInvoice();
+    const it = index !== null && index !== undefined ? inv.items[index] : null;
+    editingItemIndex = it ? index : null;
+    document.getElementById('itemFormTitle').textContent = it ? 'تعديل البند' : 'إضافة بند';
+    document.getElementById('saveItemBtn').textContent = it ? 'تحديث البند' : 'حفظ البند';
+    document.getElementById('itemName').value = it ? it.name : '';
+    document.getElementById('itemQty').value = it ? it.qty : 1;
+    document.getElementById('itemPrice').value = it ? (it.price || '') : '';
+    document.getElementById('itemNote').value = it ? (it.note || '') : '';
+    document.getElementById('deleteItemBtn').classList.toggle('hidden', !it);
+    setItemUnit(it ? (it.unit || 'عدد') : 'عدد');
+    openOverlay('item');
+    editingItemIndex = it ? index : null;
+  }
+  function saveItem() {
+    const inv = getCurrentInvoice();
+    const name = document.getElementById('itemName').value.trim();
+    if (!name) { showAppToast('⚠️ اكتب اسم البند أولاً'); return; }
+    const qty = num('itemQty') || 1;
+    const obj = { name, qty, unit: itemUnit, price: num('itemPrice'), note: document.getElementById('itemNote').value.trim() };
+    const wasEditing = editingItemIndex !== null;
+    if (wasEditing) inv.items[editingItemIndex] = obj; else inv.items.push(obj);
+    saveToStorage();
+    renderRoomsAndSummary();
+    closeOverlay();
+    showAppToast(wasEditing ? '✔️ تم تحديث البند' : `✔️ تمت إضافة "${name}"`);
+  }
+  function deleteItem() {
+    const idx = editingItemIndex;
+    if (idx === null) return;
+    showAppConfirm('حذف هذا البند من الفاتورة؟', () => {
+      getCurrentInvoice().items.splice(idx, 1);
+      saveToStorage();
+      renderRoomsAndSummary();
+      closeOverlay();
+    });
+  }
+  function calculateItems(inv) {
+    let total = 0;
+    const rows = (inv.items || []).map(it => { const c = (Number(it.qty) || 0) * (Number(it.price) || 0); total += c; return c; });
+    return { rows, total, count: rows.length };
+  }
+  function itemQtyText(it) { return it.unit === 'مقطوعية' && Number(it.qty) === 1 ? 'مقطوعية' : `${fmt(it.qty)} ${it.unit || ''}`.trim(); }
 
   /* =========================================================
      العمليات الحسابية
@@ -1511,11 +2028,40 @@
     t.materialsDue = inv.materialsDue || 0;
     t.netRemaining = t.grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0) + t.materialsDue;
     t.avgRate = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
+    // نظام البنود المنفصلة: الإجمالي = مجموع البنود فقط (بيانات النقاط تبقى محفوظة ولا تدخل في الحساب)
+    if (isItemsMode(inv)) {
+      const it = calculateItems(inv);
+      t.mode = 'items';
+      t.itemRows = it.rows;
+      t.itemsTotal = it.total;
+      t.itemsCount = it.count;
+      t.grandTotal = it.total;
+      t.netRemaining = t.grandTotal - (inv.discountAmount || 0) - (inv.paidAmount || 0) + t.materialsDue;
+    } else t.mode = 'points';
     return t;
   }
 
   /* ---------------- العرض ---------------- */
+  function renderModeUI() {
+    const inv = getCurrentInvoice();
+    const items = isItemsMode(inv);
+    document.getElementById('modePoints').classList.toggle('on', !items);
+    document.getElementById('modeItems').classList.toggle('on', items);
+    document.getElementById('modeHint').innerHTML = items
+      ? 'كل شغلانة ببندها وسعرها (مثلاً «تقفيل لوحة» فقط)، وتقدر تضيف أكتر من بند. الفاتورة بتطلع بنفس الشكل بمسميات البنود.'
+      : 'حساب الغرف بالنقاط + خطوط اللوحة والصواعد (النظام المعتاد).';
+    document.getElementById('pointsPricingCard').classList.toggle('hidden', items);
+    document.getElementById('itemsModeBox').classList.toggle('hidden', !items);
+    document.getElementById('pointsModeBox').classList.toggle('hidden', items);
+    document.getElementById('nextRoomsText').textContent = items ? 'التالي: بنود الفاتورة' : 'التالي: الغرف واللوحة';
+    document.getElementById('navRoomsLabel').textContent = items ? 'البنود' : 'الغرف';
+    document.getElementById('navRoomsIc').innerHTML = icon(items ? 'list' : 'home');
+    document.getElementById('fabText').textContent = items ? 'بند' : 'غرفة';
+    if (currentView === 'rooms') document.getElementById('headerTitle').textContent = items ? 'بنود الفاتورة' : VIEW_TITLES.rooms;
+  }
+
   function renderSystemNotice() {
+    renderModeUI();
     const inv = getCurrentInvoice();
     const isOld = inv.systemType === 'old';
     document.getElementById('cardModern').classList.toggle('on', !isOld);
@@ -1525,9 +2071,9 @@
     const notice = document.getElementById('systemRuleNotice');
     if (isOld) {
       const avg = ((inv.oldPointPrice || 0) + (inv.newPointPrice || 0)) / 2;
-      notice.innerHTML = `<strong>النظام القديم</strong> (يظهر أعلى الفاتورة):<br>• البرايز والمفاتيح وخطوط اللوحة والصواعد بمتوسط السعرين = <strong>${fmt(avg)} ج.م</strong><br>• الإسبوتات وشريط الليد بالسعر الحالي = <strong>${fmt(inv.newPointPrice || 0)} ج.م</strong>`;
+      notice.innerHTML = `<strong>النظام القديم</strong> (يظهر أعلى الفاتورة):<br>• البرايز والمفاتيح وخطوط اللوحة والصواعد بمتوسط السعرين = <strong>${fmt(avg)} ${CUR}</strong><br>• الإسبوتات وشريط الليد بالسعر الحالي = <strong>${fmt(inv.newPointPrice || 0)} ${CUR}</strong>`;
     } else {
-      notice.innerHTML = `<strong>تسعيرة موحدة:</strong> كل النقاط تُحسب بسعر <strong>${fmt(inv.newPointPrice || 0)} ج.م</strong> للنقطة، ولا يُذكر اسم النظام في الفاتورة.`;
+      notice.innerHTML = `<strong>تسعيرة موحدة:</strong> كل النقاط تُحسب بسعر <strong>${fmt(inv.newPointPrice || 0)} ${CUR}</strong> للنقطة، ولا يُذكر اسم النظام في الفاتورة.`;
     }
   }
 
@@ -1563,17 +2109,33 @@
     const p = t.panel;
 
     document.getElementById('headerSub').textContent = `${inv.clientName || 'بدون اسم'} · ${inv.date || ''}`;
-    document.getElementById('mainPanelBadge').textContent = `${fmt(p.totalPanelPts)} نقطة · ${fmt(p.totalPanelCost)} ج.م`;
+    document.getElementById('mainPanelBadge').textContent = `${fmt(p.totalPanelPts)} نقطة · ${fmt(p.totalPanelCost)} ${CUR}`;
     document.getElementById('mainPanelLiveSummary').innerHTML =
-      `• خطوط الأتوماتيك: <strong>${fmt(p.linesCount)} (${fmt(p.linesPts)} ن)</strong> = ${fmt(p.linesCost)} ج.م<br>` +
-      `• الصواعد الرئيسية: <strong>${fmt(p.risersCount)} (${fmt(p.risersPts)} ن)</strong> = ${fmt(p.risersCost)} ج.م`;
+      `• خطوط الأتوماتيك: <strong>${fmt(p.linesCount)} (${fmt(p.linesPts)} ن)</strong> = ${fmt(p.linesCost)} ${CUR}<br>` +
+      `• الصواعد الرئيسية: <strong>${fmt(p.risersCount)} (${fmt(p.risersPts)} ن)</strong> = ${fmt(p.risersCost)} ${CUR}`;
     document.getElementById('linePtsHint').textContent = `الخط = ${fmt(p.linePtsEach)} نقطة`;
     document.getElementById('riserPtsHint').textContent = `الصاعد = ${fmt(p.riserPtsEach)} نقطة`;
 
+    const itemsMode = t.mode === 'items';
+    const badgeCount = itemsMode ? inv.items.length : inv.rooms.length;
     document.getElementById('roomsCountBadge').textContent = inv.rooms.length;
+    document.getElementById('itemsCountBadge').textContent = inv.items.length;
     const navBadge = document.getElementById('drawerRoomCount');
-    navBadge.textContent = inv.rooms.length;
-    navBadge.classList.toggle('hidden', inv.rooms.length === 0);
+    navBadge.textContent = badgeCount;
+    navBadge.classList.toggle('hidden', badgeCount === 0);
+
+    const itemsBox = document.getElementById('itemsListContainer');
+    if (!inv.items.length) {
+      itemsBox.innerHTML = `<div class="card empty"><div class="big">${icon('list')}</div><p>لم تضف أي بند بعد.<br>مثال: «تقفيل لوحة» أو «سحب خط» بسعره.</p><button type="button" class="btn btn-accent" onclick="openItemSheet(null)">${icon('plus')} إضافة أول بند</button></div>`;
+    } else {
+      itemsBox.innerHTML = inv.items.map((it, idx) => `
+        <div class="item-card" onclick="openItemSheet(${idx})">
+          <span class="room-num">${idx + 1}</span>
+          <div class="i-info"><div class="i-name">${esc(it.name)}</div><div class="i-meta">${esc(itemQtyText(it))} × ${fmt(it.price)} ${CUR}${it.note ? ' · ' + esc(it.note) : ''}</div></div>
+          <div class="i-amt">${fmt((Number(it.qty) || 0) * (Number(it.price) || 0))}<small>${CUR}</small></div>
+        </div>`).join('') +
+        `<div class="sum-total" style="margin-bottom:14px"><span>إجمالي البنود (${inv.items.length})</span><strong>${fmt(calculateItems(inv).total)} ${CUR}</strong></div>`;
+    }
 
     const list = document.getElementById('roomsListContainer');
     if (inv.rooms.length === 0) {
@@ -1585,12 +2147,12 @@
         if (r.sockets) chips.push(`<span class="r-chip">برايز ومفاتيح <b>${fmt(r.sockets)} (${fmt(c.socketsPts)} ن)</b></span>`);
         if (r.spots) chips.push(`<span class="r-chip">إسبوتات <b>${fmt(r.spots)} (${fmt(c.spotsPts)} ن)</b></span>`);
         if (r.ledStrip) chips.push(`<span class="r-chip">شريط ليد <b>${fmt(r.ledStrip)} م (${fmt(c.ledStripPts)} ن)</b></span>`);
-        if (r.ledProfile) chips.push(`<span class="r-chip">بروفايل ${fmt(r.ledProfile)} م <b>${fmt(c.profileCost)} ج.م</b></span>`);
-        if (r.ledProfilePlaster) chips.push(`<span class="r-chip">بروفايل محارة ${fmt(r.ledProfilePlaster)} م <b>${fmt(c.plasterCost)} ج.م</b></span>`);
-        (r.extras || []).forEach(ex => chips.push(`<span class="r-chip">${esc(ex.name)} (${fmt(ex.qty)}) <b>${fmt(ex.qty * ex.price)} ج.م</b></span>`));
+        if (r.ledProfile) chips.push(`<span class="r-chip">بروفايل ${fmt(r.ledProfile)} م <b>${fmt(c.profileCost)} ${CUR}</b></span>`);
+        if (r.ledProfilePlaster) chips.push(`<span class="r-chip">بروفايل محارة ${fmt(r.ledProfilePlaster)} م <b>${fmt(c.plasterCost)} ${CUR}</b></span>`);
+        (r.extras || []).forEach(ex => chips.push(`<span class="r-chip">${esc(ex.name)} (${fmt(ex.qty)}) <b>${fmt(ex.qty * ex.price)} ${CUR}</b></span>`));
         return `
           <div class="room-card">
-            <div class="room-top"><span class="room-num">${idx + 1}</span><span class="room-name">${esc(r.name)}</span><span class="room-total">${fmt(c.totalCost)} ج.م</span></div>
+            <div class="room-top"><span class="room-num">${idx + 1}</span><span class="room-name">${esc(r.name)}</span><span class="room-total">${fmt(c.totalCost)} ${CUR}</span></div>
             ${chips.length ? `<div class="room-chips">${chips.join('')}</div>` : ''}
             <div class="room-foot">
               <span>نقاط الغرفة: <b>${fmt(c.totalPoints)} نقطة</b></span>
@@ -1603,28 +2165,34 @@
       }).join('');
     }
 
-    document.getElementById('topTotalPoints').textContent = `${fmt(t.allPointsCount)} نقطة`;
-    document.getElementById('topPointsCost').textContent = `${fmt(t.pointsCostTotal)} ج.م`;
-    document.getElementById('topExtrasCost').textContent = `${fmt(t.profileAndExtrasTotal)} ج.م`;
+    document.getElementById('heroL1').textContent = itemsMode ? 'عدد البنود' : 'إجمالي النقاط';
+    document.getElementById('heroL2').textContent = itemsMode ? 'إجمالي البنود' : 'حساب النقاط';
+    document.getElementById('heroL3').textContent = itemsMode ? 'المدفوع' : 'بروفايل وإضافي';
+    document.getElementById('topTotalPoints').textContent = itemsMode ? `${inv.items.length} بند` : `${fmt(t.allPointsCount)} نقطة`;
+    document.getElementById('topPointsCost').textContent = `${fmt(itemsMode ? t.itemsTotal : t.pointsCostTotal)} ${CUR}`;
+    document.getElementById('topExtrasCost').textContent = `${fmt(itemsMode ? (inv.paidAmount || 0) : t.profileAndExtrasTotal)} ${CUR}`;
     document.getElementById('topNetRequired').textContent = fmt(t.netRemaining);
 
     document.getElementById('summaryTitle').textContent = `كشف الحساب: ${inv.clientName}`;
     const row = (label, value, cls = '') => `<div class="sum-row ${cls}"><span>${label}</span><strong>${value}</strong></div>`;
     let html = '<div class="sum-list">';
-    if (inv.systemType === 'old') {
-      html += row(`نقاط البرايز والخطوط والصواعد (${fmt(t.totalBasePtsAll)} ن × ${fmt(t.avgRate)} ج.م)`, `${fmt(t.totalBaseCostAll)} ج.م`);
-      html += row(`نقاط الإسبوتات وشريط الليد (${fmt(t.sumFinishPts)} ن × ${fmt(inv.newPointPrice || 0)} ج.م)`, `${fmt(t.sumFinishCost)} ج.م`);
+    if (itemsMode) {
+      if (!inv.items.length) html += row('لا توجد بنود بعد', `0 ${CUR}`);
+      inv.items.forEach((it, i) => { html += row(`${esc(it.name)} (${esc(itemQtyText(it))} × ${fmt(it.price)} ${CUR})`, `${fmt(t.itemRows[i])} ${CUR}`); });
+    } else if (inv.systemType === 'old') {
+      html += row(`نقاط البرايز والخطوط والصواعد (${fmt(t.totalBasePtsAll)} ن × ${fmt(t.avgRate)} ${CUR})`, `${fmt(t.totalBaseCostAll)} ${CUR}`);
+      html += row(`نقاط الإسبوتات وشريط الليد (${fmt(t.sumFinishPts)} ن × ${fmt(inv.newPointPrice || 0)} ${CUR})`, `${fmt(t.sumFinishCost)} ${CUR}`);
     } else {
-      html += row(`إجمالي حساب النقاط (${fmt(t.allPointsCount)} ن × ${fmt(inv.newPointPrice || 0)} ج.م)`, `${fmt(t.pointsCostTotal)} ج.م`);
+      html += row(`إجمالي حساب النقاط (${fmt(t.allPointsCount)} ن × ${fmt(inv.newPointPrice || 0)} ${CUR})`, `${fmt(t.pointsCostTotal)} ${CUR}`);
     }
-    if (t.sumProfileCost > 0) html += row(`إجمالي الليد بروفايل (${fmt(t.sumProfileMeters)} م)`, `${fmt(t.sumProfileCost)} ج.م`);
-    if (t.sumPlasterCost > 0) html += row(`إجمالي ليد بروفايل على المحارة (${fmt(t.sumPlasterMeters)} م)`, `${fmt(t.sumPlasterCost)} ج.م`);
-    if (t.sumExtrasCost > 0) html += row('إجمالي البنود الإضافية', `${fmt(t.sumExtrasCost)} ج.م`);
-    html += row('إجمالي قيمة الأعمال', `${fmt(t.grandTotal)} ج.م`, 'bold');
-    if (inv.discountAmount > 0) html += row('الخصم', `- ${fmt(inv.discountAmount)} ج.م`, 'minus');
-    if (inv.paidAmount > 0) html += row('المدفوع تحت الحساب', `- ${fmt(inv.paidAmount)} ج.م`, 'minus');
-    if (t.materialsDue > 0) html += row('خامات (مستحقة على العميل)', `+ ${fmt(t.materialsDue)} ج.م`, 'bold');
-    html += `</div><div class="sum-total"><span>الصافي المطلوب سداده</span><strong>${fmt(t.netRemaining)} ج.م</strong></div>`;
+    if (!itemsMode && t.sumProfileCost > 0) html += row(`إجمالي الليد بروفايل (${fmt(t.sumProfileMeters)} م)`, `${fmt(t.sumProfileCost)} ${CUR}`);
+    if (!itemsMode && t.sumPlasterCost > 0) html += row(`إجمالي ليد بروفايل على المحارة (${fmt(t.sumPlasterMeters)} م)`, `${fmt(t.sumPlasterCost)} ${CUR}`);
+    if (!itemsMode && t.sumExtrasCost > 0) html += row('إجمالي البنود الإضافية', `${fmt(t.sumExtrasCost)} ${CUR}`);
+    html += row('إجمالي قيمة الأعمال', `${fmt(t.grandTotal)} ${CUR}`, 'bold');
+    if (inv.discountAmount > 0) html += row('الخصم', `- ${fmt(inv.discountAmount)} ${CUR}`, 'minus');
+    if (inv.paidAmount > 0) html += row('المدفوع تحت الحساب', `- ${fmt(inv.paidAmount)} ${CUR}`, 'minus');
+    if (t.materialsDue > 0) html += row('خامات (مستحقة على العميل)', `+ ${fmt(t.materialsDue)} ${CUR}`, 'bold');
+    html += `</div><div class="sum-total"><span>الصافي المطلوب سداده</span><strong>${fmt(t.netRemaining)} ${CUR}</strong></div>`;
     document.getElementById('finalSummaryBox').innerHTML = html;
 
     renderLinkUI();
@@ -1648,9 +2216,9 @@
           <div class="inv-avatar">${initial}</div>
           <div class="inv-info">
             <div class="n">${esc(inv.clientName)}${isCur ? '<span class="badge-now">مفتوحة</span>' : ''}</div>
-            <div class="m">${esc(inv.date || '')}${inv.clientPhone ? ' · <span dir="ltr">' + esc(inv.clientPhone) + '</span>' : ''} · ${inv.rooms.length} غرف · ${fmt(t.allPointsCount)} نقطة</div>
+            <div class="m">${esc(inv.date || '')}${inv.clientPhone ? ' · <span dir="ltr">' + esc(inv.clientPhone) + '</span>' : ''} · ${t.mode === 'items' ? `بنود منفصلة · ${inv.items.length} بند` : `${inv.rooms.length} غرف · ${fmt(t.allPointsCount)} نقطة`}</div>
           </div>
-          <div class="inv-amount">${fmt(t.netRemaining)}<small>ج.م صافي</small></div>
+          <div class="inv-amount">${fmt(t.netRemaining)}<small>${CUR} صافي</small></div>
         </div>`;
     }).join('');
     box.querySelectorAll('.inv-card').forEach(el => { el.onclick = () => openInvoice(el.dataset.id); });
@@ -1703,23 +2271,126 @@
   }
   window.addEventListener('resize', fitPreview);
 
+  /* ---------- أجزاء مشتركة للمستندات المطبوعة (فاتورة البنود وكشف الخامات) ---------- */
+  const CE = 'contenteditable="true"';
+  function printField(ic, label, value, wide = false) {
+    return `<div class="inv-field${wide ? ' wide' : ''}"><span class="ic">${icon(ic)}</span>
+      <div style="min-width:0"><div class="lbl">${label}</div><div class="val" ${CE}>${value}</div></div></div>`;
+  }
+  function printClientFields(name, phone, address, date) {
+    return [
+      printField('user', 'العميل', esc(name || '-')),
+      phone ? printField('phone', 'هاتف العميل', `<span dir="ltr">${esc(phone)}</span>`) : printField('calendar', 'التاريخ', esc(date || '-')),
+      address ? printField('pin', 'العنوان', esc(address), true) : ''
+    ].join('');
+  }
+  function printHeaderHTML(title, tag, date, countLine) {
+    const showLogo = appData.showLogo && appData.logoData;
+    return `
+      <header class="inv-head">
+        <div class="inv-brand">
+          <div class="inv-logo" id="previewLogoContainer" style="display:${showLogo ? 'grid' : 'none'};"><img src="${appData.logoData || ''}" alt="Logo"></div>
+          <div style="min-width:0">
+            <h1 ${CE}>${esc(title)}</h1>
+            <p ${CE}>${esc(appData.techName || 'للأعمال والتشطيبات الكهربائية')}</p>
+            ${appData.techPhone ? `<p ${CE}>هاتف: <b dir="ltr">${esc(appData.techPhone)}</b></p>` : ''}
+          </div>
+        </div>
+        <div class="inv-doc">
+          <span class="tag" ${CE}>${esc(tag)}</span>
+          <span class="d" ${CE}>التاريخ: <b>${esc(date || '-')}</b></span>
+          <span class="d" ${CE}>${countLine}</span>
+        </div>
+      </header>
+      <div class="inv-stripe"></div>`;
+  }
+  function printFooterHTML() {
+    return `
+      <footer class="inv-foot">
+        <span ${CE}>شكراً لثقتكم — <b>${esc(appData.techName || '')}</b>${appData.techPhone ? ` · <span dir="ltr">${esc(appData.techPhone)}</span>` : ''}</span>
+        <span>صدرت بواسطة تطبيق <b>حساباتي</b></span>
+      </footer>`;
+  }
+
+  // فاتورة نظام البنود المنفصلة: نفس شكل الفاتورة بمسميات البنود
+  function buildItemsInvoiceHTML(inv) {
+    autoFitTypographyForRoomCount(Math.round(inv.items.length * 0.8));
+    const t = computeInvoice(inv);
+    const money = v => `${fmt(v)} ${CUR}`;
+    const rows = inv.items.map((it, i) => `
+        <tr>
+          <td class="idx" ${CE}>${i + 1}</td>
+          <td class="room-col" ${CE}>${esc(it.name)}${it.note ? `<span class="sub-note">${esc(it.note)}</span>` : ''}</td>
+          <td ${CE}>${esc(itemQtyText(it))}</td>
+          <td ${CE}>${money(it.price)}</td>
+          <td class="money" ${CE}>${money(t.itemRows[i])}</td>
+        </tr>`).join('');
+    document.getElementById('printSheet').innerHTML = `
+      ${printHeaderHTML(appData.invoiceTitle || DEFAULT_TITLE, 'كشف حساب', inv.date, `عدد البنود: <b>${inv.items.length}</b>`)}
+      <section class="inv-client">${printClientFields(inv.clientName, inv.clientPhone, inv.clientAddress, inv.date)}</section>
+
+      <h2 class="inv-sec"><span class="n">1</span><span ${CE}>تفصيل البنود والأعمال</span></h2>
+      <table class="p-table">
+        <thead><tr>
+          <th ${CE}>م</th>
+          <th ${CE}>البند / العمل</th>
+          <th ${CE}>الكمية</th>
+          <th ${CE}>سعر الوحدة</th>
+          <th ${CE}>الإجمالي</th>
+        </tr></thead>
+        <tbody>${rows || '<tr><td colspan="5">لا توجد بنود مضافة</td></tr>'}</tbody>
+        <tfoot><tr>
+          <td colspan="4" style="text-align:right;" ${CE}>إجمالي البنود (${inv.items.length} بند)</td>
+          <td class="money" ${CE}>${money(t.itemsTotal)}</td>
+        </tr></tfoot>
+      </table>
+
+      <div class="inv-bottom">
+        <div class="inv-side">
+        <div class="inv-notes" ${CE}>
+          <h4>ملاحظات</h4>
+          <ul>
+            <li>الحساب بنظام البنود: كل بند بسعره المتفق عليه.</li>
+            <li>إجمالي كل بند = الكمية × سعر الوحدة.</li>
+          </ul>
+        </div>
+        <div class="inv-sign">
+          <div ${CE}>توقيع القائم بالأعمال</div>
+          <div ${CE}>اعتماد العميل</div>
+        </div>
+        </div>
+        <div class="inv-totals">
+          <table class="p-totals-table">
+            <tr><td ${CE}>إجمالي البنود (${inv.items.length} بند)</td><td ${CE}>${money(t.itemsTotal)}</td></tr>
+            <tr class="sub"><td ${CE}>إجمالي قيمة الأعمال المستحقة</td><td ${CE}>${money(t.grandTotal)}</td></tr>
+            ${inv.discountAmount > 0 ? `<tr class="minus"><td ${CE}>الخصم</td><td ${CE}>- ${money(inv.discountAmount)}</td></tr>` : ''}
+            ${inv.paidAmount > 0 ? `<tr class="paid"><td ${CE}>المدفوع تحت الحساب</td><td ${CE}>- ${money(inv.paidAmount)}</td></tr>` : ''}
+            ${t.materialsDue > 0 ? `<tr class="sub"><td ${CE}>خامات (مستحقة على العميل)</td><td ${CE}>+ ${money(t.materialsDue)}</td></tr>` : ''}
+          </table>
+          <div class="inv-net"><span ${CE}>الصافي المطلوب سداده</span><strong ${CE}>${money(t.netRemaining)}</strong></div>
+        </div>
+      </div>
+      ${printFooterHTML()}`;
+  }
+
   function buildSinglePageHTML() {
     const inv = getCurrentInvoice();
+    if (isItemsMode(inv)) { buildItemsInvoiceHTML(inv); return; }
     autoFitTypographyForRoomCount(inv.rooms.length);
     const t = computeInvoice(inv);
     const p = t.panel;
     const avgRate = t.avgRate;
     const isOld = inv.systemType === 'old';
     const ce = 'contenteditable="true"';
-    const money = v => `${fmt(v)} ج.م`;
+    const money = v => `${fmt(v)} ${CUR}`;
 
     let roomRowsHTML = '';
     inv.rooms.forEach((r, i) => {
       const c = t.rooms[i];
       const extraTexts = [];
-      if (r.ledProfile) extraTexts.push(`بروفايل ${fmt(r.ledProfile)} م = ${fmt(c.profileCost)} ج`);
-      if (r.ledProfilePlaster) extraTexts.push(`بروفايل محارة ${fmt(r.ledProfilePlaster)} م = ${fmt(c.plasterCost)} ج`);
-      (r.extras || []).forEach(ex => extraTexts.push(`${esc(ex.name)} ${fmt(ex.qty)}×${fmt(ex.price)} = ${fmt(ex.qty * ex.price)} ج`));
+      if (r.ledProfile) extraTexts.push(`بروفايل ${fmt(r.ledProfile)} م = ${fmt(c.profileCost)} ${CUR_SHORT}`);
+      if (r.ledProfilePlaster) extraTexts.push(`بروفايل محارة ${fmt(r.ledProfilePlaster)} م = ${fmt(c.plasterCost)} ${CUR_SHORT}`);
+      (r.extras || []).forEach(ex => extraTexts.push(`${esc(ex.name)} ${fmt(ex.qty)}×${fmt(ex.price)} = ${fmt(ex.qty * ex.price)} ${CUR_SHORT}`));
       roomRowsHTML += `
         <tr>
           <td class="idx" ${ce}>${i + 1}</td>
@@ -1877,6 +2548,7 @@
 
   function openSinglePagePreview(autoPrint = false) {
     buildSinglePageHTML();
+    printJobName = 'فاتورة ' + (getCurrentInvoice().clientName || '');
     openOverlay('preview');
     const modal = document.getElementById('printPreviewModal');
     modal.scrollTop = 0;
@@ -1891,7 +2563,7 @@
      النوتة: حسابات العملاء (المبالغ المستلمة والخامات)
      ========================================================= */
   function uid(prefix) { return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
-  function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+  function round2(n) { const f = Math.pow(10, Math.max(2, CUR_DEC)); return Math.round((Number(n) || 0) * f) / f; }
   function todayISO() { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
   function fmtDate(iso) {
     if (!iso) return '';
@@ -1919,7 +2591,8 @@
         date: String(e.date || ''),
         title: String(e.title || ''),
         note: String(e.note || ''),
-        createdAt: e.createdAt || Date.now()
+        createdAt: e.createdAt || Date.now(),
+        listId: e.listId ? String(e.listId) : (String(e.id || '').startsWith('ml_') ? String(e.id).split('_')[1] : undefined)
       }))
     }));
   }
@@ -2003,8 +2676,8 @@
     const stats = customers.map(c => { const st = customerStats(c); totalDue += Math.max(0, st.remaining); received += st.received; matRem += Math.max(0, st.matRemaining); return st; });
     document.getElementById('ledgerTotalDue').textContent = fmt(totalDue);
     document.getElementById('ledgerCount').textContent = customers.length;
-    document.getElementById('ledgerReceived').textContent = `${fmt(received)} ج.م`;
-    document.getElementById('ledgerMaterials').textContent = `${fmt(matRem)} ج.م`;
+    document.getElementById('ledgerReceived').textContent = `${fmt(received)} ${CUR}`;
+    document.getElementById('ledgerMaterials').textContent = `${fmt(matRem)} ${CUR}`;
 
     const q = (document.getElementById('customerSearch').value || '').trim();
     const box = document.getElementById('customerList');
@@ -2016,9 +2689,9 @@
     } else {
       box.innerHTML = items.map(({ c, st }) => {
         let amt;
-        if (st.remaining > 0) amt = `<div class="cust-amt due">${fmt(st.remaining)}<small>ج.م متبقي عليه</small></div>`;
+        if (st.remaining > 0) amt = `<div class="cust-amt due">${fmt(st.remaining)}<small>${CUR} متبقي عليه</small></div>`;
         else if (st.invs.length && round2(st.remaining) === 0) amt = `<div class="cust-amt ok">خالص ✓<small>لا يوجد متبقي</small></div>`;
-        else if (st.remaining < 0) amt = `<div class="cust-amt ok">${fmt(-st.remaining)}<small>ج.م ${st.invs.length ? 'زيادة له' : 'وصلك مقدماً'}</small></div>`;
+        else if (st.remaining < 0) amt = `<div class="cust-amt ok">${fmt(-st.remaining)}<small>${CUR} ${st.invs.length ? 'زيادة له' : 'وصلك مقدماً'}</small></div>`;
         else amt = `<div class="cust-amt">0<small>لا توجد حركة</small></div>`;
         const meta = [c.phone ? `<span dir="ltr">${esc(c.phone)}</span>` : '', `${c.entries.length} حركة`, st.invs.length ? `${st.invs.length} فاتورة` : 'بدون فاتورة'].filter(Boolean).join(' · ');
         return `
@@ -2092,9 +2765,9 @@
   function setCustTab(tab) { custTab = tab; renderCustomerPage(); }
   function entryRowHTML(e) {
     const cls = e.kind === 'material' ? 'mat' : (e.kind === 'matpay' ? 'matpay' : '');
-    const title = e.kind === 'material' ? (e.title ? esc(e.title) : 'خامات') : KIND_LABEL[e.kind];
+    const title = (e.kind === 'material' ? (e.title ? esc(e.title) : 'خامات') : KIND_LABEL[e.kind]) + (e.listId ? '<span class="src-badge">من كشف الخامات</span>' : '');
     return `
-      <div class="entry ${cls}" data-entry="${esc(e.id)}">
+      <div class="entry ${cls}" data-entry="${esc(e.id)}"${e.listId ? ` data-list="${esc(e.listId)}"` : ''}>
         <div class="e-ic">${icon(e.kind === 'material' ? 'box' : 'cash')}</div>
         <div class="e-info"><div class="e-title">${title}</div><div class="e-meta">${esc(fmtDate(e.date))}${e.note ? ' · ' + esc(e.note) : ''}</div></div>
         <div class="e-amt">${e.kind === 'material' ? '' : '+ '}${fmt(e.amount)}</div>
@@ -2107,7 +2780,7 @@
     document.getElementById('custPageName').textContent = c.name;
     document.getElementById('custPageSub').textContent = [c.phone, c.address].filter(Boolean).join(' · ') || 'صفحة العميل في النوتة';
     const row = (label, value, cls = '') => `<div class="sum-row ${cls}"><span>${label}</span><strong>${value}</strong></div>`;
-    const money = v => `${fmt(v)} ج.م`;
+    const money = v => `${fmt(v)} ${CUR}`;
     const hasMat = st.matTotal > 0 || st.matPaid > 0;
     const byNewest = (a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt - a.createdAt);
     const workEntries = c.entries.filter(e => e.kind === 'payment').sort(byNewest);
@@ -2121,7 +2794,7 @@
     let html = `
       <section class="hero">
         <div class="hero-label">${heroLabel}</div>
-        <div class="hero-value"><span id="custHeroValue">${fmt(heroValue)}</span><small>ج.م</small></div>
+        <div class="hero-value"><span id="custHeroValue">${fmt(heroValue)}</span><small>${CUR}</small></div>
         <div class="hero-stats">
           <div class="hero-stat"><span>دفعات الشغل</span><strong>${money(st.paid)}</strong></div>
           <div class="hero-stat"><span>متبقي الخامات</span><strong>${money(Math.max(0, st.matRemaining))}</strong></div>
@@ -2156,6 +2829,7 @@
           <button type="button" class="btn btn-accent" id="btnAddMaterial" onclick="openTxn('material')">${icon('plus')} إضافة خامات</button>
           <button type="button" class="btn btn-soft" id="btnAddMatpay" onclick="openTxn('matpay')">${icon('cash')} سداد خامات</button>
         </div>
+        <button type="button" class="btn btn-ghost" id="btnCustMatList" style="margin-top:10px" onclick="createMatList('${esc(c.id)}')">${icon('list')} كشف خامات جديد لهذا العميل</button>
         <div style="margin-top:8px">${matEntries.length ? matEntries.map(entryRowHTML).join('') : '<p class="hint" style="margin:10px 0 0;text-align:center">لا توجد خامات مسجلة لهذا العميل.</p>'}</div>
       </div>`;
     }
@@ -2198,17 +2872,23 @@
       </div>`;
     const body = document.getElementById('customerBody');
     body.innerHTML = html;
-    body.querySelectorAll('.entry[data-entry]').forEach(el => { el.onclick = () => openTxn(null, el.dataset.entry); });
+    body.querySelectorAll('.entry[data-entry]').forEach(el => {
+      el.onclick = () => {
+        // خامات مسجلة من كشف الخامات: تتعدل من الكشف نفسه حتى يبقى الحساب متطابقاً
+        if (el.dataset.list && getMatList(el.dataset.list)) openMatList(el.dataset.list);
+        else openTxn(null, el.dataset.entry);
+      };
+    });
   }
 
   /* ---------- تسجيل دفعة / خامات / سداد خامات (كل نوع في نافذة مستقلة) ---------- */
   const TXN_UI = {
-    payment: { add: 'تسجيل دفعة تحت الحساب', edit: 'تعديل دفعة تحت الحساب', amount: 'المبلغ المستلم (ج.م)',
+    payment: { add: 'تسجيل دفعة تحت الحساب', edit: 'تعديل دفعة تحت الحساب', get amount() { return `المبلغ المستلم (${CUR})`; },
       hint: () => 'مبلغ وصلك من العميل من <strong>حساب الشغل</strong> نفسه (المصنعية).' },
-    material: { add: 'إضافة خامات اشتريتها', edit: 'تعديل الخامات', amount: 'إجمالي ثمن الخامات (ج.م)',
+    material: { add: 'إضافة خامات اشتريتها', edit: 'تعديل الخامات', get amount() { return `إجمالي ثمن الخامات (${CUR})`; },
       hint: () => 'اكتب <strong>إجمالي ثمن الخامات</strong> التي اشتريتها للعميل على حسابك.' },
-    matpay: { add: 'تسجيل سداد خامات', edit: 'تعديل سداد الخامات', amount: 'المبلغ المسدد من الخامات (ج.م)',
-      hint: rem => `مبلغ وصلك من العميل <strong>مقابل الخامات</strong>. المتبقي من الخامات حالياً: <strong>${fmt(rem)} ج.م</strong>` }
+    matpay: { add: 'تسجيل سداد خامات', edit: 'تعديل سداد الخامات', get amount() { return `المبلغ المسدد من الخامات (${CUR})`; },
+      hint: rem => `مبلغ وصلك من العميل <strong>مقابل الخامات</strong>. المتبقي من الخامات حالياً: <strong>${fmt(rem)} ${CUR}</strong>` }
   };
   function setTxnKind(kind, isEdit = false, matRemaining = 0) {
     txnKind = kind;
@@ -2221,7 +2901,7 @@
     const showFill = kind === 'matpay' && !isEdit && matRemaining > 0;
     fillBtn.classList.toggle('hidden', !showFill);
     if (showFill) {
-      fillBtn.textContent = `سداد كل المتبقي (${fmt(matRemaining)} ج.م)`;
+      fillBtn.textContent = `سداد كل المتبقي (${fmt(matRemaining)} ${CUR})`;
       fillBtn.onclick = () => { document.getElementById('txnAmount').value = round2(matRemaining); };
     }
   }
@@ -2255,7 +2935,7 @@
     else c.entries.push(Object.assign({ id: uid('e_'), createdAt: Date.now() }, data));
     afterLedgerChange();
     closeOverlay();
-    showAppToast(existing ? '✔️ تم تعديل السجل' : `✔️ تم تسجيل ${fmt(data.amount)} ج.م (${KIND_LABEL[data.kind]})`);
+    showAppToast(existing ? '✔️ تم تعديل السجل' : `✔️ تم تسجيل ${fmt(data.amount)} ${CUR} (${KIND_LABEL[data.kind]})`);
   }
   function deleteTxn() {
     const c = getCustomer(currentCustomerId);
@@ -2279,8 +2959,8 @@
     hideClientSuggestions();
     const m = customerMoney(c);
     showAppToast(m.materialsDue > 0
-      ? `✔️ تم الربط بنوتة "${c.name}" — خامات مستحقة: ${fmt(m.materialsDue)} ج.م`
-      : `✔️ تم الربط بنوتة "${c.name}" — المدفوع: ${fmt(inv.paidAmount || 0)} ج.م`);
+      ? `✔️ تم الربط بنوتة "${c.name}" — خامات مستحقة: ${fmt(m.materialsDue)} ${CUR}`
+      : `✔️ تم الربط بنوتة "${c.name}" — المدفوع: ${fmt(inv.paidAmount || 0)} ${CUR}`);
   }
   function linkInvoiceToCustomer(invId, customerId, fillFields) {
     const inv = appData.invoices.find(i => i.id === invId);
@@ -2288,7 +2968,7 @@
     if (!inv || !c) return;
     const m = customerMoney(c);
     if ((inv.paidAmount || 0) > 0 && round2(inv.paidAmount) !== round2(m.netPaid)) {
-      showAppConfirm(`الفاتورة مسجل بها مدفوع ${fmt(inv.paidAmount)} ج.م. بعد الربط سيُحسب المدفوع من نوتة العميل (${fmt(m.netPaid)} ج.م). متابعة؟`, () => doLinkInvoice(inv, c, fillFields));
+      showAppConfirm(`الفاتورة مسجل بها مدفوع ${fmt(inv.paidAmount)} ${CUR}. بعد الربط سيُحسب المدفوع من نوتة العميل (${fmt(m.netPaid)} ${CUR}). متابعة؟`, () => doLinkInvoice(inv, c, fillFields));
     } else doLinkInvoice(inv, c, fillFields);
   }
   function unlinkInvoice(invId) {
@@ -2311,12 +2991,7 @@
     doLinkInvoice(inv, c, false);
   }
   function newInvoiceForCustomer(customerId) {
-    closeAllThen(() => {
-      const c = getCustomer(customerId);
-      if (!c) return;
-      createNewInvoice(true);
-      doLinkInvoice(getCurrentInvoice(), c, true);
-    });
+    closeAllThen(() => { if (getCustomer(customerId)) startNewInvoice(customerId); });
   }
   function openInvoiceFromCustomer(invId) { closeAllThen(() => openInvoice(invId)); }
   function openLinkedCustomer() {
@@ -2337,7 +3012,7 @@
     const matches = customers.filter(c => !q || c.name.includes(q) || c.phone.includes(q)).slice(0, 5);
     let html = matches.map(c => {
       const m = customerMoney(c);
-      const info = m.materialsDue > 0 ? `خامات مستحقة ${fmt(m.materialsDue)} ج.م` : `صافي المدفوع ${fmt(m.netPaid)} ج.م`;
+      const info = m.materialsDue > 0 ? `خامات مستحقة ${fmt(m.materialsDue)} ${CUR}` : `صافي المدفوع ${fmt(m.netPaid)} ${CUR}`;
       return `<button type="button" data-id="${esc(c.id)}"><span class="s-av">${customerInitial(c.name)}</span><span>${esc(c.name)}<small>${c.phone ? esc(c.phone) + ' · ' : ''}${info}</small></span></button>`;
     }).join('');
     if (q && !customers.some(c => c.name.trim() === q)) html += `<button type="button" data-new="1"><span class="s-av add">${icon('plus')}</span><span>حفظ «${esc(q)}» كعميل جديد في النوتة<small>لتسجيل دفعاته وربطها بهذه الفاتورة</small></span></button>`;
@@ -2356,7 +3031,7 @@
     if (c) {
       if (document.activeElement !== paidInput) paidInput.value = inv.paidAmount || '';
       const m = customerMoney(c);
-      const info = m.materialsDue > 0 ? `خامات مستحقة: ${fmt(m.materialsDue)} ج.م` : `صافي المدفوع: ${fmt(inv.paidAmount || 0)} ج.م`;
+      const info = m.materialsDue > 0 ? `خامات مستحقة: ${fmt(m.materialsDue)} ${CUR}` : `صافي المدفوع: ${fmt(inv.paidAmount || 0)} ${CUR}`;
       const box = extra => `
         <div class="link-box">
           <span class="l-ic">${icon('link')}</span>
@@ -2379,7 +3054,7 @@
   /* ---------- كشف حساب العميل ---------- */
   function buildCustomerStatement(c) {
     const st = customerStats(c);
-    const money = v => `${fmt(v)} ج.م`;
+    const money = v => `${fmt(v)} ${CUR}`;
     const line = '--------------------------------\n';
     let text = `*📒 كشف حساب العميل: ${c.name}*\n`;
     if (appData.techName) text += `*${appData.techName}*\n`;
@@ -2434,6 +3109,575 @@
     window.open(`https://wa.me/${phone}?text=` + encodeURIComponent(buildCustomerStatement(c)), '_blank');
   }
 
+  /* =========================================================
+     كشف الخامات: الخامات المطلوبة للشغل (طباعة وإرسال + تسجيل في النوتة)
+     ========================================================= */
+  const BUYER_LABEL = { me: 'أنا هجيبها', customer: 'الزبون هيشتريها' };
+  function normalizeMatLists(list) {
+    if (!Array.isArray(list)) return [];
+    return list.filter(l => l && typeof l === 'object').map(l => ({
+      id: String(l.id || uid('L')).replace(/_/g, ''),
+      title: String(l.title || ''),
+      customerId: l.customerId ? String(l.customerId) : null,
+      clientName: String(l.clientName || ''),
+      clientPhone: String(l.clientPhone || ''),
+      clientAddress: String(l.clientAddress || ''),
+      date: String(l.date || todayISO()),
+      buyer: l.buyer === 'me' || l.buyer === 'customer' ? l.buyer : null,
+      createdAt: l.createdAt || Date.now(),
+      updatedAt: l.updatedAt || Date.now(),
+      items: (Array.isArray(l.items) ? l.items : []).filter(it => it && it.name).map(it => ({
+        id: String(it.id || uid('i')).replace(/_/g, ''),
+        name: String(it.name),
+        qty: Math.max(0, Number(it.qty) || 0),
+        unit: String(it.unit || 'عدد'),
+        brand: String(it.brand || ''),
+        spec: String(it.spec || ''),
+        note: String(it.note || ''),
+        price: Math.max(0, Number(it.price) || 0)
+      }))
+    }));
+  }
+  function loadMatLists() {
+    try { const raw = localStorage.getItem(MATLISTS_KEY); if (raw) { const p = JSON.parse(raw); matLists = normalizeMatLists(Array.isArray(p) ? p : p.lists); } }
+    catch (e) { matLists = []; }
+  }
+  function saveMatLists() {
+    try { localStorage.setItem(MATLISTS_KEY, JSON.stringify({ version: 1, lists: matLists })); }
+    catch (e) { showAppToast('⚠️ تعذر حفظ كشف الخامات: مساحة التخزين ممتلئة'); }
+  }
+  function getMatList(id) { return matLists.find(l => l.id === id) || null; }
+  function curMatList() { return getMatList(currentMatListId); }
+  function matItemTotal(it) { return round2((Number(it.qty) || 0) * (Number(it.price) || 0)); }
+  function matSpecText(it) {
+    if (!it.spec) return '';
+    return isWireName(it.name) && /^\d+(\.\d+)?$/.test(it.spec.trim()) ? `${it.spec.trim()} مم` : it.spec;
+  }
+  function matQtyText(it) { return `${fmt(it.qty)} ${it.unit || ''}`.trim(); }
+  function matItemLabel(it) { return [it.name, matSpecText(it), it.brand].filter(Boolean).join(' ') + ` (${matQtyText(it)})`; }
+  function matListStats(l) {
+    let total = 0, unpriced = 0;
+    l.items.forEach(it => { const v = matItemTotal(it); total += v; if (!(v > 0)) unpriced++; });
+    return { total: round2(total), unpriced, count: l.items.length };
+  }
+  function matListName(l) { return l.clientName || (l.customerId && getCustomer(l.customerId) ? getCustomer(l.customerId).name : '') || 'كشف بدون اسم'; }
+
+  /* ---------- قائمة الكشوفات ---------- */
+  function renderMatLists() {
+    let mineTotal = 0, mine = 0, cust = 0;
+    matLists.forEach(l => { if (l.buyer === 'me') { mine++; mineTotal += matListStats(l).total; } else if (l.buyer === 'customer') cust++; });
+    document.getElementById('matHeroTotal').textContent = fmt(mineTotal);
+    document.getElementById('matHeroCount').textContent = matLists.length;
+    document.getElementById('matHeroMine').textContent = mine;
+    document.getElementById('matHeroCust').textContent = cust;
+    const q = (document.getElementById('matSearch').value || '').trim();
+    const items = matLists.filter(l => !q || matListName(l).includes(q) || l.clientPhone.includes(q));
+    const box = document.getElementById('matListBox');
+    if (!matLists.length) {
+      box.innerHTML = `<div class="card empty"><div class="big">${icon('box')}</div><p>لا توجد كشوفات خامات بعد.<br>اكتب الخامات المطلوبة بالعدد والماركة والمقاس، واطبعها أو ابعتها للزبون.</p></div>`;
+      return;
+    }
+    if (!items.length) { box.innerHTML = `<div class="card empty"><div class="big">${icon('box')}</div><p>لا يوجد كشف مطابق للبحث.</p></div>`; return; }
+    box.innerHTML = items.map(l => {
+      const st = matListStats(l);
+      const buyer = l.buyer ? BUYER_LABEL[l.buyer] : 'لم يحدد مين هيشتري';
+      const amt = l.buyer === 'me' ? `<div class="inv-amount">${fmt(st.total)}<small>${CUR} على حسابك</small></div>` : `<div class="inv-amount" style="color:var(--muted)">${st.count}<small>صنف</small></div>`;
+      return `
+        <div class="inv-card" data-id="${esc(l.id)}">
+          <div class="inv-avatar" style="background:linear-gradient(135deg,var(--orange-400),var(--orange-600))">${icon('box')}</div>
+          <div class="inv-info"><div class="n">${esc(matListName(l))}</div><div class="m">${esc(fmtDate(l.date))} · ${st.count} صنف · ${buyer}</div></div>
+          ${amt}
+        </div>`;
+    }).join('');
+    box.querySelectorAll('.inv-card').forEach(el => { el.onclick = () => openMatList(el.dataset.id); });
+  }
+
+  function createMatList(customerId) {
+    const c = customerId ? getCustomer(customerId) : null;
+    const l = { id: uid('L'), title: '', customerId: c ? c.id : null, clientName: c ? c.name : '', clientPhone: c ? c.phone : '', clientAddress: c ? c.address : '',
+      date: todayISO(), buyer: null, createdAt: Date.now(), updatedAt: Date.now(), items: [] };
+    matLists.unshift(l);
+    saveMatLists();
+    openMatList(l.id);
+  }
+  function openMatList(id) {
+    if (!getMatList(id)) return;
+    currentMatListId = id;
+    renderMatPage();
+    openOverlay('matlist');
+  }
+
+  /* ---------- صفحة الكشف ---------- */
+  function renderMatPage() {
+    const l = curMatList();
+    if (!l) return;
+    const opt = (b, ic, title, sub) => `
+      <button type="button" class="mode-opt${l.buyer === b ? ' on' : ''}" id="buyer-${b}" onclick="setMatBuyer('${b}')">
+        <span class="m-ic${b === 'me' ? ' orange' : ''}">${icon(ic)}</span>
+        <span style="flex:1;min-width:0"><b>${title}</b><small>${sub}</small></span>
+        <span class="m-check">${icon('check')}</span>
+      </button>`;
+    document.getElementById('matBody').innerHTML = `
+      <div class="card">
+        <div class="card-title"><div class="t-ic">${icon('user')}</div><h2>بيانات العميل</h2></div>
+        <div class="field"><label for="mlName">اسم العميل</label><input type="text" id="mlName" value="${esc(l.clientName)}" placeholder="اسم الزبون" oninput="onMatField('clientName', this.value)"></div>
+        <div class="row-2 stack-sm">
+          <div class="field"><label for="mlPhone">رقم الهاتف</label><input type="text" inputmode="tel" dir="ltr" style="text-align:right" id="mlPhone" value="${esc(l.clientPhone)}" placeholder="01xxxxxxxxx" oninput="onMatField('clientPhone', this.value)"></div>
+          <div class="field"><label for="mlDate">التاريخ</label><input type="date" id="mlDate" value="${esc(l.date)}" oninput="onMatField('date', this.value)"></div>
+        </div>
+        <div class="field"><label for="mlAddress">العنوان</label><input type="text" id="mlAddress" value="${esc(l.clientAddress)}" placeholder="عنوان الشغل" oninput="onMatField('clientAddress', this.value)"></div>
+        <div class="field" style="margin-bottom:0"><label for="mlTitle">ملاحظة على الكشف <span class="hint">(اختياري)</span></label><input type="text" id="mlTitle" value="${esc(l.title)}" placeholder="مثال: خامات مرحلة التأسيس" oninput="onMatField('title', this.value)"></div>
+        <div id="mlLinkBox"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="t-ic orange">${icon('cash')}</div><h2>مين هيشتري الخامات دي؟</h2></div>
+        <div class="mode-opts">
+          ${opt('me', 'wallet', 'أنا هجيبها للزبون', 'هتكتب سعر كل خامة، وتتسجل تلقائياً في نوتة الزبون كخامات على حسابه')}
+          ${opt('customer', 'user', 'الزبون هيشتريها بنفسه', 'الكشف للطباعة والإرسال فقط، من غير أسعار ولا تسجيل في النوتة')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="t-ic">${icon('list')}</div><h2>الخامات المطلوبة</h2><span class="tag" id="mlCount">0</span></div>
+        <div id="mlItems"></div>
+        <button type="button" class="btn btn-accent" id="btnAddMatItem" style="margin-top:10px" onclick="openMatItem(null)">${icon('plus')} إضافة خامة</button>
+      </div>
+
+      <div id="mlTotals"></div>
+
+      <div class="stack">
+        <button type="button" class="btn btn-primary" id="btnMatPreview" onclick="openMatPreview(false)">${icon('eye')} معاينة الكشف وطباعته PDF</button>
+        <div class="btn-row">
+          <button type="button" class="btn btn-wa" onclick="sendMatListWhatsApp()">${icon('send')} إرسال للزبون</button>
+          <button type="button" class="btn btn-ghost" onclick="copyMatListText()">${icon('copy')} نسخ النص</button>
+        </div>
+        <button type="button" class="btn btn-danger" onclick="deleteMatList()">${icon('trash')} حذف الكشف</button>
+      </div>`;
+    renderMatHeader();
+    renderMatLinkBox();
+    renderMatItems();
+  }
+  function renderMatHeader() {
+    const l = curMatList();
+    if (!l) return;
+    document.getElementById('matPageName').textContent = 'كشف خامات: ' + matListName(l);
+    document.getElementById('matPageSub').textContent = [fmtDate(l.date), l.buyer ? BUYER_LABEL[l.buyer] : ''].filter(Boolean).join(' · ');
+  }
+  function renderMatLinkBox() {
+    const l = curMatList();
+    const box = document.getElementById('mlLinkBox');
+    if (!l || !box) return;
+    const c = l.customerId ? getCustomer(l.customerId) : null;
+    if (c) {
+      box.innerHTML = `
+        <div class="link-box">
+          <span class="l-ic">${icon('link')}</span>
+          <div class="l-txt"><b>مرتبط بنوتة: ${esc(c.name)}</b><span>${l.buyer === 'me' ? 'الخامات اللي بسعر بتتسجل في حسابه تلقائياً' : 'لو اخترت «أنا هجيبها» هتتسجل في حسابه'}</span></div>
+          <button type="button" class="btn btn-soft btn-sm" onclick="openPickCustomer()">تغيير</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="unlinkMatList()">فك</button>
+        </div>`;
+      return;
+    }
+    const exact = customers.find(x => x.name.trim() === l.clientName.trim() && l.clientName.trim());
+    let html = `<button type="button" class="btn btn-soft btn-sm" id="btnPickCustomer" style="margin-top:10px;width:100%" onclick="${exact ? `pickCustomer('${esc(exact.id)}')` : 'openPickCustomer()'}">${icon('book')} ${exact ? `ربط الكشف بنوتة «${esc(exact.name)}»` : 'ربط الكشف بعميل من النوتة'}</button>`;
+    const inv = getCurrentInvoice();
+    const invName = (inv && inv.clientName || '').trim();
+    if (!l.clientName && invName && invName !== 'بدون اسم' && !DEFAULT_CLIENT_RE.test(invName)) {
+      html += `<button type="button" class="chip" style="margin-top:8px" onclick="useInvoiceClientForMat()">استخدم بيانات عميل الفاتورة المفتوحة: ${esc(invName)}</button>`;
+    }
+    box.innerHTML = html;
+  }
+  function useInvoiceClientForMat() {
+    const l = curMatList(), inv = getCurrentInvoice();
+    if (!l || !inv) return;
+    l.clientName = inv.clientName || '';
+    l.clientPhone = inv.clientPhone || l.clientPhone;
+    l.clientAddress = inv.clientAddress || l.clientAddress;
+    if (inv.customerId && getCustomer(inv.customerId)) l.customerId = inv.customerId;
+    touchMatList(l, true);
+    renderMatPage();
+  }
+  function renderMatItems() {
+    const l = curMatList();
+    if (!l) return;
+    const me = l.buyer === 'me';
+    document.getElementById('mlCount').textContent = `${l.items.length} صنف`;
+    const box = document.getElementById('mlItems');
+    if (!l.items.length) {
+      box.innerHTML = `<p class="hint" style="text-align:center;margin:4px 0 0">لم تضف أي خامة بعد. اضغط «إضافة خامة» واكتب الخامة والعدد والماركة.</p>`;
+    } else {
+      box.innerHTML = (me ? '<p class="hint" style="margin:-6px 0 6px">اكتب سعر الوحدة لكل خامة في الخانة اللي جنبها:</p>' : '') + l.items.map((it, i) => {
+        const meta = [matSpecText(it) ? (isWireName(it.name) ? 'القطر: ' : '') + matSpecText(it) : '', it.brand ? 'ماركة: ' + it.brand : '', it.note].filter(Boolean).map(esc).join(' · ');
+        return `
+          <div class="mat-row">
+            <div class="m-info" onclick="openMatItem('${esc(it.id)}')"><div class="m-name">${i + 1}. ${esc(it.name)}</div>${meta ? `<div class="m-meta">${meta}</div>` : ''}</div>
+            <span class="m-qty">${esc(matQtyText(it))}</span>
+            ${me ? `<div class="m-price"><input type="number" inputmode="decimal" min="0" step="any" placeholder="السعر" aria-label="سعر ${esc(it.name)}" data-price-id="${esc(it.id)}" value="${it.price || ''}" oninput="onMatPriceInput('${esc(it.id)}', this.value)"><small id="mlRowTot-${esc(it.id)}">= ${fmt(matItemTotal(it))} ${CUR}</small></div>` : ''}
+          </div>`;
+      }).join('');
+    }
+    renderMatTotals();
+  }
+  function renderMatTotals() {
+    const l = curMatList();
+    const box = document.getElementById('mlTotals');
+    if (!l || !box) return;
+    if (l.buyer !== 'me') {
+      box.innerHTML = l.buyer === 'customer'
+        ? `<div class="note" style="margin-bottom:14px">الزبون هيشتري الخامات بنفسه — الكشف ده للطباعة والإرسال فقط، ومش هيتسجل في النوتة.</div>`
+        : `<div class="warn-box" style="margin:0 0 14px">اختار من فوق <b>مين هيشتري الخامات</b>: لو إنت اللي هتجيبها هيسألك على أسعارها ويسجلها في نوتة الزبون.</div>`;
+      return;
+    }
+    const st = matListStats(l);
+    const c = l.customerId ? getCustomer(l.customerId) : null;
+    let html = `<div class="card"><div class="card-title"><div class="t-ic orange">${icon('calc')}</div><h2>ثمن الخامات</h2></div>
+      <div class="sum-total" style="margin-top:0"><span>إجمالي ثمن الخامات (${st.count} صنف)</span><strong id="mlTotalVal">${fmt(st.total)} ${CUR}</strong></div>`;
+    if (st.unpriced) html += `<div class="warn-box"><b>${st.unpriced} صنف</b> لسه من غير سعر — مش هيتسجل في النوتة غير لما تكتب سعره.</div>`;
+    if (c) {
+      const n = l.items.filter(it => matItemTotal(it) > 0).length;
+      html += `<div class="ok-box">✓ متسجلة في نوتة <b>${esc(c.name)}</b> في «حساب الخامات» كبنود منفصلة: <b>${n} بند</b> بإجمالي <b>${fmt(st.total)} ${CUR}</b>. أي تعديل هنا بيتحدث في النوتة تلقائياً، والسداد بتسجله من صفحة العميل («سداد خامات»).</div>`;
+    } else {
+      html += `<div class="warn-box">علشان الخامات تتسجل في النوتة تلقائياً لازم تربط الكشف بعميل.<button type="button" class="btn btn-accent btn-sm" style="width:100%;margin-top:8px" onclick="openPickCustomer()">${icon('book')} ربط الكشف بعميل من النوتة</button></div>`;
+    }
+    box.innerHTML = html + '</div>';
+  }
+  function onMatField(field, value) {
+    const l = curMatList();
+    if (!l) return;
+    l[field] = field === 'date' ? (value || todayISO()) : value;
+    touchMatList(l, field === 'date' || field === 'title');
+    renderMatHeader();
+    if (field === 'clientName') renderMatLinkBox();
+  }
+  function touchMatList(l, affectsLedger) {
+    l.updatedAt = Date.now();
+    saveMatLists();
+    if (affectsLedger) scheduleMatLedgerSync();
+  }
+  function matListLedgerAmount(l) {
+    const prefix = 'ml_' + l.id + '_';
+    let sum = 0, holder = null;
+    customers.forEach(c => c.entries.forEach(e => { if (String(e.id).startsWith(prefix)) { sum += e.amount; holder = c; } }));
+    return { sum: round2(sum), holder };
+  }
+  function setMatBuyer(b) {
+    const l = curMatList();
+    if (!l || l.buyer === b) return;
+    const apply = () => {
+      l.buyer = b;
+      touchMatList(l, false);
+      applyMatLedgerSync();
+      renderMatPage();
+      if (b === 'me') showAppToast(l.items.length ? 'اكتب سعر كل خامة في الخانة اللي جنبها' : 'ضيف الخامات واكتب سعر كل واحدة');
+    };
+    const led = matListLedgerAmount(l);
+    if (b !== 'me' && led.sum > 0 && led.holder) {
+      showAppConfirm(`الخامات دي متسجلة في نوتة "${led.holder.name}" بمبلغ ${fmt(led.sum)} ${CUR}. لو اخترت إن الزبون هيشتريها هتتشال من النوتة. متابعة؟`, apply);
+    } else apply();
+  }
+
+  /* ---------- مزامنة الكشف مع النوتة ---------- */
+  // كل خامة بسعر = بند «خامات» منفصل في حساب الخامات بالنوتة (بمعرّف ثابت يمنع التكرار)
+  function syncMatListToLedger(l) {
+    const prefix = 'ml_' + l.id + '_';
+    customers.forEach(c => { c.entries = c.entries.filter(e => !String(e.id).startsWith(prefix)); });
+    if (l.buyer !== 'me' || !l.customerId) return;
+    const c = getCustomer(l.customerId);
+    if (!c) return;
+    l.items.forEach((it, i) => {
+      const amount = matItemTotal(it);
+      if (!(amount > 0)) return;
+      c.entries.push({ id: prefix + it.id, kind: 'material', amount, date: l.date || todayISO(), title: matItemLabel(it),
+        note: 'من كشف الخامات' + (l.title ? ': ' + l.title : ''), createdAt: (l.createdAt || Date.now()) + i, listId: l.id });
+    });
+  }
+  let matSyncTimer = null;
+  function scheduleMatLedgerSync() { clearTimeout(matSyncTimer); matSyncTimer = setTimeout(applyMatLedgerSync, 350); }
+  function flushMatLedgerSync() { if (matSyncTimer) applyMatLedgerSync(); }
+  function applyMatLedgerSync(list) {
+    clearTimeout(matSyncTimer); matSyncTimer = null;
+    const l = list || curMatList();
+    if (!l) return;
+    syncMatListToLedger(l);
+    saveCustomers();
+    saveToStorage();
+    renderRoomsAndSummary();
+    renderMatTotals();
+  }
+  function onMatPriceInput(itemId, value) {
+    const l = curMatList();
+    const it = l && l.items.find(x => x.id === itemId);
+    if (!it) return;
+    it.price = Math.max(0, parseFloat(value) || 0);
+    const tot = document.getElementById('mlRowTot-' + itemId);
+    if (tot) tot.textContent = `= ${fmt(matItemTotal(it))} ${CUR}`;
+    const tv = document.getElementById('mlTotalVal');
+    if (tv) tv.textContent = `${fmt(matListStats(l).total)} ${CUR}`;
+    touchMatList(l, true);
+  }
+
+  /* ---------- ربط الكشف بعميل ---------- */
+  function openPickCustomer() {
+    document.getElementById('pickSearch').value = '';
+    renderPickList();
+    openOverlay('pick');
+  }
+  function renderPickList() {
+    const l = curMatList();
+    const q = (document.getElementById('pickSearch').value || '').trim();
+    const list = customers.filter(c => !q || c.name.includes(q) || c.phone.includes(q));
+    const newName = q || (l ? l.clientName.trim() : '');
+    let html = list.map(c => `<button type="button" data-id="${esc(c.id)}"><span class="s-av">${customerInitial(c.name)}</span><span>${esc(c.name)}<small>${c.phone ? esc(c.phone) + ' · ' : ''}${c.entries.length} حركة</small></span></button>`).join('');
+    if (newName && !customers.some(c => c.name.trim() === newName)) html += `<button type="button" data-new="${esc(newName)}"><span class="s-av add">${icon('plus')}</span><span>إضافة «${esc(newName)}» كعميل جديد في النوتة<small>وربط الكشف بيه</small></span></button>`;
+    if (!html) html = `<p class="hint" style="padding:14px;text-align:center">النوتة فاضية. اكتب اسم العميل في البحث لإضافته.</p>`;
+    const box = document.getElementById('pickList');
+    box.innerHTML = html;
+    box.onclick = e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.dataset.id) pickCustomer(b.dataset.id);
+      else if (b.dataset.new) pickNewCustomer(b.dataset.new);
+    };
+  }
+  function pickCustomer(id) {
+    const l = curMatList(), c = getCustomer(id);
+    if (!l || !c) return;
+    l.customerId = c.id;
+    l.clientName = c.name;
+    if (c.phone) l.clientPhone = c.phone;
+    if (c.address) l.clientAddress = c.address;
+    touchMatList(l, false);
+    const finish = () => { applyMatLedgerSync(); renderMatPage(); showAppToast(`✔️ تم ربط الكشف بنوتة "${c.name}"`); };
+    if (overlayStack[overlayStack.length - 1] === 'pick') closeTopThen(finish); else finish();
+  }
+  function pickNewCustomer(name) {
+    const l = curMatList();
+    const c = { id: uid('c_'), name, phone: l ? l.clientPhone : '', address: l ? l.clientAddress : '', note: '', createdAt: Date.now(), entries: [] };
+    customers.unshift(c);
+    saveCustomers();
+    pickCustomer(c.id);
+  }
+  function unlinkMatList() {
+    const l = curMatList();
+    if (!l) return;
+    const led = matListLedgerAmount(l);
+    const apply = () => { l.customerId = null; touchMatList(l, false); applyMatLedgerSync(); renderMatPage(); showAppToast('تم فك ربط الكشف بالنوتة'); };
+    if (led.sum > 0 && led.holder) showAppConfirm(`فك الربط هيشيل خامات الكشف (${fmt(led.sum)} ${CUR}) من نوتة "${led.holder.name}". متابعة؟`, apply);
+    else apply();
+  }
+  function deleteMatList() {
+    const l = curMatList();
+    if (!l) return;
+    const led = matListLedgerAmount(l);
+    const extra = led.sum > 0 && led.holder ? ` وهتتشال خاماته (${fmt(led.sum)} ${CUR}) من نوتة "${led.holder.name}"` : '';
+    showAppConfirm(`حذف كشف خامات "${matListName(l)}" نهائياً${extra}؟`, () => {
+      l.buyer = null;
+      syncMatListToLedger(l);
+      matLists = matLists.filter(x => x.id !== l.id);
+      saveMatLists();
+      saveCustomers();
+      saveToStorage();
+      closeTopThen(() => { renderAll(); showAppToast('تم حذف الكشف'); });
+    });
+  }
+
+  /* ---------- إضافة / تعديل خامة ---------- */
+  function initMatItemSheet() {
+    const chips = document.getElementById('matChips');
+    chips.innerHTML = MAT_PRESETS.map(n => `<button type="button" class="chip" data-name="${esc(n)}">${esc(n)}</button>`).join('');
+    chips.addEventListener('click', e => {
+      const b = e.target.closest('.chip');
+      if (!b) return;
+      document.getElementById('miName').value = b.dataset.name;
+      if (isWireName(b.dataset.name)) setMatItemUnit('لفة');
+      else if (/خرطوم|شريط|بروفايل/.test(b.dataset.name)) setMatItemUnit('متر');
+      updateMatItemForm();
+    });
+    const wire = document.getElementById('miWireChips');
+    wire.innerHTML = WIRE_SIZES.map(v => `<button type="button" class="chip" data-v="${v}">${v} مم</button>`).join('');
+    wire.addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) { document.getElementById('miSpec').value = b.dataset.v; updateMatItemForm(); } });
+    document.getElementById('matItemSheet').addEventListener('input', updateMatItemLive);
+  }
+  function setMatItemUnit(u) { matItemUnit = u; renderUnitChips('miUnits', MAT_UNITS, matItemUnit, setMatItemUnit); updateMatItemLive(); }
+  function updateMatItemForm() {
+    const wire = isWireName(document.getElementById('miName').value);
+    document.getElementById('miSpecLabel').innerHTML = wire ? 'قطر / مقطع السلك (مم)' : 'المقاس / المواصفات <span class="hint">(اختياري)</span>';
+    document.getElementById('miSpec').placeholder = wire ? 'مثال: 2 أو 3×6' : 'مثال: 16 أمبير، 3/4 بوصة، أبيض';
+    const spec = document.getElementById('miSpec').value.trim();
+    const wc = document.getElementById('miWireChips');
+    wc.classList.toggle('hidden', !wire);
+    wc.querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.v === spec));
+    updateMatItemLive();
+  }
+  function updateMatItemLive() {
+    const q = num('miQty'), p = num('miPrice');
+    document.getElementById('miLiveQty').textContent = `${fmt(q || 0)} ${matItemUnit} × ${fmt(p)} ${CUR}`;
+    document.getElementById('miLiveTotal').textContent = `${fmt(q * p)} ${CUR}`;
+  }
+  function openMatItem(id) {
+    const l = curMatList();
+    if (!l) return;
+    const it = id ? l.items.find(x => x.id === id) : null;
+    const me = l.buyer === 'me';
+    document.getElementById('matItemTitle').textContent = it ? 'تعديل الخامة' : 'إضافة خامة';
+    document.getElementById('saveMatItemBtn').textContent = it ? 'تحديث الخامة' : 'حفظ الخامة';
+    document.getElementById('miName').value = it ? it.name : '';
+    document.getElementById('miQty').value = it ? it.qty : 1;
+    document.getElementById('miBrand').value = it ? it.brand : '';
+    document.getElementById('miSpec').value = it ? it.spec : '';
+    document.getElementById('miNote').value = it ? it.note : '';
+    document.getElementById('miPrice').value = it && it.price ? it.price : '';
+    document.getElementById('miPriceField').classList.toggle('hidden', !me);
+    document.getElementById('miLive').classList.toggle('hidden', !me);
+    document.getElementById('deleteMatItemBtn').classList.toggle('hidden', !it);
+    setMatItemUnit(it ? it.unit : 'عدد');
+    updateMatItemForm();
+    openOverlay('matItem');
+    editingMatItemId = it ? it.id : null;
+  }
+  function saveMatItem() {
+    const l = curMatList();
+    if (!l) return;
+    const name = document.getElementById('miName').value.trim();
+    if (!name) { showAppToast('⚠️ اكتب اسم الخامة أولاً'); return; }
+    const data = { name, qty: num('miQty') || 1, unit: matItemUnit, brand: document.getElementById('miBrand').value.trim(),
+      spec: document.getElementById('miSpec').value.trim(), note: document.getElementById('miNote').value.trim() };
+    if (l.buyer === 'me') data.price = num('miPrice');
+    const existing = editingMatItemId ? l.items.find(x => x.id === editingMatItemId) : null;
+    if (existing) Object.assign(existing, data);
+    else l.items.push(Object.assign({ id: uid('i'), price: 0 }, data));
+    touchMatList(l, false);
+    applyMatLedgerSync();
+    renderMatItems();
+    closeOverlay();
+    showAppToast(existing ? '✔️ تم تحديث الخامة' : `✔️ تمت إضافة "${name}"`);
+  }
+  function deleteMatItem() {
+    const l = curMatList();
+    const id = editingMatItemId;
+    if (!l || !id) return;
+    showAppConfirm('حذف هذه الخامة من الكشف؟', () => {
+      l.items = l.items.filter(x => x.id !== id);
+      touchMatList(l, false);
+      applyMatLedgerSync();
+      renderMatItems();
+      closeOverlay();
+    });
+  }
+
+  /* ---------- طباعة الكشف وإرساله ---------- */
+  function buildMatListHTML(l) {
+    autoFitTypographyForRoomCount(Math.round(l.items.length * 0.75));
+    const me = l.buyer === 'me';
+    const st = matListStats(l);
+    const money = v => `${fmt(v)} ${CUR}`;
+    const cols = me ? 7 : 5;
+    const rows = l.items.map((it, i) => `
+        <tr>
+          <td class="idx" ${CE}>${i + 1}</td>
+          <td class="room-col" ${CE}>${esc(it.name)}${it.note ? `<span class="sub-note">${esc(it.note)}</span>` : ''}</td>
+          <td ${CE}>${esc(matSpecText(it)) || '-'}</td>
+          <td ${CE}>${esc(it.brand) || '-'}</td>
+          <td ${CE}><b>${esc(matQtyText(it))}</b></td>
+          ${me ? `<td ${CE}>${it.price ? money(it.price) : '-'}</td><td class="money" ${CE}>${matItemTotal(it) ? money(matItemTotal(it)) : '-'}</td>` : ''}
+        </tr>`).join('');
+    const chips = [];
+    if (l.buyer === 'me') chips.push(`<span class="inv-chip" ${CE}>الخامات يوفّرها: <b>القائم بالأعمال (على حساب العميل)</b></span>`);
+    else if (l.buyer === 'customer') chips.push(`<span class="inv-chip navy" ${CE}>الخامات يشتريها: <b>العميل</b></span>`);
+    if (l.title) chips.push(`<span class="inv-chip navy" ${CE}>${esc(l.title)}</span>`);
+    const notes = `
+        <div class="inv-notes" ${CE}>
+          <h4>ملاحظات</h4>
+          <ul>
+            <li>يرجى الالتزام بالمقاسات والماركات المذكورة لضمان جودة وأمان التنفيذ.</li>
+            <li>أي تغيير في الخامات يتم بالتنسيق مع القائم بالأعمال.</li>
+          </ul>
+        </div>`;
+    const sign = `
+        <div class="inv-sign">
+          <div ${CE}>توقيع القائم بالأعمال</div>
+          <div ${CE}>اعتماد العميل</div>
+        </div>`;
+    const bottom = me ? `
+      <div class="inv-bottom">
+        <div class="inv-side">${notes}${sign}</div>
+        <div class="inv-totals">
+          <table class="p-totals-table">
+            <tr><td ${CE}>عدد الأصناف</td><td ${CE}>${st.count} صنف</td></tr>
+            <tr class="sub"><td ${CE}>إجمالي ثمن الخامات</td><td ${CE}>${money(st.total)}</td></tr>
+          </table>
+          <div class="inv-net"><span ${CE}>إجمالي الخامات</span><strong ${CE}>${money(st.total)}</strong></div>
+        </div>
+      </div>` : `<div class="inv-bottom" style="grid-template-columns:1fr 1fr">${notes}${sign}</div>`;
+    document.getElementById('printSheet').innerHTML = `
+      ${printHeaderHTML('كشف الخامات المطلوبة', 'كشف خامات', fmtDate(l.date), `عدد الأصناف: <b>${st.count}</b>`)}
+      <section class="inv-client">${printClientFields(matListName(l), l.clientPhone, l.clientAddress, fmtDate(l.date))}</section>
+      ${chips.length ? `<div class="inv-pricing">${chips.join('')}</div>` : ''}
+      <h2 class="inv-sec"><span class="n">1</span><span ${CE}>الخامات المطلوبة للشغل</span></h2>
+      <table class="p-table">
+        <thead><tr>
+          <th ${CE}>م</th>
+          <th ${CE}>الخامة</th>
+          <th ${CE}>المقاس / القطر</th>
+          <th ${CE}>الماركة</th>
+          <th ${CE}>الكمية</th>
+          ${me ? `<th ${CE}>سعر الوحدة</th><th ${CE}>الإجمالي</th>` : ''}
+        </tr></thead>
+        <tbody>${rows || `<tr><td colspan="${cols}">لا توجد خامات مضافة</td></tr>`}</tbody>
+        ${me ? `<tfoot><tr><td colspan="6" style="text-align:right;" ${CE}>إجمالي ثمن الخامات</td><td class="money" ${CE}>${money(st.total)}</td></tr></tfoot>` : ''}
+      </table>
+      ${bottom}
+      ${printFooterHTML()}`;
+  }
+  function openMatPreview(autoPrint = false) {
+    const l = curMatList();
+    if (!l) return;
+    if (!l.items.length) { showAppToast('⚠️ ضيف الخامات الأول قبل الطباعة'); return; }
+    buildMatListHTML(l);
+    printJobName = 'كشف خامات ' + matListName(l);
+    openOverlay('preview');
+    const modal = document.getElementById('printPreviewModal');
+    modal.scrollTop = 0;
+    fitPreview();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitPreview);
+    if (autoPrint) setTimeout(() => window.print(), 300);
+  }
+  function buildMatListText(l) {
+    const me = l.buyer === 'me';
+    const st = matListStats(l);
+    const line = '--------------------------------\n';
+    let text = `*📋 كشف الخامات المطلوبة*\n`;
+    if (appData.techName) text += `*${appData.techName}*\n`;
+    text += `*العميل:* ${matListName(l)} | *التاريخ:* ${fmtDate(l.date)}\n`;
+    if (l.clientAddress) text += `*العنوان:* ${l.clientAddress}\n`;
+    if (l.title) text += `*ملاحظة:* ${l.title}\n`;
+    text += line;
+    l.items.forEach((it, i) => {
+      const details = [matSpecText(it) ? (isWireName(it.name) ? 'قطر ' : '') + matSpecText(it) : '', it.brand ? 'ماركة ' + it.brand : ''].filter(Boolean).join(' - ');
+      text += `${i + 1}) *${it.name}*${details ? ' (' + details + ')' : ''} — *${matQtyText(it)}*`;
+      if (me && it.price) text += ` × ${fmt(it.price)} = ${fmt(matItemTotal(it))} ${CUR}`;
+      text += '\n';
+      if (it.note) text += `   _${it.note}_\n`;
+    });
+    text += line + `*عدد الأصناف:* ${st.count}\n`;
+    if (me) text += `*إجمالي ثمن الخامات:* *${fmt(st.total)} ${CUR}*\n`;
+    else if (l.buyer === 'customer') text += `*الخامات يشتريها العميل* — يرجى الالتزام بالمقاسات والماركات المذكورة.\n`;
+    return text.trim();
+  }
+  function sendMatListWhatsApp() {
+    const l = curMatList();
+    if (!l) return;
+    if (!l.items.length) { showAppToast('⚠️ ضيف الخامات الأول'); return; }
+    let phone = (l.clientPhone || '').replace(/\D/g, '');
+    if (/^01\d{9}$/.test(phone)) phone = '2' + phone;
+    window.open(`https://wa.me/${phone}?text=` + encodeURIComponent(buildMatListText(l)), '_blank');
+  }
+  function copyMatListText() {
+    const l = curMatList();
+    if (l) copyText(buildMatListText(l), '✔️ تم نسخ كشف الخامات');
+  }
+
   /* ---------------- واتساب ---------------- */
   function buildWhatsAppText() {
     const inv = getCurrentInvoice();
@@ -2444,23 +3688,36 @@
     text += `*العميل:* ${inv.clientName} | *التاريخ:* ${inv.date || '-'}\n`;
     if (inv.clientPhone) text += `*هاتف العميل:* ${inv.clientPhone}\n`;
     if (inv.clientAddress) text += `*العنوان:* ${inv.clientAddress}\n`;
-    if (inv.systemType === 'old') text += `*نظام الحساب:* النظام القديم (متوسط النقطة ${fmt(t.avgRate)} ج.م / الحالي ${fmt(inv.newPointPrice)} ج.م)\n`;
-    else text += `*سعر النقطة:* ${fmt(inv.newPointPrice)} ج.م\n`;
+    if (isItemsMode(inv)) {
+      text += `--------------------------------\n`;
+      inv.items.forEach((it, i) => {
+        text += `*${i + 1}. ${it.name}:* ${itemQtyText(it)} × ${fmt(it.price)} = *${fmt(t.itemRows[i])} ${CUR}*\n`;
+        if (it.note) text += `   _${it.note}_\n`;
+      });
+      text += `--------------------------------\n*إجمالي البنود:* ${fmt(t.itemsTotal)} ${CUR}\n`;
+      if (inv.discountAmount > 0) text += `*الخصم:* ${fmt(inv.discountAmount)} ${CUR}\n`;
+      if (inv.paidAmount > 0) text += `*المدفوع:* ${fmt(inv.paidAmount)} ${CUR}\n`;
+      if (t.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${fmt(t.materialsDue)} ${CUR}\n`;
+      text += `*الصافي المتبقي:* *${fmt(t.netRemaining)} ${CUR}*`;
+      return text;
+    }
+    if (inv.systemType === 'old') text += `*نظام الحساب:* النظام القديم (متوسط النقطة ${fmt(t.avgRate)} ${CUR} / الحالي ${fmt(inv.newPointPrice)} ${CUR})\n`;
+    else text += `*سعر النقطة:* ${fmt(inv.newPointPrice)} ${CUR}\n`;
     text += `--------------------------------\n`;
     inv.rooms.forEach((r, i) => {
       const c = t.rooms[i];
-      text += `*${i + 1}. ${r.name}:* (${fmt(c.totalPoints)} ن) = *${fmt(c.totalCost)} ج.م*\n`;
+      text += `*${i + 1}. ${r.name}:* (${fmt(c.totalPoints)} ن) = *${fmt(c.totalCost)} ${CUR}*\n`;
     });
     if (p.totalPanelPts > 0) {
       text += `--------------------------------\n*⚡ اللوحة الرئيسية والصواعد:*\n`;
-      if (p.linesCount) text += `- خطوط اللوحة: ${fmt(p.linesCount)} (${fmt(p.linesPts)} ن) = ${fmt(p.linesCost)} ج.م\n`;
-      if (p.risersCount) text += `- الصواعد: ${fmt(p.risersCount)} (${fmt(p.risersPts)} ن) = ${fmt(p.risersCost)} ج.م\n`;
+      if (p.linesCount) text += `- خطوط اللوحة: ${fmt(p.linesCount)} (${fmt(p.linesPts)} ن) = ${fmt(p.linesCost)} ${CUR}\n`;
+      if (p.risersCount) text += `- الصواعد: ${fmt(p.risersCount)} (${fmt(p.risersPts)} ن) = ${fmt(p.risersCost)} ${CUR}\n`;
     }
-    text += `--------------------------------\n*إجمالي عدد النقاط الكلي:* ${fmt(t.allPointsCount)} نقطة\n*إجمالي الحساب الكلي:* ${fmt(t.grandTotal)} ج.م\n`;
-    if (inv.discountAmount > 0) text += `*الخصم:* ${fmt(inv.discountAmount)} ج.م\n`;
-    if (inv.paidAmount > 0) text += `*المدفوع:* ${fmt(inv.paidAmount)} ج.م\n`;
-    if (t.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${fmt(t.materialsDue)} ج.م\n`;
-    text += `*الصافي المتبقي:* *${fmt(t.netRemaining)} ج.م*`;
+    text += `--------------------------------\n*إجمالي عدد النقاط الكلي:* ${fmt(t.allPointsCount)} نقطة\n*إجمالي الحساب الكلي:* ${fmt(t.grandTotal)} ${CUR}\n`;
+    if (inv.discountAmount > 0) text += `*الخصم:* ${fmt(inv.discountAmount)} ${CUR}\n`;
+    if (inv.paidAmount > 0) text += `*المدفوع:* ${fmt(inv.paidAmount)} ${CUR}\n`;
+    if (t.materialsDue > 0) text += `*خامات مستحقة على العميل:* ${fmt(t.materialsDue)} ${CUR}\n`;
+    text += `*الصافي المتبقي:* *${fmt(t.netRemaining)} ${CUR}*`;
     return text;
   }
 
@@ -2487,6 +3744,12 @@
 
   /* ---------------- النسخ الاحتياطي ---------------- */
   function downloadJSON(obj, filename) {
+    if (IN_APP) {
+      try { window.HesabatyApp.saveFile(filename, 'application/json', JSON.stringify(obj, null, 2)); } catch (e) { showAppToast('⚠️ تعذر حفظ الملف'); return; }
+      try { localStorage.setItem(BACKUP_KEY, String(Date.now())); } catch (e) {}
+      renderBackupLine();
+      return;
+    }
     const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -2501,9 +3764,9 @@
   // نسخة كاملة: الفواتير + نوتة العملاء + الإعدادات
   function exportBackupJSON() {
     syncLinkedInvoices();
-    downloadJSON(Object.assign({}, appData, { app: 'hesabaty', backupVersion: 2, exportedAt: new Date().toISOString(), customers, settings }),
+    downloadJSON(Object.assign({}, appData, { app: 'hesabaty', backupVersion: 3, exportedAt: new Date().toISOString(), customers, settings, matLists }),
       `حساباتي_نسخة_كاملة_${todayISO()}.json`);
-    showAppToast('✔️ تم تنزيل النسخة الكاملة (الفواتير + النوتة)');
+    showAppToast('✔️ تم تنزيل النسخة الكاملة (الفواتير + النوتة + كشوفات الخامات)');
   }
   // نسخة النوتة فقط
   function exportLedgerJSON() {
@@ -2545,7 +3808,14 @@
           loadFromParsed(imported);
           if (!appData.currentId || !appData.invoices.some(i => i.id === appData.currentId)) appData.currentId = appData.invoices[0].id;
           if (hasLedger) mergeCustomers(imported.customers);
-          if (imported.settings && typeof imported.settings === 'object') { settings = Object.assign(settings, imported.settings); saveSettings(); }
+          if (Array.isArray(imported.matLists)) {
+            normalizeMatLists(imported.matLists).forEach(nl => {
+              const i = matLists.findIndex(x => x.id === nl.id);
+              if (i >= 0) matLists[i] = nl; else matLists.push(nl);
+            });
+            saveMatLists();
+          }
+          if (imported.settings && typeof imported.settings === 'object') { settings = Object.assign(settings, imported.settings); saveSettings(); applyCurrency(); applyTheme(); }
           afterLedgerChange();
           showAppToast('✔️ تم استعادة النسخة الاحتياطية بنجاح.');
         });
@@ -2598,6 +3868,18 @@
     const applyBtn = document.getElementById('btnApplyUpdate');
     const rollBtn = document.getElementById('btnRollback');
     const dot = document.getElementById('verDot');
+    if (IN_APP) {
+      document.getElementById('verCurrent').textContent = appVersion();
+      applyBtn.classList.toggle('hidden', !appUpdate);
+      dot.classList.toggle('warn', !!appUpdate);
+      rollBtn.classList.add('hidden');
+      if (appUpdate) {
+        document.getElementById('btnApplyUpdateText').textContent = `تحميل الإصدار ${appUpdate.version}`;
+        applyBtn.onclick = openAppUpdateSheet;
+        status.innerHTML = `يوجد إصدار جديد <strong>${esc(appUpdate.version)}</strong> جاهز للتحميل. اضغط «تحميل» أو على فقاعة «تحديث جديد».`;
+      } else status.innerHTML = 'التطبيق بيدوّر على التحديثات كل ما تفتحه، ولما ينزل إصدار جديد هتظهرلك فقاعة <strong>«تحديث جديد»</strong> فيها كل الجديد.';
+      return;
+    }
     if (IS_BETA) {
       status.textContent = 'هذه نسخة تجريبية للمعاينة فقط. بعد موافقتك سيصل التحديث للتطبيق الأصلي مع خيار التحديث أو البقاء.';
       document.getElementById('btnCheckUpdate').classList.add('hidden');
@@ -2666,6 +3948,7 @@
   }
 
   async function checkForUpdatesManual() {
+    if (IN_APP) { checkAppUpdate(true); return; }
     if (!('serviceWorker' in navigator)) { showAppToast('التحديثات غير متاحة في هذا الوضع'); return; }
     const btn = document.getElementById('btnCheckUpdate');
     btn.disabled = true;
@@ -2716,7 +3999,80 @@
     });
   }
 
+  /* =========================================================
+     تحديثات تطبيق أندرويد: فقاعة «تحديث جديد» + تحميل وتثبيت مباشر
+     ========================================================= */
+  let appUpdate = null;
+  let lastAppCheck = 0;
+  function appVersion() { try { return IN_APP ? String(window.HesabatyApp.versionName()) : APP_VERSION; } catch (e) { return APP_VERSION; } }
+  function parseReleaseNotes(body) {
+    return String(body || '').split(/\r?\n/).map(l => l.trim()).filter(l => /^[-*•]\s+/.test(l)).map(l => l.replace(/^[-*•]\s+/, '')).filter(Boolean).slice(0, 10);
+  }
+  async function checkAppUpdate(fromUser) {
+    lastAppCheck = Date.now();
+    try {
+      const res = await fetch(RELEASES_API, { cache: 'no-store', headers: { Accept: 'application/vnd.github+json' } });
+      if (!res.ok) throw new Error('http ' + res.status);
+      const rel = await res.json();
+      const version = String(rel.tag_name || '').replace(/^v/i, '');
+      const assets = Array.isArray(rel.assets) ? rel.assets : [];
+      const apk = assets.find(a => a.name === 'hesabaty.apk') || assets.find(a => /\.apk$/i.test(a.name || ''));
+      if (!apk || !version || cmpVer(version, appVersion()) <= 0) {
+        appUpdate = null;
+        renderAppUpdate();
+        if (fromUser) showAppToast('✔️ أنت تستخدم أحدث إصدار');
+        return;
+      }
+      appUpdate = { version, url: apk.browser_download_url, size: apk.size || 0, notes: parseReleaseNotes(rel.body) };
+      renderAppUpdate();
+      if (fromUser) openAppUpdateSheet();
+    } catch (e) {
+      if (fromUser) showAppToast('⚠️ تعذر التحقق من التحديثات — تأكد من الإنترنت');
+    }
+  }
+  function renderAppUpdate() {
+    const b = document.getElementById('updBubble');
+    b.classList.toggle('hidden', !appUpdate);
+    if (appUpdate) document.getElementById('updBubbleVer').textContent = `الإصدار ${appUpdate.version} · اضغط للتفاصيل`;
+    renderUpdateUI();
+  }
+  function openAppUpdateSheet() {
+    if (!appUpdate) return;
+    document.getElementById('appUpdTitle').textContent = `الإصدار ${appUpdate.version} جاهز`;
+    const mb = appUpdate.size ? ` · حجمه ${(appUpdate.size / 1048576).toFixed(1)} ميجا` : '';
+    document.getElementById('appUpdSub').textContent = `إنت دلوقتي على الإصدار ${appVersion()}${mb}`;
+    const notes = appUpdate.notes.length ? appUpdate.notes : ['تحسينات وإصلاحات عامة'];
+    document.getElementById('appUpdNotes').innerHTML = notes.map(n => `<li>${esc(n)}</li>`).join('');
+    openOverlay('appUpd');
+  }
+  function startAppUpdate() {
+    if (!appUpdate) return;
+    if (!IN_APP) { window.location.href = appUpdate.url; return; }
+    document.getElementById('appUpdProgressBox').classList.remove('hidden');
+    document.getElementById('appUpdBtn').disabled = true;
+    window.onAppUpdateProgress(0, 'start');
+    try { window.HesabatyApp.downloadUpdate(appUpdate.url, appUpdate.version); }
+    catch (e) { window.HesabatyApp.openExternal(appUpdate.url); }
+  }
+  // يستدعيها تطبيق أندرويد أثناء التحميل
+  window.onAppUpdateProgress = function (pct, state) {
+    const bar = document.getElementById('appUpdBar');
+    const txt = document.getElementById('appUpdState');
+    const btn = document.getElementById('appUpdBtn');
+    document.getElementById('appUpdProgressBox').classList.remove('hidden');
+    bar.style.width = Math.max(0, Math.min(100, Number(pct) || 0)) + '%';
+    if (state === 'start') txt.textContent = 'بيبدأ التحميل...';
+    else if (state === 'progress') txt.textContent = `جاري التحميل ${Math.round(pct)}%`;
+    else if (state === 'install') { txt.textContent = 'تم التحميل ✓ — اضغط «تثبيت» في الشاشة اللي ظهرت'; btn.disabled = false; btn.innerHTML = `${icon('download')} تثبيت التحديث`; }
+    else if (state === 'permission') { txt.textContent = 'فعّل «السماح من هذا المصدر» لتطبيق حساباتي، وارجع للتطبيق والتحميل هيكمل لوحده'; btn.disabled = false; }
+    else if (state === 'failed') { txt.textContent = 'التحميل وقف — تأكد من الإنترنت وجرب تاني'; btn.disabled = false; }
+  };
+  // يستدعيها التطبيق كل ما ترجع له
+  window.onAppResume = function () { if (Date.now() - lastAppCheck > 20 * 60 * 1000) checkAppUpdate(false); };
+
   function initServiceWorker() {
+    if (IN_APP) { console.info('HESABATY_READY ' + APP_VERSION + ' app=' + appVersion()); setTimeout(() => checkAppUpdate(false), 1500); renderUpdateUI(); return; }
+    document.getElementById('apkCard').classList.remove('hidden');
     if (IS_BETA || !('serviceWorker' in navigator)) { renderUpdateUI(); return; }
     navigator.serviceWorker.addEventListener('message', e => {
       if (e.data && e.data.type === 'VERSION_AVAILABLE') evaluateUpdate(false);
