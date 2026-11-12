@@ -5,7 +5,15 @@ APK="$(ls apk/*.apk | head -1)"
 adb install -r "$APK" || exit 1
 adb logcat -c || true
 adb shell am start -W -n com.ahmedhassan.hesabaty/.MainActivity
-sleep 25
+# انتظار تحميل الصفحة (حتى 90 ثانية — أول تشغيل للمحاكي ممكن يكون بطيء)
+for i in $(seq 1 45); do
+  sleep 2
+  adb logcat -d > logcat.txt || true
+  grep -q "HESABATY_READY" logcat.txt && break
+  # بعد 40 ثانية من غير ما الصفحة تظهر: إعادة فتح التطبيق مرة واحدة
+  if [ "$i" = "20" ]; then adb shell am force-stop com.ahmedhassan.hesabaty; adb shell am start -W -n com.ahmedhassan.hesabaty/.MainActivity; fi
+done
+sleep 3
 adb logcat -d > logcat.txt || true
 adb exec-out screencap -p > screen.png || true
 PID="$(adb shell pidof com.ahmedhassan.hesabaty | tr -d '\r' || true)"
