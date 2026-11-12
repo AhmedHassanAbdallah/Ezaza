@@ -14,6 +14,14 @@
   <link rel="manifest" href="../manifest.json">
   <link rel="icon" type="image/png" href="../icons/icon-192.png">
   <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <script>
+    // تطبيق المظهر المحفوظ قبل ظهور الصفحة (بدون وميض)
+    try {
+      var _k = (/\/beta\//.test(location.pathname) ? 'beta_' : '') + 'hesabaty_settings_v1';
+      var _t = (JSON.parse(localStorage.getItem(_k) || '{}') || {}).theme;
+      if (_t === 'dark' || _t === 'light') document.documentElement.setAttribute('data-theme', _t);
+    } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -61,8 +69,9 @@
       --p-cell-pad-h: 6px;
       --p-logo-height: 58px;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
+    :root[data-theme="light"] { color-scheme: light; }
+    /* الوضع الليلي: تلقائي حسب الموبايل، أو يختاره المستخدم من «المزيد» */
+    :root[data-theme="dark"] {
         --bg: #071226;
         --surface: #0f1f38;
         --surface-2: #142847;
@@ -76,6 +85,24 @@
         --danger-soft: #3d1a1d;
         --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
         --shadow-md: 0 6px 20px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #071226;
+        --surface: #0f1f38;
+        --surface-2: #142847;
+        --border: #223a5e;
+        --text: #e9eff8;
+        --muted: #9db0cb;
+        --primary: #7fa7e6;
+        --primary-soft: #18315a;
+        --accent-soft: #3a2413;
+        --success-soft: #0f3529;
+        --danger-soft: #3d1a1d;
+        --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
+        --shadow-md: 0 6px 20px rgba(0,0,0,.35);
+        color-scheme: dark;
       }
     }
 
@@ -145,7 +172,8 @@
     .card-title .t-ic.orange { background: var(--accent-soft); color: var(--accent); }
     .card-title h2 { font-size: 1rem; font-weight: 800; flex: 1; }
     .card-title .tag { font-size: .75rem; font-weight: 700; background: var(--accent-soft); color: var(--orange-600); padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
-    @media (prefers-color-scheme: dark) { .card-title .tag { color: var(--orange-400); } }
+    :root[data-theme="dark"] .card-title .tag { color: var(--orange-400); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .card-title .tag { color: var(--orange-400); } }
 
     .field { margin-bottom: 12px; min-width: 0; }
     .field label { display: block; font-size: .8rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
@@ -170,7 +198,8 @@
     .note strong { color: var(--primary); font-weight: 800; }
     .note.orange { background: var(--accent-soft); }
     .note.orange strong { color: var(--orange-600); }
-    @media (prefers-color-scheme: dark) { .note.orange strong { color: var(--orange-400); } }
+    :root[data-theme="dark"] .note.orange strong { color: var(--orange-400); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .note.orange strong { color: var(--orange-400); } }
 
     /* عدّاد + / - */
     .stepper { display: flex; align-items: stretch; height: 48px; border: 1.5px solid var(--border); border-radius: 13px; background: var(--surface-2); overflow: hidden; }
@@ -308,7 +337,8 @@
     .live-total { display: flex; justify-content: space-between; align-items: center; background: var(--accent-soft); border-radius: 14px; padding: 12px 14px; margin: 4px 0 12px; }
     .live-total span { font-size: .82rem; color: var(--muted); }
     .live-total strong { font-size: 1.15rem; font-weight: 900; color: var(--orange-600); }
-    @media (prefers-color-scheme: dark) { .live-total strong { color: var(--orange-400); } }
+    :root[data-theme="dark"] .live-total strong { color: var(--orange-400); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .live-total strong { color: var(--orange-400); } }
     .extra-row { display: grid; grid-template-columns: 1.6fr .8fr .9fr 40px; gap: 6px; margin-bottom: 8px; align-items: center; }
     .extra-row input { height: 44px; padding: 0 10px; font-size: .9rem; }
     .action-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 12px; border: 0; background: var(--surface-2); border-radius: 14px; font-weight: 800; font-size: .95rem; text-align: right; color: var(--text); }
@@ -548,6 +578,7 @@
       <h1 id="headerTitle">بيانات الفاتورة</h1>
       <div class="sub" id="headerSub">—</div>
     </div>
+    <button type="button" class="icon-btn" id="themeBtn" onclick="toggleTheme()" aria-label="تبديل الوضع الليلي والفاتح"><i data-icon="moon"></i></button>
     <button type="button" class="icon-btn accent" onclick="openActions()" aria-label="الفاتورة والمشاركة"><i data-icon="share"></i></button>
   </header>
 
@@ -752,6 +783,16 @@
           <input type="file" id="logoInputFile" accept="image/*" class="hidden" onchange="uploadLogoFile(event)">
         </div>
         <label class="switch"><span>إظهار اللوجو أعلى الفاتورة</span><input type="checkbox" id="showLogoCheck" onchange="saveInvoiceMeta()"></label>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="t-ic"><i data-icon="moon"></i></div><h2>المظهر</h2><span class="tag" id="themeTag">تلقائي</span></div>
+        <div class="segmented" style="grid-template-columns:repeat(3,1fr);margin-bottom:8px" role="radiogroup" aria-label="المظهر">
+          <button type="button" id="themeAuto" role="radio" onclick="setTheme('auto')">تلقائي</button>
+          <button type="button" id="themeLight" role="radio" onclick="setTheme('light')">فاتح</button>
+          <button type="button" id="themeDark" role="radio" onclick="setTheme('dark')">ليلي</button>
+        </div>
+        <div class="hint" style="margin:0">«تلقائي» يمشي مع إعداد الموبايل. تقدر كمان تبدّل بسرعة من زرار القمر/الشمس فوق.</div>
       </div>
 
       <div class="card">
@@ -1142,6 +1183,35 @@
     const sel = document.getElementById('currencySelect');
     if (sel) sel.value = c.code;
   }
+  // المظهر: تلقائي (حسب الموبايل) / فاتح / ليلي
+  const darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function themeMode() { return settings.theme === 'dark' || settings.theme === 'light' ? settings.theme : 'auto'; }
+  function isDarkNow() { const m = themeMode(); return m === 'dark' || (m === 'auto' && !!(darkQuery && darkQuery.matches)); }
+  function applyTheme() {
+    const m = themeMode();
+    if (m === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', m);
+    const dark = isDarkNow();
+    const btn = document.getElementById('themeBtn');
+    if (btn) { btn.innerHTML = icon(dark ? 'sun' : 'moon'); btn.setAttribute('aria-label', dark ? 'التبديل للوضع الفاتح' : 'التبديل للوضع الليلي'); }
+    [['auto', 'themeAuto'], ['light', 'themeLight'], ['dark', 'themeDark']].forEach(([k, id]) => {
+      const b = document.getElementById(id);
+      if (b) { b.classList.toggle('on', m === k); b.setAttribute('aria-checked', m === k ? 'true' : 'false'); }
+    });
+    const tag = document.getElementById('themeTag');
+    if (tag) tag.textContent = m === 'auto' ? `تلقائي (${dark ? 'ليلي' : 'فاتح'})` : (m === 'dark' ? 'ليلي' : 'فاتح');
+  }
+  function setTheme(mode) {
+    settings.theme = mode === 'dark' || mode === 'light' ? mode : 'auto';
+    saveSettings();
+    applyTheme();
+  }
+  function toggleTheme() {
+    setTheme(isDarkNow() ? 'light' : 'dark');
+    showAppToast(isDarkNow() ? '🌙 الوضع الليلي' : '☀️ الوضع الفاتح');
+  }
+  if (darkQuery) { try { darkQuery.addEventListener('change', applyTheme); } catch (e) { try { darkQuery.addListener(applyTheme); } catch (e2) {} } }
+
   function setCurrency(code) {
     if (!CURRENCIES.some(c => c.code === code)) return;
     settings.currency = code;
@@ -1215,7 +1285,9 @@
     cash: '<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 10v4M18 10v4"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
     layers: '<path d="M12 2l10 5-10 5L2 7z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
-    list: '<path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>'
+    list: '<path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
   };
   function icon(name) { return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`; }
   function hydrateIcons(root = document) {
@@ -1442,6 +1514,7 @@
     }
     loadSettings();
     applyCurrency();
+    applyTheme();
     loadCustomers();
     loadMatLists();
     if (saved) { try { loadFromParsed(JSON.parse(saved)); } catch (e) {} }
@@ -3673,7 +3746,7 @@
             });
             saveMatLists();
           }
-          if (imported.settings && typeof imported.settings === 'object') { settings = Object.assign(settings, imported.settings); saveSettings(); }
+          if (imported.settings && typeof imported.settings === 'object') { settings = Object.assign(settings, imported.settings); saveSettings(); applyCurrency(); applyTheme(); }
           afterLedgerChange();
           showAppToast('✔️ تم استعادة النسخة الاحتياطية بنجاح.');
         });
