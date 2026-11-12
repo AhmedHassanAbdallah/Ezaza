@@ -35,8 +35,10 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -262,6 +264,14 @@ public class MainActivity extends Activity {
        اختيار الملفات (اللوجو + استعادة النسخة الاحتياطية)
        ------------------------------------------------------------------ */
     private class AppChromeClient extends WebChromeClient {
+        /** رسائل الصفحة في سجل أندرويد (لاختبار التشغيل وتتبع الأخطاء) */
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage m) {
+            int level = m.messageLevel() == ConsoleMessage.MessageLevel.ERROR ? Log.ERROR : Log.INFO;
+            Log.println(level, "HesabatyWeb", m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")");
+            return true;
+        }
+
         @Override
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
             if (filePathCallback != null) filePathCallback.onReceiveValue(null);

@@ -10,7 +10,7 @@ adb logcat -d > logcat.txt || true
 adb exec-out screencap -p > screen.png || true
 PID="$(adb shell pidof com.ahmedhassan.hesabaty | tr -d '\r' || true)"
 echo "pid=$PID"
-grep -E "HESABATY|CONSOLE|Uncaught|FATAL EXCEPTION|AndroidRuntime" logcat.txt | head -60 || true
+grep -E "HesabatyWeb|HESABATY|CONSOLE|Uncaught|FATAL EXCEPTION|AndroidRuntime" logcat.txt | head -60 || true
 [ -n "$PID" ] || { echo "::error::التطبيق مش شغال"; exit 1; }
 grep -q "HESABATY_READY" logcat.txt || { echo "::error::صفحة التطبيق ما اتحملتش"; exit 1; }
 if grep -q "Uncaught" logcat.txt; then echo "::error::خطأ JavaScript"; exit 1; fi
