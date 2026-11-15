@@ -274,6 +274,10 @@
     .inv-info .m { font-size: .76rem; color: var(--muted); }
     .inv-amount { text-align: left; font-weight: 900; color: var(--primary); white-space: nowrap; font-size: .92rem; }
     .inv-amount small { display: block; font-size: .68rem; color: var(--muted); font-weight: 700; }
+    #appConfirmText { white-space: pre-line; }
+    .card-del { width: 36px; height: 36px; flex-shrink: 0; border: 0; border-radius: 11px; background: var(--danger-soft); color: var(--danger); display: grid; place-items: center; cursor: pointer; padding: 0; margin-inline-start: -2px; }
+    .card-del svg { width: 18px; height: 18px; }
+    .card-del:active { transform: scale(.92); }
     .badge-now { font-size: .66rem; background: var(--accent); color: #fff; border-radius: 99px; padding: 1px 8px; margin-inline-start: 6px; vertical-align: middle; }
 
     /* المزيد */
@@ -672,7 +676,7 @@
 <body>
 
 <div id="editorApp">
-  <div class="beta-bar hidden" id="betaBar">نسخة تجريبية للواجهة الجديدة 2.4.0 — شغالة على نسخة من بياناتك، وتطبيقك الأصلي لن يتأثر</div>
+  <div class="beta-bar hidden" id="betaBar">نسخة تجريبية 2.4.1 (زرار حذف للفواتير والكشوفات) — شغالة على نسخة من بياناتك، وتطبيقك الأصلي لن يتأثر</div>
   <!-- رأس الأقسام الرئيسية -->
   <header class="app-header tab-only" id="tabHeader">
     <img class="brand-ic" src="./icons/icon-192.png" alt="">
@@ -1331,7 +1335,7 @@
      تصميم وتطوير: أحمد حسن عبدالله  |  واتساب: +201015421255
      © 2026 أحمد حسن عبدالله - جميع الحقوق محفوظة.
      ========================================================= */
-  const APP_VERSION = '2.4.0';
+  const APP_VERSION = '2.4.1';
   // النسخة التجريبية (/beta/) تعمل على نسخة مستقلة من البيانات ولا تلمس بيانات التطبيق الأصلي
   const IS_BETA = /\/beta\//.test(location.pathname);
   const KEY_PREFIX = IS_BETA ? 'beta_' : '';
@@ -1859,21 +1863,26 @@
     if (goPricing) { openEditor('pricing'); showAppToast('✔️ تم إنشاء فاتورة جديدة'); }
   }
 
-  function deleteCurrentInvoice() {
-    if (appData.invoices.length <= 1) {
-      showAppConfirm('تصفير الفاتورة الحالية؟', () => { appData.invoices = []; createNewInvoice(false); renderInvoiceList(); });
-      return;
-    }
-    const inv = getCurrentInvoice();
-    showAppConfirm(`هل أنت متأكد من حذف فاتورة "${inv.clientName}" نهائياً؟`, () => {
-      appData.invoices = appData.invoices.filter(i => i.id !== appData.currentId);
-      appData.currentId = appData.invoices[0].id;
+  function deleteCurrentInvoice() { deleteInvoice(appData.currentId, true); }
+  function deleteInvoice(id, fromEditor = false) {
+    const inv = appData.invoices.find(i => i.id === id);
+    if (!inv) return;
+    const holder = inv.customerId ? getCustomer(inv.customerId) : null;
+    const extra = holder ? `\nالفاتورة مربوطة بنوتة "${holder.name}"، وهتتشال من حسابه (الدفعات المسجلة في النوتة هتفضل زي ما هي).` : '';
+    showAppConfirm(`حذف فاتورة "${inv.clientName}" نهائياً؟${extra}`, () => {
+      appData.invoices = appData.invoices.filter(i => i.id !== id);
       editingRoomIndex = null;
-      saveToStorage();
-      renderAll();
-      renderInvoiceList();
-      showAppToast('تم حذف الفاتورة');
-      exitEditor();
+      if (!appData.invoices.length) createNewInvoice(false);
+      else if (appData.currentId === id) appData.currentId = appData.invoices[0].id;
+      const done = () => {
+        saveToStorage();
+        saveCustomers();
+        renderAll();
+        renderInvoiceList();
+        if (currentCustomerId) renderCustomerPage();
+        showAppToast('تم حذف الفاتورة');
+      };
+      if (fromEditor) { done(); exitEditor(); } else done();
     });
   }
 
@@ -2419,9 +2428,13 @@
             <div class="m">${esc(inv.date || '')}${inv.clientPhone ? ' · <span dir="ltr">' + esc(inv.clientPhone) + '</span>' : ''} · ${invoiceMeta(inv, t)}</div>
           </div>
           ${amt}
+          <button type="button" class="card-del" data-del="${esc(inv.id)}" aria-label="حذف الفاتورة" title="حذف الفاتورة">${icon('trash')}</button>
         </div>`;
   }
-  function bindInvoiceCards(box) { box.querySelectorAll('.inv-card').forEach(el => { el.onclick = () => openInvoice(el.dataset.id); }); }
+  function bindInvoiceCards(box) {
+    box.querySelectorAll('.inv-card').forEach(el => { el.onclick = () => openInvoice(el.dataset.id); });
+    box.querySelectorAll('.card-del').forEach(b => { b.onclick = e => { e.stopPropagation(); deleteInvoice(b.dataset.del); }; });
+  }
 
   function renderInvoiceList() {
     const q = (document.getElementById('invoiceSearch').value || '').trim();
@@ -3484,9 +3497,11 @@
           <div class="inv-avatar" style="background:linear-gradient(135deg,var(--orange-400),var(--orange-600))">${icon('box')}</div>
           <div class="inv-info"><div class="n">${esc(matListName(l))}</div><div class="m">${esc(fmtDate(l.date))} · ${st.count} صنف · ${buyer}</div></div>
           ${amt}
+          <button type="button" class="card-del" data-del="${esc(l.id)}" aria-label="حذف الكشف" title="حذف الكشف">${icon('trash')}</button>
         </div>`;
     }).join('');
     box.querySelectorAll('.inv-card').forEach(el => { el.onclick = () => openMatList(el.dataset.id); });
+    box.querySelectorAll('.card-del').forEach(b => { b.onclick = e => { e.stopPropagation(); deleteMatList(b.dataset.del); }; });
   }
 
   function createMatList(customerId) {
@@ -3771,8 +3786,9 @@
     if (led.sum > 0 && led.holder) showAppConfirm(`فك الربط هيشيل خامات الكشف (${fmt(led.sum)} ${CUR}) من نوتة "${led.holder.name}". متابعة؟`, apply);
     else apply();
   }
-  function deleteMatList() {
-    const l = curMatList();
+  function deleteMatList(id) {
+    const fromPage = !id;
+    const l = id ? getMatList(id) : curMatList();
     if (!l) return;
     const led = matListLedgerAmount(l);
     const extra = led.sum > 0 && led.holder ? ` وهتتشال خاماته (${fmt(led.sum)} ${CUR}) من نوتة "${led.holder.name}"` : '';
@@ -3783,7 +3799,8 @@
       saveMatLists();
       saveCustomers();
       saveToStorage();
-      closeTopThen(() => { renderAll(); showAppToast('تم حذف الكشف'); });
+      const done = () => { renderAll(); renderMatLists(); renderInvoiceList(); if (currentCustomerId) renderCustomerPage(); showAppToast('تم حذف الكشف'); };
+      if (fromPage) closeTopThen(done); else done();
     });
   }
 
